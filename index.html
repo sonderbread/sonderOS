@@ -436,6 +436,7 @@ The scrubber will automatically detect and parse your format!"></textarea>
         <div class="action-buttons" id="actionButtons" style="display: none;">
             <button class="btn" onclick="clearSession()">Clear Session</button>
             <button class="btn" onclick="exportData()">Export Data</button>
+            <button class="btn" onclick="clearSavedData()">Clear Saved Data</button>
         </div>
 
         <div class="log-section">
@@ -460,15 +461,60 @@ The scrubber will automatically detect and parse your format!"></textarea>
         let scrubberActive = false;
         let sessionActive = false;
 
-        function logActivity(message, type = 'info') {
-            const timestamp = new Date().toLocaleTimeString();
-            const logEntry = `[${timestamp}] ${message}`;
-            
-            activityLog.unshift({ message: logEntry, type });
-            if (activityLog.length > 100) {
-                activityLog = activityLog.slice(0, 100);
+        // Auto-save functionality
+        function saveState() {
+            const state = {
+                materials: materials,
+                activityLog: activityLog,
+                sessionActive: sessionActive,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('sonderOS_state', JSON.stringify(state));
+        }
+
+        function loadState() {
+            try {
+                const savedState = localStorage.getItem('sonderOS_state');
+                if (savedState) {
+                    const state = JSON.parse(savedState);
+                    
+                    materials = state.materials || [];
+                    activityLog = state.activityLog || [];
+                    sessionActive = state.sessionActive || false;
+                    
+                    if (materials.length > 0 && sessionActive) {
+                        // Restore UI to active session state
+                        document.getElementById('inputSection').style.display = 'none';
+                        document.getElementById('statsSection').style.display = 'grid';
+                        document.getElementById('materialsSection').style.display = 'block';
+                        document.getElementById('actionButtons').style.display = 'flex';
+                        document.getElementById('confirmBtn').disabled = false;
+                        document.getElementById('scrubber-text').textContent = 'SCRUB COMPLETE';
+                        
+                        renderMaterials();
+                        updateStats();
+                        renderActivityLog();
+                        
+                        const savedTime = new Date(state.timestamp).toLocaleString();
+                        logActivity(`Previous session restored from ${savedTime}`, 'success');
+                        logActivity(`Restored ${materials.length} materials with ongoing allocations`, 'info');
+                        
+                        return true;
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading saved state:', e);
+                localStorage.removeItem('sonderOS_state');
             }
-            
+            return false;
+        }
+
+        function clearSavedState() {
+            localStorage.removeItem('sonderOS_state');
+            logActivity('Saved browser data cleared', 'info');
+        }
+
+        function renderActivityLog() {
             const logContainer = document.getElementById('activityLog');
             logContainer.innerHTML = '';
             
@@ -478,6 +524,23 @@ The scrubber will automatically detect and parse your format!"></textarea>
                 logDiv.textContent = entry.message;
                 logContainer.appendChild(logDiv);
             });
+        }
+
+        function logActivity(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            
+            activityLog.unshift({ message: logEntry, type });
+            if (activityLog.length > 100) {
+                activityLog = activityLog.slice(0, 100);
+            }
+            
+            renderActivityLog();
+            
+            // Auto-save state after logging activity
+            if (sessionActive) {
+                saveState();
+            }
         }
 
         function runDataScrubber() {
@@ -533,6 +596,9 @@ The scrubber will automatically detect and parse your format!"></textarea>
                         
                         // Hide input section
                         document.getElementById('inputSection').style.display = 'none';
+                        
+                        // Save initial state
+                        saveState();
                         
                     } else {
                         scrubberText.textContent = 'SCRUB FAILED';
@@ -800,6 +866,9 @@ The scrubber will automatically detect and parse your format!"></textarea>
             renderMaterials();
             updateStats();
             
+            // Auto-save state after allocation
+            saveState();
+            
             // Check if material is complete
             if (material.needed <= 0) {
                 logActivity(`✓ ${material.name} COMPLETE (${material.allocated}/${material.original})`, 'success');
@@ -850,6 +919,9 @@ The scrubber will automatically detect and parse your format!"></textarea>
             materials = [];
             sessionActive = false;
             
+            // Clear saved state
+            clearSavedState();
+            
             // Reset UI
             document.getElementById('commoditiesPaste').value = '';
             document.getElementById('inputSection').style.display = 'block';
@@ -865,6 +937,13 @@ The scrubber will automatically detect and parse your format!"></textarea>
             scrubberActive = false;
             
             logActivity('Session cleared - ready for new commodities list', 'info');
+        }
+
+        function clearSavedData() {
+            if (confirm('Clear all saved browser data?\n\nThis will permanently remove your saved session and activity log from this browser.')) {
+                clearSavedState();
+                logActivity('All saved browser data has been cleared', 'success');
+            }
         }
 
         function exportData() {
@@ -893,7 +972,12 @@ The scrubber will automatically detect and parse your format!"></textarea>
 
         // Initialize
         logActivity('SonderOS Materials Management System initialized', 'info');
-        logActivity('Ready to receive commodities list for scrubbing', 'info');
+        
+        // Try to restore previous session
+        const restored = loadState();
+        if (!restored) {
+            logActivity('Ready to receive commodities list for scrubbing', 'info');
+        }
     </script>
 </body>
 </html>
