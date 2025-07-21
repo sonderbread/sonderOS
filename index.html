@@ -580,6 +580,9 @@ The scrubber will automatically detect and parse your format!"></textarea>
                         materials = parsedMaterials;
                         sessionActive = true;
                         
+                        // Save state immediately after parsing completes
+                        saveState();
+                        
                         scrubberText.textContent = 'SCRUB COMPLETE';
                         scrubberBtn.classList.remove('active');
                         
@@ -593,12 +596,10 @@ The scrubber will automatically detect and parse your format!"></textarea>
                         updateStats();
                         
                         logActivity(`Successfully parsed ${materials.length} materials from input`, 'success');
+                        logActivity(`Session auto-saved to browser storage`, 'info');
                         
                         // Hide input section
                         document.getElementById('inputSection').style.display = 'none';
-                        
-                        // Save initial state
-                        saveState();
                         
                     } else {
                         scrubberText.textContent = 'SCRUB FAILED';
