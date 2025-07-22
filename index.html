@@ -466,11 +466,14 @@ The scrubber will automatically detect and parse your format!"></textarea>
             <div class="sample-format">
                 <strong>Auto-detected formats:</strong><br>
                 • <strong>Discord Tickets</strong> - Full ticket paste with ITEMS section<br>
-                • Material Name: Quantity<br>
-                • Material Name, Quantity<br>
-                • Material Name - Quantity<br>
-                • Material Name | Quantity<br>
-                • Material Name [tab] Quantity
+                • Material Name: Quantity <em>or</em> Quantity: Material Name<br>
+                • Material Name, Quantity <em>or</em> Quantity, Material Name<br>
+                • Material Name - Quantity <em>or</em> Quantity - Material Name<br>
+                • Material Name | Quantity <em>or</em> Quantity | Material Name<br>
+                • Material Name [tab] Quantity <em>or</em> Quantity [tab] Material Name<br>
+                <br><strong>Quantity formats supported:</strong><br>
+                • Plain numbers: 784, 1,250<br>
+                • With tons suffix: 784t, 784T, 784 tons, 784 Tons
             </div>
         </div>
 
@@ -734,45 +737,136 @@ The scrubber will automatically detect and parse your format!"></textarea>
             for (const line of lines) {
                 // Try different separator patterns
                 let match = null;
+                let name = '';
+                let quantity = 0;
                 
-                // Pattern 1: Name: Quantity
-                match = line.match(/^(.+?):\s*(\d+)$/);
-                if (!match) {
-                    // Pattern 2: Name, Quantity
-                    match = line.match(/^(.+?),\s*(\d+)$/);
-                }
-                if (!match) {
-                    // Pattern 3: Name - Quantity
-                    match = line.match(/^(.+?)\s*-\s*(\d+)$/);
-                }
-                if (!match) {
-                    // Pattern 4: Name | Quantity (2-column only)
-                    match = line.match(/^(.+?)\s*\|\s*(\d+)$/);
-                }
-                if (!match) {
-                    // Pattern 5: Name [tab] Quantity
-                    match = line.match(/^(.+?)\t+(\d+)$/);
-                }
-                if (!match) {
-                    // Pattern 6: Name [multiple spaces] Quantity
-                    match = line.match(/^(.+?)\s{2,}(\d+)$/);
+                // Helper function to extract quantity from string with optional t/tons suffix
+                function parseQuantity(quantityStr) {
+                    const cleanStr = quantityStr.replace(/,/g, ''); // Remove commas
+                    const quantityMatch = cleanStr.match(/^(\d+)(?:\s*[tT](?:ons?)?)?$/);
+                    return quantityMatch ? parseInt(quantityMatch[1]) : 0;
                 }
                 
+                // Pattern 1: Name: Quantity (with optional t/tons)
+                match = line.match(/^(.+?):\s*(\d+(?:,\d{3})*(?:\s*[tT](?:ons?)?)?)$/);
                 if (match) {
-                    const name = match[1].trim();
-                    const quantity = parseInt(match[2]);
-                    
-                    if (name && quantity > 0) {
-                        parsedMaterials.push({
-                            id: id++,
-                            name: name,
-                            needed: quantity,
-                            original: quantity,
-                            allocated: 0
-                        });
-                        
-                        logActivity(`Parsed: ${name} (${quantity} needed)`, 'info');
+                    name = match[1].trim();
+                    quantity = parseQuantity(match[2]);
+                } else {
+                    // Pattern 1b: Quantity: Name (reversed)
+                    match = line.match(/^(\d+(?:,\d{3})*(?:\s*[tT](?:ons?)?)?)\s*:\s*(.+)$/);
+                    if (match) {
+                        quantity = parseQuantity(match[1]);
+                        name = match[2].trim();
                     }
+                }
+                
+                if (!match) {
+                    // Pattern 2: Name, Quantity (with optional t/tons)
+                    match = line.match(/^(.+?),\s*(\d+(?:,\d{3})*(?:\s*[tT](?:ons?)?)?)$/);
+                    if (match) {
+                        name = match[1].trim();
+                        quantity = parseQuantity(match[2]);
+                    } else {
+                        // Pattern 2b: Quantity, Name (reversed)
+                        match = line.match(/^(\d+(?:,\d{3})*(?:\s*[tT](?:ons?)?)?)\s*,\s*(.+)$/);
+                        if (match) {
+                            quantity = parseQuantity(match[1]);
+                            name = match[2].trim();
+                        }
+                    }
+                }
+                
+                if (!match) {
+                    // Pattern 3: Name - Quantity (with optional t/tons)
+                    match = line.match(/^(.+?)\s*-\s*(\d+(?:,\d{3})*(?:\s*[tT](?:ons?)?)?)$/);
+                    if (match) {
+                        name = match[1].trim();
+                        quantity = parseQuantity(match[2]);
+                    } else {
+                        // Pattern 3b: Quantity - Name (reversed)
+                        match = line.match(/^(\d+(?:,\d{3})*(?:\s*[tT](?:ons?)?)?)\s*-\s*(.+)$/);
+                        if (match) {
+                            quantity = parseQuantity(match[1]);
+                            name = match[2].trim();
+                        }
+                    }
+                }
+                
+                if (!match) {
+                    // Pattern 4: Name | Quantity (2-column only, with optional t/tons)
+                    match = line.match(/^(.+?)\s*\|\s*(\d+(?:,\d{3})*(?:\s*[tT](?:ons?)?)?)$/);
+                    if (match) {
+                        name = match[1].trim();
+                        quantity = parseQuantity(match[2]);
+                    } else {
+                        // Pattern 4b: Quantity | Name (reversed)
+                        match = line.match(/^(\d+(?:,\d{3})*(?:\s*[tT](?:ons?)?)?)\s*\|\s*(.+)$/);
+                        if (match) {
+                            quantity = parseQuantity(match[1]);
+                            name = match[2].trim();
+                        }
+                    }
+                }
+                
+                if (!match) {
+                    // Pattern 5: Name [tab] Quantity (with optional t/tons)
+                    match = line.match(/^(.+?)\t+(\d+(?:,\d{3})*(?:\s*[tT](?:ons?)?)?)$/);
+                    if (match) {
+                        name = match[1].trim();
+                        quantity = parseQuantity(match[2]);
+                    } else {
+                        // Pattern 5b: Quantity [tab] Name (reversed)
+                        match = line.match(/^(\d+(?:,\d{3})*(?:\s*[tT](?:ons?)?)?)\t+(.+)$/);
+                        if (match) {
+                            quantity = parseQuantity(match[1]);
+                            name = match[2].trim();
+                        }
+                    }
+                }
+                
+                if (!match) {
+                    // Pattern 6: Name [multiple spaces] Quantity (with optional t/tons)
+                    match = line.match(/^(.+?)\s{2,}(\d+(?:,\d{3})*(?:\s*[tT](?:ons?)?)?)$/);
+                    if (match) {
+                        name = match[1].trim();
+                        quantity = parseQuantity(match[2]);
+                    } else {
+                        // Pattern 6b: Quantity [multiple spaces] Name (reversed)
+                        match = line.match(/^(\d+(?:,\d{3})*(?:\s*[tT](?:ons?)?)?)\s{2,}(.+)$/);
+                        if (match) {
+                            quantity = parseQuantity(match[1]);
+                            name = match[2].trim();
+                        }
+                    }
+                }
+                
+                if (!match) {
+                    // Pattern 7: Name [single space] Quantity (with optional t/tons)
+                    match = line.match(/^(.+?)\s+(\d+(?:,\d{3})*(?:\s*[tT](?:ons?)?)?)$/);
+                    if (match) {
+                        name = match[1].trim();
+                        quantity = parseQuantity(match[2]);
+                    } else {
+                        // Pattern 7b: Quantity [single space] Name (reversed) - THIS HANDLES "100t cmm composite"
+                        match = line.match(/^(\d+(?:,\d{3})*(?:\s*[tT](?:ons?)?)?)\s+(.+)$/);
+                        if (match) {
+                            quantity = parseQuantity(match[1]);
+                            name = match[2].trim();
+                        }
+                    }
+                }
+                
+                if (match && name && quantity > 0) {
+                    parsedMaterials.push({
+                        id: id++,
+                        name: name,
+                        needed: quantity,
+                        original: quantity,
+                        allocated: 0
+                    });
+                    
+                    logActivity(`Parsed: ${name} (${quantity} needed)`, 'info');
                 } else {
                     logActivity(`Warning: Could not parse line: "${line}"`, 'warning');
                 }
