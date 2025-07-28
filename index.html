@@ -597,7 +597,7 @@
     <div class="container">
         <div class="header">
             <h1>SonderOS Materials Management</h1>
-            <p>Enhanced Multi-Job Tracking System v3.1</p>
+            <p>Enhanced Multi-Job Tracking System v3.2</p>
         </div>
 
         <!-- Tab System -->
@@ -1214,6 +1214,27 @@ The scrubber will automatically detect and parse your format!"></textarea>
             }, 500);
         }
 
+        // Centralized quantity parsing function - strips ALL punctuation except 'k' suffix
+        function parseQuantity(quantityStr) {
+            if (!quantityStr) return 0;
+            
+            let cleanStr = quantityStr.toString().trim();
+            
+            // Handle 'k' or 'K' suffix (thousands) - check this BEFORE stripping punctuation
+            const kMatch = cleanStr.match(/(\d+(?:[,.]\d+)?)\s*[kK](?:\s*[tT](?:ons?)?)?/i);
+            if (kMatch) {
+                // Strip punctuation from the number part and multiply by 1000
+                const baseNumber = kMatch[1].replace(/[^\d]/g, '');
+                return parseInt(baseNumber) * 1000;
+            }
+            
+            // Strip ALL punctuation except digits (includes commas, periods, colons, pipes, etc.)
+            cleanStr = cleanStr.replace(/[^\d]/g, '');
+            
+            // Return parsed integer or 0 if invalid
+            return parseInt(cleanStr) || 0;
+        }
+
         function parseRawData(tabId, rawData) {
             // Check for Consolidated Contract format
             if (rawData.includes('ALL MATERIALS:') && rawData.includes('===')) {
@@ -1241,117 +1262,118 @@ The scrubber will automatically detect and parse your format!"></textarea>
                 let name = '';
                 let quantity = 0;
                 
-                // Helper function to extract quantity from string with optional suffixes
-                function parseQuantity(quantityStr) {
-                    let cleanStr = quantityStr.trim();
-                    
-                    // Remove commas and periods used as thousands separators
-                    cleanStr = cleanStr.replace(/[,.]/g, '');
-                    
-                    // Handle 'k' or 'K' suffix (thousands)
-                    const kMatch = cleanStr.match(/^(\d+)\s*[kK](?:\s*[tT](?:ons?)?)?$/);
-                    if (kMatch) {
-                        return parseInt(kMatch[1]) * 1000;
-                    }
-                    
-                    // Handle regular numbers with optional t/tons suffix
-                    const quantityMatch = cleanStr.match(/^(\d+)(?:\s*[tT](?:ons?)?)?$/);
-                    return quantityMatch ? parseInt(quantityMatch[1]) : 0;
-                }
-                
-                // Pattern matching logic (same as before)
-                match = line.match(/^(.+?):\s*([\d.,]+(?:\s*[kKtT](?:ons?)?)?)$/);
+                // Pattern matching logic using centralized parseQuantity
+                match = line.match(/^(.+?):\s*(.+)$/);
                 if (match) {
                     name = match[1].trim();
                     quantity = parseQuantity(match[2]);
                 } else {
-                    match = line.match(/^([\d.,]+(?:\s*[kKtT](?:ons?)?)?)\s*:\s*(.+)$/);
+                    match = line.match(/^(.+?)\s*:\s*(.+)$/);
                     if (match) {
-                        quantity = parseQuantity(match[1]);
-                        name = match[2].trim();
-                    }
-                }
-                
-                if (!match) {
-                    match = line.match(/^(.+?),\s*([\d.,]+(?:\s*[kKtT](?:ons?)?)?)$/);
-                    if (match) {
-                        name = match[1].trim();
-                        quantity = parseQuantity(match[2]);
-                    } else {
-                        match = line.match(/^([\d.,]+(?:\s*[kKtT](?:ons?)?)?)\s*,\s*(.+)$/);
-                        if (match) {
-                            quantity = parseQuantity(match[1]);
+                        // Try parsing first part as quantity, second as name
+                        const firstPart = parseQuantity(match[1]);
+                        if (firstPart > 0) {
+                            quantity = firstPart;
                             name = match[2].trim();
+                        } else {
+                            name = match[1].trim();
+                            quantity = parseQuantity(match[2]);
                         }
                     }
                 }
                 
                 if (!match) {
-                    match = line.match(/^(.+?)\s*-\s*([\d.,]+(?:\s*[kKtT](?:ons?)?)?)$/);
+                    match = line.match(/^(.+?),\s*(.+)$/);
                     if (match) {
                         name = match[1].trim();
                         quantity = parseQuantity(match[2]);
-                    } else {
-                        match = line.match(/^([\d.,]+(?:\s*[kKtT](?:ons?)?)?)\s*-\s*(.+)$/);
-                        if (match) {
-                            quantity = parseQuantity(match[1]);
-                            name = match[2].trim();
+                        // If first parse failed, try reverse
+                        if (quantity === 0) {
+                            const firstPart = parseQuantity(match[1]);
+                            if (firstPart > 0) {
+                                quantity = firstPart;
+                                name = match[2].trim();
+                            }
                         }
                     }
                 }
                 
                 if (!match) {
-                    match = line.match(/^(.+?)\s*\|\s*([\d.,]+(?:\s*[kKtT](?:ons?)?)?)$/);
+                    match = line.match(/^(.+?)\s*-\s*(.+)$/);
                     if (match) {
                         name = match[1].trim();
                         quantity = parseQuantity(match[2]);
-                    } else {
-                        match = line.match(/^([\d.,]+(?:\s*[kKtT](?:ons?)?)?)\s*\|\s*(.+)$/);
-                        if (match) {
-                            quantity = parseQuantity(match[1]);
-                            name = match[2].trim();
+                        // If first parse failed, try reverse
+                        if (quantity === 0) {
+                            const firstPart = parseQuantity(match[1]);
+                            if (firstPart > 0) {
+                                quantity = firstPart;
+                                name = match[2].trim();
+                            }
                         }
                     }
                 }
                 
                 if (!match) {
-                    match = line.match(/^(.+?)\t+([\d.,]+(?:\s*[kKtT](?:ons?)?)?)$/);
+                    match = line.match(/^(.+?)\s*\|\s*(.+)$/);
                     if (match) {
                         name = match[1].trim();
                         quantity = parseQuantity(match[2]);
-                    } else {
-                        match = line.match(/^([\d.,]+(?:\s*[kKtT](?:ons?)?)?)\t+(.+)$/);
-                        if (match) {
-                            quantity = parseQuantity(match[1]);
-                            name = match[2].trim();
+                        // If first parse failed, try reverse
+                        if (quantity === 0) {
+                            const firstPart = parseQuantity(match[1]);
+                            if (firstPart > 0) {
+                                quantity = firstPart;
+                                name = match[2].trim();
+                            }
                         }
                     }
                 }
                 
                 if (!match) {
-                    match = line.match(/^(.+?)\s{2,}([\d.,]+(?:\s*[kKtT](?:ons?)?)?)$/);
+                    match = line.match(/^(.+?)\t+(.+)$/);
                     if (match) {
                         name = match[1].trim();
                         quantity = parseQuantity(match[2]);
-                    } else {
-                        match = line.match(/^([\d.,]+(?:\s*[kKtT](?:ons?)?)?)\s{2,}(.+)$/);
-                        if (match) {
-                            quantity = parseQuantity(match[1]);
-                            name = match[2].trim();
+                        // If first parse failed, try reverse
+                        if (quantity === 0) {
+                            const firstPart = parseQuantity(match[1]);
+                            if (firstPart > 0) {
+                                quantity = firstPart;
+                                name = match[2].trim();
+                            }
                         }
                     }
                 }
                 
                 if (!match) {
-                    match = line.match(/^(.+?)\s+([\d.,]+(?:\s*[kKtT](?:ons?)?)?)$/);
+                    match = line.match(/^(.+?)\s{2,}(.+)$/);
                     if (match) {
                         name = match[1].trim();
                         quantity = parseQuantity(match[2]);
-                    } else {
-                        match = line.match(/^([\d.,]+(?:\s*[kKtT](?:ons?)?)?)\s+(.+)$/);
-                        if (match) {
-                            quantity = parseQuantity(match[1]);
-                            name = match[2].trim();
+                        // If first parse failed, try reverse
+                        if (quantity === 0) {
+                            const firstPart = parseQuantity(match[1]);
+                            if (firstPart > 0) {
+                                quantity = firstPart;
+                                name = match[2].trim();
+                            }
+                        }
+                    }
+                }
+                
+                if (!match) {
+                    match = line.match(/^(.+?)\s+(.+)$/);
+                    if (match) {
+                        name = match[1].trim();
+                        quantity = parseQuantity(match[2]);
+                        // If first parse failed, try reverse
+                        if (quantity === 0) {
+                            const firstPart = parseQuantity(match[1]);
+                            if (firstPart > 0) {
+                                quantity = firstPart;
+                                name = match[2].trim();
+                            }
                         }
                     }
                 }
@@ -1442,11 +1464,11 @@ The scrubber will automatically detect and parse your format!"></textarea>
                 }
                 
                 // Parse material lines (format: Material Name | Quantity)
-                const itemMatch = line.match(/^(.+?)\s*\|\s*([0-9,]+)$/);
+                const itemMatch = line.match(/^(.+?)\s*\|\s*(.+)$/);
                 
                 if (itemMatch) {
                     let name = itemMatch[1].trim();
-                    const quantity = parseInt(itemMatch[2].replace(/,/g, ''));
+                    const quantity = parseQuantity(itemMatch[2]);
                     
                     // Handle arrow notation (→) for alternative names
                     const arrowMatch = name.match(/^(.+?)\s*\(→(.+?)\)$/);
@@ -1498,12 +1520,12 @@ The scrubber will automatically detect and parse your format!"></textarea>
                     continue;
                 }
                 
-                const match = line.match(/^(.+?)\s*\|\s*([0-9,]+)\s*\|\s*([0-9,]+)$/);
+                const match = line.match(/^(.+?)\s*\|\s*(.+?)\s*\|\s*(.+)$/);
                 
                 if (match) {
                     const name = match[1].trim();
-                    const quantity = parseInt(match[2].replace(/,/g, ''));
-                    const price = parseInt(match[3].replace(/,/g, ''));
+                    const quantity = parseQuantity(match[2]);
+                    const price = parseQuantity(match[3]);
                     
                     if (name && quantity > 0) {
                         parsedMaterials.push({
@@ -1580,11 +1602,11 @@ The scrubber will automatically detect and parse your format!"></textarea>
                     continue;
                 }
                 
-                const itemMatch = line.match(/^(.+?)\s*\|\s*([0-9,]+)\s*\|\s*[\d,]+$/);
+                const itemMatch = line.match(/^(.+?)\s*\|\s*(.+?)\s*\|\s*(.+)$/);
                 
                 if (itemMatch) {
                     const name = itemMatch[1].trim();
-                    const quantity = parseInt(itemMatch[2].replace(/,/g, ''));
+                    const quantity = parseQuantity(itemMatch[2]);
                     
                     if (name && quantity > 0) {
                         parsedMaterials.push({
