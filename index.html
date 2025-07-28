@@ -11,78 +11,6 @@
             box-sizing: border-box;
         }
 
-        // Event Listener Setup
-        function setupTabEventListeners(tabId) {
-            console.log('Setting up event listeners for tab:', tabId);
-            
-            // Scrubber button
-            const scrubberBtn = document.getElementById(`scrubberBtn-${tabId}`);
-            if (scrubberBtn) {
-                scrubberBtn.addEventListener('click', () => {
-                    console.log('Scrubber button clicked for tab:', tabId);
-                    runDataScrubber(tabId);
-                });
-            } else {
-                console.warn('Scrubber button not found for tab:', tabId);
-            }
-            
-            // Finalize button
-            const confirmBtn = document.getElementById(`confirmBtn-${tabId}`);
-            if (confirmBtn) {
-                confirmBtn.addEventListener('click', () => finalizeSession(tabId));
-            }
-            
-            // Action buttons
-            const actionButtons = document.getElementById(`actionButtons-${tabId}`);
-            if (actionButtons) {
-                actionButtons.addEventListener('click', (e) => {
-                    if (e.target.textContent === 'Clear Session') {
-                        clearSession(tabId);
-                    } else if (e.target.textContent === 'Export Data') {
-                        exportData(tabId);
-                    }
-                });
-            }
-        }
-
-        // Setup material event listeners (called when materials are rendered)
-        function setupMaterialEventListeners(tabId) {
-            const grid = document.getElementById(`materialsGrid-${tabId}`);
-            if (!grid) return;
-            
-            // Use event delegation for material controls
-            grid.addEventListener('click', (e) => {
-                const action = e.target.getAttribute('data-action');
-                const materialId = parseInt(e.target.getAttribute('data-material-id'));
-                const targetTabId = parseInt(e.target.getAttribute('data-tab-id'));
-                
-                if (targetTabId !== tabId) return;
-                
-                if (action === 'cargo' && !e.target.disabled) {
-                    allocateCargoCapacity(tabId, materialId);
-                } else if (action === 'undo' && !e.target.disabled) {
-                    undoLastAllocation(tabId, materialId);
-                }
-            });
-            
-            // Handle enter key on inputs
-            grid.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && e.target.classList.contains('material-input')) {
-                    const materialId = parseInt(e.target.getAttribute('data-material-id'));
-                    const targetTabId = parseInt(e.target.getAttribute('data-tab-id'));
-                    
-                    if (targetTabId === tabId) {
-                        const quantity = parseInt(e.target.value) || 0;
-                        if (quantity > 0) {
-                            allocateMaterial(tabId, materialId, quantity);
-                            e.target.value = '0';
-                            e.target.focus();
-                        }
-                    }
-                }
-            });
-        }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
@@ -308,8 +236,6 @@
             outline: none;
             box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         }
-
-
 
         .cargo-btn {
             background: linear-gradient(45deg, #4CAF50, #45a049);
@@ -671,7 +597,7 @@
     <div class="container">
         <div class="header">
             <h1>SonderOS Materials Management</h1>
-            <p>Enhanced Multi-Job Tracking System v3.0</p>
+            <p>Enhanced Multi-Job Tracking System v3.1</p>
         </div>
 
         <!-- Tab System -->
@@ -718,6 +644,7 @@
                         <h4 style="margin-top: 20px;">Paste SonderOS Commodities List</h4>
                         <textarea class="paste-area" id="commoditiesPaste-${tabId}" placeholder="Paste your commodities list here...
 
+✓ Consolidated Contract Format (full contract paste)
 ✓ Discord Ticket Format (full ticket paste)
 ✓ Simple formats like:
 Steel Plates: 100
@@ -734,6 +661,7 @@ The scrubber will automatically detect and parse your format!"></textarea>
                         
                         <div class="sample-format">
                             <strong>Auto-detected formats:</strong><br>
+                            • <strong>Consolidated Contracts</strong> - Full contract paste with "ALL MATERIALS:" and categories<br>
                             • <strong>Discord Tickets</strong> - Full ticket paste with ITEMS section<br>
                             • Material Name: Quantity <em>or</em> Quantity: Material Name<br>
                             • Material Name, Quantity <em>or</em> Quantity, Material Name<br>
@@ -1287,6 +1215,11 @@ The scrubber will automatically detect and parse your format!"></textarea>
         }
 
         function parseRawData(tabId, rawData) {
+            // Check for Consolidated Contract format
+            if (rawData.includes('ALL MATERIALS:') && rawData.includes('===')) {
+                return parseConsolidatedContract(tabId, rawData);
+            }
+            
             // Check if this is a Discord ticket format
             if (rawData.includes('ITEMS:') || rawData.includes('CONTRACT:')) {
                 return parseDiscordTicket(tabId, rawData);
@@ -1442,6 +1375,113 @@ The scrubber will automatically detect and parse your format!"></textarea>
             return parsedMaterials;
         }
 
+        // NEW: Parse Consolidated Contract format
+        function parseConsolidatedContract(tabId, rawData) {
+            const lines = rawData.split('\n').map(line => line.trim());
+            const parsedMaterials = [];
+            let id = 1;
+            let inMaterialsSection = false;
+            let contractInfo = {};
+            
+            // Extract contract info
+            for (const line of lines) {
+                if (line.includes('CONSOLIDATED CONTRACT')) {
+                    contractInfo.type = 'Consolidated Contract';
+                } else if (line.includes('System:')) {
+                    contractInfo.system = line.split(':')[1]?.trim();
+                } else if (line.includes('Order:')) {
+                    contractInfo.order = line.split(':')[1]?.trim();
+                } else if (line.includes('Total Tonnage:')) {
+                    contractInfo.tonnage = line.split(':')[1]?.trim();
+                } else if (line.includes('TOTAL CONTRACT PRICE:')) {
+                    contractInfo.price = line.split(':')[1]?.trim();
+                }
+            }
+            
+            // Log contract info
+            if (contractInfo.type) {
+                logActivity(tabId, `Processing: ${contractInfo.type}`, 'info');
+                if (contractInfo.system) logActivity(tabId, `System: ${contractInfo.system}`, 'info');
+                if (contractInfo.order) logActivity(tabId, `Order: ${contractInfo.order}`, 'info');
+                if (contractInfo.tonnage) logActivity(tabId, `Total Tonnage: ${contractInfo.tonnage}`, 'info');
+                if (contractInfo.price) logActivity(tabId, `Contract Price: ${contractInfo.price}`, 'info');
+                
+                // Update tab name based on order
+                if (contractInfo.order) {
+                    tabs[tabId].name = contractInfo.order;
+                    const tabNameElement = document.getElementById(`tab-name-${tabId}`);
+                    if (tabNameElement) {
+                        tabNameElement.textContent = contractInfo.order;
+                    }
+                    
+                    // Update job name input
+                    const jobNameInput = document.getElementById(`jobName-${tabId}`);
+                    if (jobNameInput) {
+                        jobNameInput.value = contractInfo.order;
+                    }
+                }
+            }
+            
+            for (const line of lines) {
+                // Start processing materials after "ALL MATERIALS:" section
+                if (line.includes('ALL MATERIALS:')) {
+                    inMaterialsSection = true;
+                    continue;
+                }
+                
+                if (!inMaterialsSection) continue;
+                
+                // Skip category headers, separators, and header lines
+                if (line.startsWith('===') || 
+                    line.includes('Item') || 
+                    line.includes('---') || 
+                    line.includes('Qty') ||
+                    line.trim() === '' ||
+                    line.startsWith('=')) {
+                    continue;
+                }
+                
+                // Parse material lines (format: Material Name | Quantity)
+                const itemMatch = line.match(/^(.+?)\s*\|\s*([0-9,]+)$/);
+                
+                if (itemMatch) {
+                    let name = itemMatch[1].trim();
+                    const quantity = parseInt(itemMatch[2].replace(/,/g, ''));
+                    
+                    // Handle arrow notation (→) for alternative names
+                    const arrowMatch = name.match(/^(.+?)\s*\(→(.+?)\)$/);
+                    if (arrowMatch) {
+                        name = arrowMatch[2].trim(); // Use the name after the arrow
+                        logActivity(tabId, `Using alternative name: ${arrowMatch[1].trim()} → ${name}`, 'info');
+                    }
+                    
+                    if (name && quantity > 0) {
+                        parsedMaterials.push({
+                            id: id++,
+                            name: name,
+                            needed: quantity,
+                            original: quantity,
+                            allocated: 0,
+                            undoHistory: []
+                        });
+                        
+                        logActivity(tabId, `Parsed: ${name} (${quantity} needed)`, 'info');
+                    }
+                } else {
+                    // Log lines that couldn't be parsed for debugging
+                    if (line.length > 0 && !line.startsWith('=') && !line.includes('--')) {
+                        logActivity(tabId, `Skipped line: "${line}"`, 'warning');
+                    }
+                }
+            }
+            
+            if (parsedMaterials.length > 0) {
+                logActivity(tabId, `Successfully parsed ${parsedMaterials.length} items from consolidated contract`, 'success');
+            }
+            
+            return parsedMaterials;
+        }
+
         function parseThreeColumnFormat(tabId, rawData) {
             const lines = rawData.split('\n').map(line => line.trim()).filter(line => line);
             const parsedMaterials = [];
@@ -1520,7 +1560,10 @@ The scrubber will automatically detect and parse your format!"></textarea>
                 
                 // Update tab name based on contract
                 tabs[tabId].name = contractInfo.contract;
-                document.querySelector(`#tab-${tabId} span`).textContent = contractInfo.contract;
+                const tabNameElement = document.getElementById(`tab-name-${tabId}`);
+                if (tabNameElement) {
+                    tabNameElement.textContent = contractInfo.contract;
+                }
             }
             
             for (const line of lines) {
@@ -1666,18 +1709,6 @@ The scrubber will automatically detect and parse your format!"></textarea>
             }
         }
 
-        function handleEnterKey(event, tabId, materialId, inputElement) {
-            if (event.key === 'Enter') {
-                const quantity = parseInt(inputElement.value) || 0;
-                
-                if (quantity > 0) {
-                    allocateMaterial(tabId, materialId, quantity);
-                    inputElement.value = '0';
-                    inputElement.focus();
-                }
-            }
-        }
-
         function allocateMaterial(tabId, materialId, quantity) {
             if (!tabs[tabId]) return;
             
@@ -1721,8 +1752,10 @@ The scrubber will automatically detect and parse your format!"></textarea>
             const totalItems = materials.length;
             const totalNeeded = materials.reduce((sum, m) => sum + m.needed, 0);
             const totalAllocated = materials.reduce((sum, m) => sum + m.allocated, 0);
-            const completedItems = materials.filter(m => m.needed <= 0).length;
-            const completionRate = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+            const totalOriginal = materials.reduce((sum, m) => sum + m.original, 0);
+            
+            // Calculate completion rate based on tonnage, not item count
+            const completionRate = totalOriginal > 0 ? Math.round((totalAllocated / totalOriginal) * 100) : 0;
 
             const totalItemsEl = document.getElementById(`totalItems-${tabId}`);
             const totalNeededEl = document.getElementById(`totalNeeded-${tabId}`);
