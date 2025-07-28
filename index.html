@@ -11,6 +11,78 @@
             box-sizing: border-box;
         }
 
+        // Event Listener Setup
+        function setupTabEventListeners(tabId) {
+            console.log('Setting up event listeners for tab:', tabId);
+            
+            // Scrubber button
+            const scrubberBtn = document.getElementById(`scrubberBtn-${tabId}`);
+            if (scrubberBtn) {
+                scrubberBtn.addEventListener('click', () => {
+                    console.log('Scrubber button clicked for tab:', tabId);
+                    runDataScrubber(tabId);
+                });
+            } else {
+                console.warn('Scrubber button not found for tab:', tabId);
+            }
+            
+            // Finalize button
+            const confirmBtn = document.getElementById(`confirmBtn-${tabId}`);
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => finalizeSession(tabId));
+            }
+            
+            // Action buttons
+            const actionButtons = document.getElementById(`actionButtons-${tabId}`);
+            if (actionButtons) {
+                actionButtons.addEventListener('click', (e) => {
+                    if (e.target.textContent === 'Clear Session') {
+                        clearSession(tabId);
+                    } else if (e.target.textContent === 'Export Data') {
+                        exportData(tabId);
+                    }
+                });
+            }
+        }
+
+        // Setup material event listeners (called when materials are rendered)
+        function setupMaterialEventListeners(tabId) {
+            const grid = document.getElementById(`materialsGrid-${tabId}`);
+            if (!grid) return;
+            
+            // Use event delegation for material controls
+            grid.addEventListener('click', (e) => {
+                const action = e.target.getAttribute('data-action');
+                const materialId = parseInt(e.target.getAttribute('data-material-id'));
+                const targetTabId = parseInt(e.target.getAttribute('data-tab-id'));
+                
+                if (targetTabId !== tabId) return;
+                
+                if (action === 'cargo' && !e.target.disabled) {
+                    allocateCargoCapacity(tabId, materialId);
+                } else if (action === 'undo' && !e.target.disabled) {
+                    undoLastAllocation(tabId, materialId);
+                }
+            });
+            
+            // Handle enter key on inputs
+            grid.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && e.target.classList.contains('material-input')) {
+                    const materialId = parseInt(e.target.getAttribute('data-material-id'));
+                    const targetTabId = parseInt(e.target.getAttribute('data-tab-id'));
+                    
+                    if (targetTabId === tabId) {
+                        const quantity = parseInt(e.target.value) || 0;
+                        if (quantity > 0) {
+                            allocateMaterial(tabId, materialId, quantity);
+                            e.target.value = '0';
+                            e.target.focus();
+                        }
+                    }
+                }
+            });
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
@@ -23,6 +95,95 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
+        }
+
+        /* Tab System Styles */
+        .tabs-container {
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .tabs-header {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+
+        .tab {
+            background: rgba(0, 100, 100, 0.2);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-bottom: none;
+            color: rgba(0, 255, 255, 0.7);
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            min-width: 120px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+        }
+
+        .tab:hover {
+            background: rgba(0, 150, 150, 0.3);
+            color: #00ffff;
+        }
+
+        .tab.active {
+            background: rgba(0, 255, 255, 0.1);
+            color: #00ffff;
+            border-color: #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+
+        .tab-close {
+            background: rgba(255, 100, 100, 0.8);
+            border: none;
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            margin-left: auto;
+        }
+
+        .tab-close:hover {
+            background: rgba(255, 50, 50, 1);
+            transform: scale(1.1);
+        }
+
+        .new-tab-btn {
+            background: linear-gradient(45deg, #00cc00, #00ff00);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .new-tab-btn:hover {
+            background: linear-gradient(45deg, #00ff00, #44ff44);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         .header {
@@ -118,6 +279,37 @@
             font-size: 12px;
             font-style: italic;
         }
+
+        .job-name-section {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .job-name-input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            padding: 10px 15px;
+            border-radius: 6px;
+            flex: 1;
+            min-width: 250px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .job-name-input:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+
 
         .cargo-btn {
             background: linear-gradient(45deg, #4CAF50, #45a049);
@@ -260,7 +452,7 @@
 
         .materials-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
             gap: 15px;
         }
 
@@ -324,6 +516,38 @@
             box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
         }
 
+        .material-controls {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .undo-btn {
+            background: linear-gradient(45deg, #ff6600, #ff9900);
+            border: none;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            min-width: 60px;
+        }
+
+        .undo-btn:hover {
+            background: linear-gradient(45deg, #ff9900, #ffcc00);
+            box-shadow: 0 0 8px rgba(255, 153, 0, 0.5);
+            transform: translateY(-1px);
+        }
+
+        .undo-btn:disabled {
+            background: linear-gradient(45deg, #333, #666);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
         .status-indicator {
             width: 16px;
             height: 16px;
@@ -379,6 +603,11 @@
         .log-entry.allocation {
             border-left-color: #ff00ff;
             background: rgba(255, 0, 255, 0.05);
+        }
+
+        .log-entry.undo {
+            border-left-color: #ff6600;
+            background: rgba(255, 102, 0, 0.05);
         }
 
         .action-buttons {
@@ -442,89 +671,18 @@
     <div class="container">
         <div class="header">
             <h1>SonderOS Materials Management</h1>
-            <p>Advanced Resource Allocation & Tracking System v2.1</p>
+            <p>Enhanced Multi-Job Tracking System v3.0</p>
         </div>
 
-        <div class="input-section" id="inputSection">
-            <h3>Paste SonderOS Commodities List</h3>
-            <textarea class="paste-area" id="commoditiesPaste" placeholder="Paste your commodities list here...
-
-✓ Discord Ticket Format (full ticket paste)
-✓ Simple formats like:
-Steel Plates: 100
-Copper Wire: 250
-Circuit Boards: 50
-
-The scrubber will automatically detect and parse your format!"></textarea>
-            
-            <div class="cargo-capacity-section">
-                <label for="cargoCapacity" class="cargo-label">Your Ship's Cargo Capacity (tons):</label>
-                <input type="number" id="cargoCapacity" class="cargo-input" placeholder="e.g., 500" min="1" max="10000" oninput="saveCargoCapacity()">
-                <div class="cargo-hint">This will be saved for future sessions</div>
-            </div>
-            
-            <div class="sample-format">
-                <strong>Auto-detected formats:</strong><br>
-                • <strong>Discord Tickets</strong> - Full ticket paste with ITEMS section<br>
-                • Material Name: Quantity <em>or</em> Quantity: Material Name<br>
-                • Material Name, Quantity <em>or</em> Quantity, Material Name<br>
-                • Material Name - Quantity <em>or</em> Quantity - Material Name<br>
-                • Material Name | Quantity <em>or</em> Quantity | Material Name<br>
-                • Material Name [tab] Quantity <em>or</em> Quantity [tab] Material Name<br>
-                • Material Name [space] Quantity <em>or</em> Quantity [space] Material Name<br>
-                <br><strong>Quantity formats supported:</strong><br>
-                • Plain numbers: 784, 1250<br>
-                • With commas: 28,000<br>
-                • With periods: 28.000 (European format)<br>
-                • With k suffix: 28k, 28K (= 28,000)<br>
-                • With tons suffix: 784t, 784T, 784 tons<br>
-                • Combined: 28kt, 1.5k tons
+        <!-- Tab System -->
+        <div class="tabs-container">
+            <div class="tabs-header" id="tabsHeader">
+                <button class="new-tab-btn" onclick="createNewTab()">+ NEW JOB</button>
             </div>
         </div>
 
-        <div class="controls-section">
-            <button class="scrubber-btn" id="scrubberBtn" onclick="runDataScrubber()">
-                <span id="scrubber-text">SCRUB & PARSE DATA</span>
-            </button>
-            <button class="confirm-btn" id="confirmBtn" onclick="finalizeSession()" disabled>
-                FINALIZE SESSION
-            </button>
-        </div>
-
-        <div class="stats-section" id="statsSection" style="display: none;">
-            <div class="stat-card">
-                <div class="stat-value" id="totalItems">0</div>
-                <div class="stat-label">Total Materials</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="totalNeeded">0</div>
-                <div class="stat-label">Total Needed</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="totalAllocated">0</div>
-                <div class="stat-label">Total Allocated</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="completionRate">0%</div>
-                <div class="stat-label">Completion Rate</div>
-            </div>
-        </div>
-
-        <div class="materials-section" id="materialsSection" style="display: none;">
-            <h3>Materials Tracking</h3>
-            <div class="materials-grid" id="materialsGrid"></div>
-        </div>
-
-        <div class="action-buttons" id="actionButtons" style="display: none;">
-            <button class="btn" onclick="clearSession()">Clear Session</button>
-            <button class="btn" onclick="exportData()">Export Data</button>
-            <button class="btn" onclick="clearSavedData()">Clear Saved Data</button>
-        </div>
-
-        <div class="log-section">
-            <h3>System Activity Log</h3>
-            <div id="activityLog"></div>
-        </div>
+        <!-- Tab Contents Container -->
+        <div id="tabContents"></div>
 
         <div class="footer">
             <div>
@@ -538,95 +696,456 @@ The scrubber will automatically detect and parse your format!"></textarea>
     </div>
 
     <script>
-        let materials = [];
-        let activityLog = [];
-        let scrubberActive = false;
-        let sessionActive = false;
-        let cargoCapacity = 0;
+        let tabs = {};
+        let currentTabId = null;
+        let globalCargoCapacity = 0;
+        let nextTabId = 1;
 
-        // Auto-save functionality
+        // Tab Content Template
+        function createTabContentHTML(tabId) {
+            return `
+                <div class="tab-content" id="tab-content-${tabId}">
+                    <div class="input-section" id="inputSection-${tabId}">
+                        <h3>Setup New Job</h3>
+                        <div class="job-name-section">
+                            <label for="jobName-${tabId}" class="cargo-label">Job Name:</label>
+                            <input type="text" id="jobName-${tabId}" class="job-name-input" 
+                                   placeholder="Enter job name (e.g., Mining Contract Alpha)" 
+                                   oninput="updateJobName(${tabId}, this.value)"
+                                   maxlength="50">
+                            <div class="cargo-hint">This will be displayed on the tab</div>
+                        </div>
+                        <h4 style="margin-top: 20px;">Paste SonderOS Commodities List</h4>
+                        <textarea class="paste-area" id="commoditiesPaste-${tabId}" placeholder="Paste your commodities list here...
+
+✓ Discord Ticket Format (full ticket paste)
+✓ Simple formats like:
+Steel Plates: 100
+Copper Wire: 250
+Circuit Boards: 50
+
+The scrubber will automatically detect and parse your format!"></textarea>
+                        
+                        <div class="cargo-capacity-section">
+                            <label for="cargoCapacity-${tabId}" class="cargo-label">Your Ship's Cargo Capacity (tons):</label>
+                            <input type="number" id="cargoCapacity-${tabId}" class="cargo-input" placeholder="e.g., 500" min="1" max="10000" oninput="saveCargoCapacity(${tabId})">
+                            <div class="cargo-hint">This will be saved globally for all jobs</div>
+                        </div>
+                        
+                        <div class="sample-format">
+                            <strong>Auto-detected formats:</strong><br>
+                            • <strong>Discord Tickets</strong> - Full ticket paste with ITEMS section<br>
+                            • Material Name: Quantity <em>or</em> Quantity: Material Name<br>
+                            • Material Name, Quantity <em>or</em> Quantity, Material Name<br>
+                            • Material Name - Quantity <em>or</em> Quantity - Material Name<br>
+                            • Material Name | Quantity <em>or</em> Quantity | Material Name<br>
+                            • Material Name [tab] Quantity <em>or</em> Quantity [tab] Material Name<br>
+                            • Material Name [space] Quantity <em>or</em> Quantity [space] Material Name<br>
+                            <br><strong>Quantity formats supported:</strong><br>
+                            • Plain numbers: 784, 1250<br>
+                            • With commas: 28,000<br>
+                            • With periods: 28.000 (European format)<br>
+                            • With k suffix: 28k, 28K (= 28,000)<br>
+                            • With tons suffix: 784t, 784T, 784 tons<br>
+                            • Combined: 28kt, 1.5k tons
+                        </div>
+                    </div>
+
+                    <div class="controls-section">
+                        <button class="scrubber-btn" id="scrubberBtn-${tabId}" onclick="runDataScrubber(${tabId})">
+                            <span id="scrubber-text-${tabId}">SCRUB & PARSE DATA</span>
+                        </button>
+                        <button class="confirm-btn" id="confirmBtn-${tabId}" onclick="finalizeSession(${tabId})" disabled>
+                            FINALIZE SESSION
+                        </button>
+                    </div>
+
+                    <div class="stats-section" id="statsSection-${tabId}" style="display: none;">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalItems-${tabId}">0</div>
+                            <div class="stat-label">Total Materials</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalNeeded-${tabId}">0</div>
+                            <div class="stat-label">Total Needed</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalAllocated-${tabId}">0</div>
+                            <div class="stat-label">Total Allocated</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="completionRate-${tabId}">0%</div>
+                            <div class="stat-label">Completion Rate</div>
+                        </div>
+                    </div>
+
+                    <div class="materials-section" id="materialsSection-${tabId}" style="display: none;">
+                        <h3>Materials Tracking</h3>
+                        <div class="materials-grid" id="materialsGrid-${tabId}"></div>
+                    </div>
+
+                    <div class="action-buttons" id="actionButtons-${tabId}" style="display: none;">
+                        <button class="btn" onclick="clearSession(${tabId})">Clear Session</button>
+                        <button class="btn" onclick="exportData(${tabId})">Export Data</button>
+                    </div>
+
+                    <div class="log-section">
+                        <h3>System Activity Log</h3>
+                        <div id="activityLog-${tabId}"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Tab Management
+        function createNewTab() {
+            console.log('Creating new tab...');
+            
+            const tabId = nextTabId++;
+            const tabName = `Job ${tabId}`;
+            
+            try {
+                // Create tab data structure
+                tabs[tabId] = {
+                    id: tabId,
+                    name: tabName,
+                    materials: [],
+                    activityLog: [],
+                    sessionActive: false,
+                    scrubberActive: false
+                };
+                
+                // Create tab UI
+                const tabsHeader = document.getElementById('tabsHeader');
+                const newTabBtn = tabsHeader.querySelector('.new-tab-btn');
+                
+                if (!tabsHeader || !newTabBtn) {
+                    console.error('Required elements not found:', { tabsHeader, newTabBtn });
+                    return;
+                }
+                
+                const tabElement = document.createElement('div');
+                tabElement.className = 'tab';
+                tabElement.id = `tab-${tabId}`;
+                tabElement.innerHTML = `
+                    <span id="tab-name-${tabId}">${tabName}</span>
+                    <button class="tab-close" onclick="closeTab(${tabId}, event)">×</button>
+                `;
+                tabElement.onclick = (e) => {
+                    if (e.target.className !== 'tab-close') {
+                        switchToTab(tabId);
+                    }
+                };
+                
+                tabsHeader.insertBefore(tabElement, newTabBtn);
+                
+                // Create tab content
+                const tabContents = document.getElementById('tabContents');
+                if (!tabContents) {
+                    console.error('tabContents element not found');
+                    return;
+                }
+                
+                tabContents.insertAdjacentHTML('beforeend', createTabContentHTML(tabId));
+                
+                // Wait for DOM to process the inserted HTML before switching tabs
+                setTimeout(() => {
+                    // Switch to new tab
+                    switchToTab(tabId);
+                    
+                    // Set focus to job name input
+                    setTimeout(() => {
+                        const jobNameInput = document.getElementById(`jobName-${tabId}`);
+                        if (jobNameInput) {
+                            jobNameInput.focus();
+                            jobNameInput.select();
+                        } else {
+                            console.warn('Job name input not found:', `jobName-${tabId}`);
+                        }
+                    }, 50);
+                    
+                    // Log activity
+                    logActivity(tabId, `New job "${tabName}" created`, 'success');
+                    saveState();
+                    
+                    console.log('Tab created successfully:', tabId);
+                }, 10);
+                
+            } catch (error) {
+                console.error('Error creating tab:', error);
+            }
+        }
+
+        // Job Name Management
+        function updateJobName(tabId, newName) {
+            if (!tabs[tabId]) return;
+            
+            newName = newName.trim();
+            if (newName === '') {
+                newName = `Job ${tabId}`;
+            }
+            
+            // Limit name length
+            if (newName.length > 50) {
+                newName = newName.substring(0, 50);
+                document.getElementById(`jobName-${tabId}`).value = newName;
+            }
+            
+            const oldName = tabs[tabId].name;
+            tabs[tabId].name = newName;
+            
+            // Update tab display
+            const tabNameElement = document.getElementById(`tab-name-${tabId}`);
+            if (tabNameElement) {
+                tabNameElement.textContent = newName;
+            }
+            
+            if (oldName !== newName) {
+                logActivity(tabId, `Job renamed from "${oldName}" to "${newName}"`, 'info');
+                saveState();
+            }
+        }
+
+        function switchToTab(tabId) {
+            // Deactivate current tab
+            if (currentTabId) {
+                const currentTab = document.getElementById(`tab-${currentTabId}`);
+                const currentContent = document.getElementById(`tab-content-${currentTabId}`);
+                if (currentTab) currentTab.classList.remove('active');
+                if (currentContent) currentContent.classList.remove('active');
+            }
+            
+            // Activate new tab
+            currentTabId = tabId;
+            const newTab = document.getElementById(`tab-${tabId}`);
+            const newContent = document.getElementById(`tab-content-${tabId}`);
+            
+            if (newTab) {
+                newTab.classList.add('active');
+            } else {
+                console.error('Tab element not found:', `tab-${tabId}`);
+            }
+            
+            if (newContent) {
+                newContent.classList.add('active');
+            } else {
+                console.error('Tab content not found:', `tab-content-${tabId}`);
+            }
+            
+            // Update cargo capacity display
+            if (globalCargoCapacity > 0) {
+                const cargoInput = document.getElementById(`cargoCapacity-${tabId}`);
+                if (cargoInput) {
+                    cargoInput.value = globalCargoCapacity;
+                }
+            }
+            
+            // Update job name input
+            const jobNameInput = document.getElementById(`jobName-${tabId}`);
+            if (jobNameInput && tabs[tabId]) {
+                jobNameInput.value = tabs[tabId].name;
+            }
+            
+            saveState();
+        }
+
+        function closeTab(tabId, event) {
+            event.stopPropagation();
+            
+            const tab = tabs[tabId];
+            if (!tab) return;
+            
+            // Ask for confirmation if session is active
+            if (tab.sessionActive) {
+                const completedCount = tab.materials.filter(m => m.needed <= 0).length;
+                const totalCount = tab.materials.length;
+                
+                if (!confirm(`Close job "${tab.name}"?\n\nThis job has ${completedCount}/${totalCount} materials completed.\n\nAll progress will be lost!`)) {
+                    return;
+                }
+            }
+            
+            // Remove tab from UI
+            document.getElementById(`tab-${tabId}`).remove();
+            document.getElementById(`tab-content-${tabId}`).remove();
+            
+            // Remove tab data
+            delete tabs[tabId];
+            
+            // Switch to another tab if this was the current tab
+            if (currentTabId === tabId) {
+                const remainingTabs = Object.keys(tabs);
+                if (remainingTabs.length > 0) {
+                    switchToTab(parseInt(remainingTabs[0]));
+                } else {
+                    currentTabId = null;
+                    // Create a new tab if no tabs remain
+                    createNewTab();
+                }
+            }
+            
+            saveState();
+        }
+
+        // Enhanced State Management
         function saveState() {
             const state = {
-                materials: materials,
-                activityLog: activityLog,
-                sessionActive: sessionActive,
-                cargoCapacity: cargoCapacity,
+                tabs: tabs,
+                currentTabId: currentTabId,
+                globalCargoCapacity: globalCargoCapacity,
+                nextTabId: nextTabId,
                 timestamp: new Date().toISOString()
             };
-            localStorage.setItem('sonderOS_state', JSON.stringify(state));
+            localStorage.setItem('sonderOS_enhanced_state', JSON.stringify(state));
         }
 
         function loadState() {
             try {
-                const savedState = localStorage.getItem('sonderOS_state');
+                const savedState = localStorage.getItem('sonderOS_enhanced_state');
                 if (savedState) {
                     const state = JSON.parse(savedState);
                     
-                    materials = state.materials || [];
-                    activityLog = state.activityLog || [];
-                    sessionActive = state.sessionActive || false;
-                    cargoCapacity = state.cargoCapacity || 0;
+                    tabs = state.tabs || {};
+                    currentTabId = state.currentTabId || null;
+                    globalCargoCapacity = state.globalCargoCapacity || 0;
+                    nextTabId = state.nextTabId || 1;
                     
-                    // Restore cargo capacity in UI
-                    if (cargoCapacity > 0) {
-                        document.getElementById('cargoCapacity').value = cargoCapacity;
+                    // Restore tabs UI
+                    const tabsHeader = document.getElementById('tabsHeader');
+                    const tabContents = document.getElementById('tabContents');
+                    
+                    // Clear existing content except new tab button
+                    const newTabBtn = tabsHeader.querySelector('.new-tab-btn');
+                    tabsHeader.innerHTML = '';
+                    tabsHeader.appendChild(newTabBtn);
+                    tabContents.innerHTML = '';
+                    
+                    // Recreate tabs
+                    for (const [tabId, tabData] of Object.entries(tabs)) {
+                        const id = parseInt(tabId);
+                        
+                        // Create tab UI
+                        const tabElement = document.createElement('div');
+                        tabElement.className = 'tab';
+                        tabElement.id = `tab-${id}`;
+                        tabElement.innerHTML = `
+                            <span id="tab-name-${id}">${tabData.name}</span>
+                            <button class="tab-close" onclick="closeTab(${id}, event)">×</button>
+                        `;
+                        tabElement.onclick = (e) => {
+                            if (e.target.className !== 'tab-close') {
+                                switchToTab(id);
+                            }
+                        };
+                        tabsHeader.insertBefore(tabElement, newTabBtn);
+                        
+                        // Create tab content
+                        tabContents.insertAdjacentHTML('beforeend', createTabContentHTML(id));
+                        
+                        // Wait for DOM to process before restoring state
+                        setTimeout(() => {
+                            // Restore tab state
+                            if (tabData.sessionActive) {
+                                const inputSection = document.getElementById(`inputSection-${id}`);
+                                const statsSection = document.getElementById(`statsSection-${id}`);
+                                const materialsSection = document.getElementById(`materialsSection-${id}`);
+                                const actionButtons = document.getElementById(`actionButtons-${id}`);
+                                const confirmBtn = document.getElementById(`confirmBtn-${id}`);
+                                const scrubberText = document.getElementById(`scrubber-text-${id}`);
+                                
+                                if (inputSection) inputSection.style.display = 'none';
+                                if (statsSection) statsSection.style.display = 'grid';
+                                if (materialsSection) materialsSection.style.display = 'block';
+                                if (actionButtons) actionButtons.style.display = 'flex';
+                                if (confirmBtn) confirmBtn.disabled = false;
+                                if (scrubberText) scrubberText.textContent = 'SCRUB COMPLETE';
+                                
+                                renderMaterials(id);
+                                updateStats(id);
+                            }
+                            
+                            renderActivityLog(id);
+                            
+                            // Set cargo capacity
+                            if (globalCargoCapacity > 0) {
+                                const cargoInput = document.getElementById(`cargoCapacity-${id}`);
+                                if (cargoInput) {
+                                    cargoInput.value = globalCargoCapacity;
+                                }
+                            }
+                            
+                            // Set job name in input field
+                            const jobNameInput = document.getElementById(`jobName-${id}`);
+                            if (jobNameInput) {
+                                jobNameInput.value = tabData.name;
+                            }
+                        }, 10);
                     }
                     
-                    if (materials.length > 0 && sessionActive) {
-                        // Restore UI to active session state
-                        document.getElementById('inputSection').style.display = 'none';
-                        document.getElementById('statsSection').style.display = 'grid';
-                        document.getElementById('materialsSection').style.display = 'block';
-                        document.getElementById('actionButtons').style.display = 'flex';
-                        document.getElementById('confirmBtn').disabled = false;
-                        document.getElementById('scrubber-text').textContent = 'SCRUB COMPLETE';
-                        
-                        renderMaterials();
-                        updateStats();
-                        renderActivityLog();
-                        
-                        const savedTime = new Date(state.timestamp).toLocaleString();
-                        logActivity(`Previous session restored from ${savedTime}`, 'success');
-                        logActivity(`Restored ${materials.length} materials with ongoing allocations`, 'info');
-                        
-                        if (cargoCapacity > 0) {
-                            logActivity(`Cargo capacity: ${cargoCapacity} tons`, 'info');
+                    // Switch to current tab after a delay to ensure all content is loaded
+                    setTimeout(() => {
+                        if (currentTabId && tabs[currentTabId]) {
+                            switchToTab(currentTabId);
+                        } else if (Object.keys(tabs).length > 0) {
+                            switchToTab(parseInt(Object.keys(tabs)[0]));
                         }
-                        
-                        return true;
-                    }
+                    }, 50);
+                    
+                    return true;
                 }
             } catch (e) {
                 console.error('Error loading saved state:', e);
-                localStorage.removeItem('sonderOS_state');
+                localStorage.removeItem('sonderOS_enhanced_state');
             }
             return false;
         }
 
-        function clearSavedState() {
-            localStorage.removeItem('sonderOS_state');
-            logActivity('Saved browser data cleared', 'info');
-        }
-
-        function saveCargoCapacity() {
-            const input = document.getElementById('cargoCapacity');
-            cargoCapacity = parseInt(input.value) || 0;
+        function saveCargoCapacity(tabId) {
+            const input = document.getElementById(`cargoCapacity-${tabId}`);
+            globalCargoCapacity = parseInt(input.value) || 0;
             
-            // Save just the cargo capacity immediately
-            const existingState = JSON.parse(localStorage.getItem('sonderOS_state') || '{}');
-            existingState.cargoCapacity = cargoCapacity;
-            localStorage.setItem('sonderOS_state', JSON.stringify(existingState));
+            // Update all other tab inputs
+            for (const otherTabId of Object.keys(tabs)) {
+                if (parseInt(otherTabId) !== tabId) {
+                    const otherInput = document.getElementById(`cargoCapacity-${otherTabId}`);
+                    if (otherInput) {
+                        otherInput.value = globalCargoCapacity;
+                    }
+                }
+            }
             
-            if (cargoCapacity > 0) {
-                logActivity(`Cargo capacity set to ${cargoCapacity} tons`, 'info');
+            saveState();
+            
+            if (globalCargoCapacity > 0) {
+                logActivity(tabId, `Global cargo capacity set to ${globalCargoCapacity} tons`, 'info');
             }
         }
 
-        function renderActivityLog() {
-            const logContainer = document.getElementById('activityLog');
+        // Activity Logging
+        function logActivity(tabId, message, type = 'info') {
+            if (!tabs[tabId]) return;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            
+            tabs[tabId].activityLog.unshift({ message: logEntry, type });
+            if (tabs[tabId].activityLog.length > 100) {
+                tabs[tabId].activityLog = tabs[tabId].activityLog.slice(0, 100);
+            }
+            
+            renderActivityLog(tabId);
+            saveState();
+        }
+
+        function renderActivityLog(tabId) {
+            if (!tabs[tabId]) return;
+            
+            const logContainer = document.getElementById(`activityLog-${tabId}`);
+            if (!logContainer) return;
+            
             logContainer.innerHTML = '';
             
-            activityLog.forEach(entry => {
+            tabs[tabId].activityLog.forEach(entry => {
                 const logDiv = document.createElement('div');
                 logDiv.className = `log-entry ${entry.type}`;
                 logDiv.textContent = entry.message;
@@ -634,43 +1153,89 @@ The scrubber will automatically detect and parse your format!"></textarea>
             });
         }
 
-        function logActivity(message, type = 'info') {
-            const timestamp = new Date().toLocaleTimeString();
-            const logEntry = `[${timestamp}] ${message}`;
+        // Material Management with Undo
+        function addUndoHistory(tabId, materialId, action, oldValue, newValue) {
+            const material = tabs[tabId].materials.find(m => m.id === materialId);
+            if (!material) return;
             
-            activityLog.unshift({ message: logEntry, type });
-            if (activityLog.length > 100) {
-                activityLog = activityLog.slice(0, 100);
+            if (!material.undoHistory) {
+                material.undoHistory = [];
             }
             
-            renderActivityLog();
+            material.undoHistory.unshift({
+                action: action,
+                oldNeeded: oldValue.needed,
+                oldAllocated: oldValue.allocated,
+                newNeeded: newValue.needed,
+                newAllocated: newValue.allocated,
+                timestamp: new Date().toISOString()
+            });
             
-            // Auto-save state after logging activity
-            if (sessionActive) {
-                saveState();
+            // Keep only last 10 undo actions per material
+            if (material.undoHistory.length > 10) {
+                material.undoHistory = material.undoHistory.slice(0, 10);
             }
         }
 
-        function runDataScrubber() {
-            const pasteArea = document.getElementById('commoditiesPaste');
-            const rawData = pasteArea.value.trim();
+        function undoLastAllocation(tabId, materialId) {
+            if (!tabs[tabId]) return;
             
-            if (!rawData) {
-                logActivity('Error: No data to scrub. Please paste commodities list first.', 'warning');
+            const material = tabs[tabId].materials.find(m => m.id === materialId);
+            if (!material || !material.undoHistory || material.undoHistory.length === 0) {
+                logActivity(tabId, `No undo history for ${material ? material.name : 'unknown material'}`, 'warning');
                 return;
             }
             
-            if (scrubberActive) return;
+            const lastAction = material.undoHistory.shift();
             
-            scrubberActive = true;
-            const scrubberBtn = document.getElementById('scrubberBtn');
-            const scrubberText = document.getElementById('scrubber-text');
+            // Restore previous values
+            material.needed = lastAction.oldNeeded;
+            material.allocated = lastAction.oldAllocated;
+            
+            logActivity(tabId, `UNDO: ${material.name} restored to ${lastAction.oldAllocated} allocated, ${lastAction.oldNeeded} needed`, 'undo');
+            
+            renderMaterials(tabId);
+            updateStats(tabId);
+            saveState();
+        }
+
+        // Data Scrubbing
+        function runDataScrubber(tabId) {
+            console.log('runDataScrubber called for tab:', tabId);
+            
+            if (!tabs[tabId]) {
+                console.error('Tab not found:', tabId);
+                return;
+            }
+            
+            const pasteArea = document.getElementById(`commoditiesPaste-${tabId}`);
+            if (!pasteArea) {
+                console.error('Paste area not found for tab:', tabId);
+                return;
+            }
+            
+            const rawData = pasteArea.value.trim();
+            console.log('Raw data length:', rawData.length);
+            
+            if (!rawData) {
+                logActivity(tabId, 'Error: No data to scrub. Please paste commodities list first.', 'warning');
+                return;
+            }
+            
+            if (tabs[tabId].scrubberActive) {
+                console.log('Scrubber already active for tab:', tabId);
+                return;
+            }
+            
+            tabs[tabId].scrubberActive = true;
+            const scrubberBtn = document.getElementById(`scrubberBtn-${tabId}`);
+            const scrubberText = document.getElementById(`scrubber-text-${tabId}`);
             
             scrubberBtn.classList.add('active');
             scrubberText.textContent = 'SCRUBBING DATA...';
             scrubberBtn.disabled = true;
             
-            logActivity('Data scrubber initiated - parsing commodities list', 'info');
+            logActivity(tabId, 'Data scrubber initiated - parsing commodities list', 'info');
             
             // Simulate scrubbing process with progress
             let progress = 0;
@@ -682,56 +1247,54 @@ The scrubber will automatically detect and parse your format!"></textarea>
                     clearInterval(scrubberInterval);
                     
                     // Parse the data
-                    const parsedMaterials = parseRawData(rawData);
+                    const parsedMaterials = parseRawData(tabId, rawData);
                     
                     if (parsedMaterials.length > 0) {
-                        materials = parsedMaterials;
-                        sessionActive = true;
+                        tabs[tabId].materials = parsedMaterials;
+                        tabs[tabId].sessionActive = true;
                         
-                        // Save state immediately after parsing completes
                         saveState();
                         
                         scrubberText.textContent = 'SCRUB COMPLETE';
                         scrubberBtn.classList.remove('active');
                         
                         // Show materials section
-                        document.getElementById('statsSection').style.display = 'grid';
-                        document.getElementById('materialsSection').style.display = 'block';
-                        document.getElementById('actionButtons').style.display = 'flex';
-                        document.getElementById('confirmBtn').disabled = false;
+                        document.getElementById(`statsSection-${tabId}`).style.display = 'grid';
+                        document.getElementById(`materialsSection-${tabId}`).style.display = 'block';
+                        document.getElementById(`actionButtons-${tabId}`).style.display = 'flex';
+                        document.getElementById(`confirmBtn-${tabId}`).disabled = false;
                         
-                        renderMaterials();
-                        updateStats();
+                        renderMaterials(tabId);
+                        updateStats(tabId);
                         
-                        logActivity(`Successfully parsed ${materials.length} materials from input`, 'success');
-                        logActivity(`Session auto-saved to browser storage`, 'info');
+                        logActivity(tabId, `Successfully parsed ${parsedMaterials.length} materials from input`, 'success');
                         
                         // Hide input section
-                        document.getElementById('inputSection').style.display = 'none';
+                        document.getElementById(`inputSection-${tabId}`).style.display = 'none';
                         
                     } else {
                         scrubberText.textContent = 'SCRUB FAILED';
-                        logActivity('Error: Could not parse any valid materials from input', 'warning');
+                        logActivity(tabId, 'Error: Could not parse any valid materials from input', 'warning');
                         
                         setTimeout(() => {
                             scrubberText.textContent = 'SCRUB & PARSE DATA';
                             scrubberBtn.disabled = false;
-                            scrubberActive = false;
+                            tabs[tabId].scrubberActive = false;
                         }, 2000);
                     }
                 }
             }, 500);
         }
 
-        function parseRawData(rawData) {
+        function parseRawData(tabId, rawData) {
             // Check if this is a Discord ticket format
             if (rawData.includes('ITEMS:') || rawData.includes('CONTRACT:')) {
-                return parseDiscordTicket(rawData);
+                return parseDiscordTicket(tabId, rawData);
             }
             
             // Check for 3-column pipe format (Item | Qty | Price)
             if (rawData.includes('|') && (rawData.includes('Qty') || rawData.includes('Buy Price'))) {
-                return parseThreeColumnFormat(rawData);
+                return parseThreeColumnFormat(tabId, rawData);
             }
             
             // Original parsing for other formats
@@ -763,13 +1326,12 @@ The scrubber will automatically detect and parse your format!"></textarea>
                     return quantityMatch ? parseInt(quantityMatch[1]) : 0;
                 }
                 
-                // Pattern 1: Name: Quantity (with optional k/t/tons and punctuation)
+                // Pattern matching logic (same as before)
                 match = line.match(/^(.+?):\s*([\d.,]+(?:\s*[kKtT](?:ons?)?)?)$/);
                 if (match) {
                     name = match[1].trim();
                     quantity = parseQuantity(match[2]);
                 } else {
-                    // Pattern 1b: Quantity: Name (reversed)
                     match = line.match(/^([\d.,]+(?:\s*[kKtT](?:ons?)?)?)\s*:\s*(.+)$/);
                     if (match) {
                         quantity = parseQuantity(match[1]);
@@ -778,13 +1340,11 @@ The scrubber will automatically detect and parse your format!"></textarea>
                 }
                 
                 if (!match) {
-                    // Pattern 2: Name, Quantity (with optional k/t/tons and punctuation)
                     match = line.match(/^(.+?),\s*([\d.,]+(?:\s*[kKtT](?:ons?)?)?)$/);
                     if (match) {
                         name = match[1].trim();
                         quantity = parseQuantity(match[2]);
                     } else {
-                        // Pattern 2b: Quantity, Name (reversed)
                         match = line.match(/^([\d.,]+(?:\s*[kKtT](?:ons?)?)?)\s*,\s*(.+)$/);
                         if (match) {
                             quantity = parseQuantity(match[1]);
@@ -794,13 +1354,11 @@ The scrubber will automatically detect and parse your format!"></textarea>
                 }
                 
                 if (!match) {
-                    // Pattern 3: Name - Quantity (with optional k/t/tons and punctuation)
                     match = line.match(/^(.+?)\s*-\s*([\d.,]+(?:\s*[kKtT](?:ons?)?)?)$/);
                     if (match) {
                         name = match[1].trim();
                         quantity = parseQuantity(match[2]);
                     } else {
-                        // Pattern 3b: Quantity - Name (reversed)
                         match = line.match(/^([\d.,]+(?:\s*[kKtT](?:ons?)?)?)\s*-\s*(.+)$/);
                         if (match) {
                             quantity = parseQuantity(match[1]);
@@ -810,13 +1368,11 @@ The scrubber will automatically detect and parse your format!"></textarea>
                 }
                 
                 if (!match) {
-                    // Pattern 4: Name | Quantity (2-column only, with optional k/t/tons and punctuation)
                     match = line.match(/^(.+?)\s*\|\s*([\d.,]+(?:\s*[kKtT](?:ons?)?)?)$/);
                     if (match) {
                         name = match[1].trim();
                         quantity = parseQuantity(match[2]);
                     } else {
-                        // Pattern 4b: Quantity | Name (reversed)
                         match = line.match(/^([\d.,]+(?:\s*[kKtT](?:ons?)?)?)\s*\|\s*(.+)$/);
                         if (match) {
                             quantity = parseQuantity(match[1]);
@@ -826,13 +1382,11 @@ The scrubber will automatically detect and parse your format!"></textarea>
                 }
                 
                 if (!match) {
-                    // Pattern 5: Name [tab] Quantity (with optional k/t/tons and punctuation)
                     match = line.match(/^(.+?)\t+([\d.,]+(?:\s*[kKtT](?:ons?)?)?)$/);
                     if (match) {
                         name = match[1].trim();
                         quantity = parseQuantity(match[2]);
                     } else {
-                        // Pattern 5b: Quantity [tab] Name (reversed)
                         match = line.match(/^([\d.,]+(?:\s*[kKtT](?:ons?)?)?)\t+(.+)$/);
                         if (match) {
                             quantity = parseQuantity(match[1]);
@@ -842,13 +1396,11 @@ The scrubber will automatically detect and parse your format!"></textarea>
                 }
                 
                 if (!match) {
-                    // Pattern 6: Name [multiple spaces] Quantity (with optional k/t/tons and punctuation)
                     match = line.match(/^(.+?)\s{2,}([\d.,]+(?:\s*[kKtT](?:ons?)?)?)$/);
                     if (match) {
                         name = match[1].trim();
                         quantity = parseQuantity(match[2]);
                     } else {
-                        // Pattern 6b: Quantity [multiple spaces] Name (reversed)
                         match = line.match(/^([\d.,]+(?:\s*[kKtT](?:ons?)?)?)\s{2,}(.+)$/);
                         if (match) {
                             quantity = parseQuantity(match[1]);
@@ -858,13 +1410,11 @@ The scrubber will automatically detect and parse your format!"></textarea>
                 }
                 
                 if (!match) {
-                    // Pattern 7: Name [single space] Quantity (with optional k/t/tons and punctuation)
                     match = line.match(/^(.+?)\s+([\d.,]+(?:\s*[kKtT](?:ons?)?)?)$/);
                     if (match) {
                         name = match[1].trim();
                         quantity = parseQuantity(match[2]);
                     } else {
-                        // Pattern 7b: Quantity [single space] Name (reversed) - HANDLES "28.000 titanium" and "28k titanium"
                         match = line.match(/^([\d.,]+(?:\s*[kKtT](?:ons?)?)?)\s+(.+)$/);
                         if (match) {
                             quantity = parseQuantity(match[1]);
@@ -879,27 +1429,27 @@ The scrubber will automatically detect and parse your format!"></textarea>
                         name: name,
                         needed: quantity,
                         original: quantity,
-                        allocated: 0
+                        allocated: 0,
+                        undoHistory: []
                     });
                     
-                    logActivity(`Parsed: ${name} (${quantity} needed)`, 'info');
+                    logActivity(tabId, `Parsed: ${name} (${quantity} needed)`, 'info');
                 } else {
-                    logActivity(`Warning: Could not parse line: "${line}"`, 'warning');
+                    logActivity(tabId, `Warning: Could not parse line: "${line}"`, 'warning');
                 }
             }
             
             return parsedMaterials;
         }
 
-        function parseThreeColumnFormat(rawData) {
+        function parseThreeColumnFormat(tabId, rawData) {
             const lines = rawData.split('\n').map(line => line.trim()).filter(line => line);
             const parsedMaterials = [];
             let id = 1;
             
-            logActivity('Detected 3-column pipe format (Item | Qty | Price)', 'info');
+            logActivity(tabId, 'Detected 3-column pipe format (Item | Qty | Price)', 'info');
             
             for (const line of lines) {
-                // Skip header lines, separators, and category lines
                 if (line.includes('Item') && line.includes('Qty') ||
                     line.includes('---') ||
                     line.includes('===') ||
@@ -908,7 +1458,6 @@ The scrubber will automatically detect and parse your format!"></textarea>
                     continue;
                 }
                 
-                // Parse 3-column format: "Item Name | Quantity | Price"
                 const match = line.match(/^(.+?)\s*\|\s*([0-9,]+)\s*\|\s*([0-9,]+)$/);
                 
                 if (match) {
@@ -922,27 +1471,27 @@ The scrubber will automatically detect and parse your format!"></textarea>
                             name: name,
                             needed: quantity,
                             original: quantity,
-                            allocated: 0
+                            allocated: 0,
+                            undoHistory: []
                         });
                         
-                        logActivity(`Parsed: ${name} (${quantity} needed @ ${price} credits)`, 'info');
+                        logActivity(tabId, `Parsed: ${name} (${quantity} needed @ ${price} credits)`, 'info');
                     }
                 } else {
-                    // Only log non-empty lines that don't match
                     if (line.length > 0) {
-                        logActivity(`Skipped line: "${line}"`, 'warning');
+                        logActivity(tabId, `Skipped line: "${line}"`, 'warning');
                     }
                 }
             }
             
             if (parsedMaterials.length > 0) {
-                logActivity(`Successfully parsed ${parsedMaterials.length} items from 3-column format`, 'success');
+                logActivity(tabId, `Successfully parsed ${parsedMaterials.length} items from 3-column format`, 'success');
             }
             
             return parsedMaterials;
         }
 
-        function parseDiscordTicket(rawData) {
+        function parseDiscordTicket(tabId, rawData) {
             const lines = rawData.split('\n');
             const parsedMaterials = [];
             let id = 1;
@@ -964,20 +1513,22 @@ The scrubber will automatically detect and parse your format!"></textarea>
             
             // Log contract info
             if (contractInfo.contract) {
-                logActivity(`Processing ticket: ${contractInfo.contract}`, 'info');
-                if (contractInfo.system) logActivity(`System: ${contractInfo.system}`, 'info');
-                if (contractInfo.order) logActivity(`Order: ${contractInfo.order}`, 'info');
-                if (contractInfo.tonnage) logActivity(`Total Tonnage: ${contractInfo.tonnage}`, 'info');
+                logActivity(tabId, `Processing ticket: ${contractInfo.contract}`, 'info');
+                if (contractInfo.system) logActivity(tabId, `System: ${contractInfo.system}`, 'info');
+                if (contractInfo.order) logActivity(tabId, `Order: ${contractInfo.order}`, 'info');
+                if (contractInfo.tonnage) logActivity(tabId, `Total Tonnage: ${contractInfo.tonnage}`, 'info');
+                
+                // Update tab name based on contract
+                tabs[tabId].name = contractInfo.contract;
+                document.querySelector(`#tab-${tabId} span`).textContent = contractInfo.contract;
             }
             
             for (const line of lines) {
-                // Start parsing items after "ITEMS:" line
                 if (line.includes('ITEMS:')) {
                     inItemsSection = true;
                     continue;
                 }
                 
-                // Skip header lines and separators
                 if (!inItemsSection || 
                     line.includes('Item') || 
                     line.includes('---') || 
@@ -986,7 +1537,6 @@ The scrubber will automatically detect and parse your format!"></textarea>
                     continue;
                 }
                 
-                // Parse item lines with format: "Item Name                |    Qty |  Price"
                 const itemMatch = line.match(/^(.+?)\s*\|\s*([0-9,]+)\s*\|\s*[\d,]+$/);
                 
                 if (itemMatch) {
@@ -999,26 +1549,32 @@ The scrubber will automatically detect and parse your format!"></textarea>
                             name: name,
                             needed: quantity,
                             original: quantity,
-                            allocated: 0
+                            allocated: 0,
+                            undoHistory: []
                         });
                         
-                        logActivity(`Parsed: ${name} (${quantity} needed)`, 'info');
+                        logActivity(tabId, `Parsed: ${name} (${quantity} needed)`, 'info');
                     }
                 }
             }
             
             if (parsedMaterials.length > 0) {
-                logActivity(`Successfully parsed ${parsedMaterials.length} items from Discord ticket`, 'success');
+                logActivity(tabId, `Successfully parsed ${parsedMaterials.length} items from Discord ticket`, 'success');
             }
             
             return parsedMaterials;
         }
 
-        function renderMaterials() {
-            const grid = document.getElementById('materialsGrid');
+        // Material Rendering and Control
+        function renderMaterials(tabId) {
+            if (!tabs[tabId]) return;
+            
+            const grid = document.getElementById(`materialsGrid-${tabId}`);
+            if (!grid) return;
+            
             grid.innerHTML = '';
             
-            materials.forEach(material => {
+            tabs[tabId].materials.forEach(material => {
                 const remaining = material.needed;
                 const status = remaining <= 0 ? 'complete' : 
                               material.allocated > 0 ? 'partial' : 'needed';
@@ -1027,9 +1583,12 @@ The scrubber will automatically detect and parse your format!"></textarea>
                 itemDiv.className = `material-item ${status}`;
                 
                 // Determine cargo button allocation amount and text
-                const cargoAllocation = Math.min(cargoCapacity, remaining);
-                const cargoButtonDisabled = cargoCapacity <= 0 || remaining <= 0;
-                const cargoButtonText = cargoCapacity > 0 ? `${cargoAllocation}T` : 'Set Cargo';
+                const cargoAllocation = Math.min(globalCargoCapacity, remaining);
+                const cargoButtonDisabled = globalCargoCapacity <= 0 || remaining <= 0;
+                const cargoButtonText = globalCargoCapacity > 0 ? `${cargoAllocation}T` : 'Set Cargo';
+                
+                // Check if undo is available
+                const undoAvailable = material.undoHistory && material.undoHistory.length > 0;
                 
                 itemDiv.innerHTML = `
                     <div class="material-name">${material.name}</div>
@@ -1037,12 +1596,16 @@ The scrubber will automatically detect and parse your format!"></textarea>
                         Need: ${material.needed}<br>
                         Allocated: ${material.allocated}
                     </div>
-                    <input type="number" class="material-input" 
-                           value="0" min="0" max="${remaining}"
-                           onkeypress="handleEnterKey(event, ${material.id}, this)"
-                           placeholder="0">
-                    <button class="cargo-btn" ${cargoButtonDisabled ? 'disabled' : ''} 
-                            onclick="allocateCargoCapacity(${material.id})">${cargoButtonText}</button>
+                    <div class="material-controls">
+                        <input type="number" class="material-input" 
+                               value="0" min="0" max="${remaining}"
+                               onkeypress="handleEnterKey(event, ${tabId}, ${material.id}, this)"
+                               placeholder="0">
+                        <button class="cargo-btn" ${cargoButtonDisabled ? 'disabled' : ''} 
+                                onclick="allocateCargoCapacity(${tabId}, ${material.id})">${cargoButtonText}</button>
+                        <button class="undo-btn" ${undoAvailable ? '' : 'disabled'} 
+                                onclick="undoLastAllocation(${tabId}, ${material.id})">UNDO</button>
+                    </div>
                     <div class="status-indicator status-${status}"></div>
                 `;
                 
@@ -1050,216 +1613,244 @@ The scrubber will automatically detect and parse your format!"></textarea>
             });
         }
 
-        function allocateCargoCapacity(materialId) {
-            if (cargoCapacity <= 0) {
-                logActivity('Error: Set your cargo capacity first', 'warning');
-                return;
-            }
-            
-            const material = materials.find(m => m.id === materialId);
-            if (!material) return;
-            
-            const allocatable = Math.min(cargoCapacity, material.needed);
-            
-            if (allocatable <= 0) {
-                logActivity(`${material.name} already fully allocated`, 'warning');
-                return;
-            }
-            
-            // Allocate the cargo capacity amount
-            material.needed -= allocatable;
-            material.allocated += allocatable;
-            
-            // Log the allocation
-            logActivity(`Full cargo load: ${allocatable}T ${material.name} (Remaining: ${material.needed})`, 'allocation');
-            
-            // Re-render and update stats
-            renderMaterials();
-            updateStats();
-            
-            // Auto-save state after allocation
-            saveState();
-            
-            // Check if material is complete
-            if (material.needed <= 0) {
-                logActivity(`✓ ${material.name} COMPLETE (${material.allocated}/${material.original})`, 'success');
-            }
-        }
-
-        function handleEnterKey(event, materialId, inputElement) {
+        function handleEnterKey(event, tabId, materialId, inputElement) {
             if (event.key === 'Enter') {
                 const quantity = parseInt(inputElement.value) || 0;
                 
                 if (quantity > 0) {
-                    allocateMaterial(materialId, quantity);
+                    allocateMaterial(tabId, materialId, quantity);
                     inputElement.value = '0';
                     inputElement.focus();
                 }
             }
         }
 
-        function allocateMaterial(materialId, quantity) {
-            const material = materials.find(m => m.id === materialId);
+        function allocateCargoCapacity(tabId, materialId) {
+            if (!tabs[tabId]) return;
+            
+            if (globalCargoCapacity <= 0) {
+                logActivity(tabId, 'Error: Set your cargo capacity first', 'warning');
+                return;
+            }
+            
+            const material = tabs[tabId].materials.find(m => m.id === materialId);
+            if (!material) return;
+            
+            const allocatable = Math.min(globalCargoCapacity, material.needed);
+            
+            if (allocatable <= 0) {
+                logActivity(tabId, `${material.name} already fully allocated`, 'warning');
+                return;
+            }
+            
+            // Store undo history
+            addUndoHistory(tabId, materialId, 'cargo_allocation', 
+                          { needed: material.needed, allocated: material.allocated },
+                          { needed: material.needed - allocatable, allocated: material.allocated + allocatable });
+            
+            // Allocate the cargo capacity amount
+            material.needed -= allocatable;
+            material.allocated += allocatable;
+            
+            // Log the allocation
+            logActivity(tabId, `Full cargo load: ${allocatable}T ${material.name} (Remaining: ${material.needed})`, 'allocation');
+            
+            // Re-render and update stats
+            renderMaterials(tabId);
+            updateStats(tabId);
+            saveState();
+            
+            // Check if material is complete
+            if (material.needed <= 0) {
+                logActivity(tabId, `✓ ${material.name} COMPLETE (${material.allocated}/${material.original})`, 'success');
+            }
+        }
+
+        function handleEnterKey(event, tabId, materialId, inputElement) {
+            if (event.key === 'Enter') {
+                const quantity = parseInt(inputElement.value) || 0;
+                
+                if (quantity > 0) {
+                    allocateMaterial(tabId, materialId, quantity);
+                    inputElement.value = '0';
+                    inputElement.focus();
+                }
+            }
+        }
+
+        function allocateMaterial(tabId, materialId, quantity) {
+            if (!tabs[tabId]) return;
+            
+            const material = tabs[tabId].materials.find(m => m.id === materialId);
             if (!material) return;
             
             const allocatable = Math.min(quantity, material.needed);
             
             if (allocatable <= 0) {
-                logActivity(`Warning: ${material.name} already fully allocated`, 'warning');
+                logActivity(tabId, `Warning: ${material.name} already fully allocated`, 'warning');
                 return;
             }
+            
+            // Store undo history
+            addUndoHistory(tabId, materialId, 'manual_allocation', 
+                          { needed: material.needed, allocated: material.allocated },
+                          { needed: material.needed - allocatable, allocated: material.allocated + allocatable });
             
             // Subtract from needed and add to allocated
             material.needed -= allocatable;
             material.allocated += allocatable;
             
             // Log the allocation
-            logActivity(`Allocated ${allocatable} ${material.name} (Remaining: ${material.needed})`, 'allocation');
+            logActivity(tabId, `Allocated ${allocatable} ${material.name} (Remaining: ${material.needed})`, 'allocation');
             
             // Re-render and update stats
-            renderMaterials();
-            updateStats();
-            
-            // Auto-save state after allocation
+            renderMaterials(tabId);
+            updateStats(tabId);
             saveState();
             
             // Check if material is complete
             if (material.needed <= 0) {
-                logActivity(`✓ ${material.name} COMPLETE (${material.allocated}/${material.original})`, 'success');
+                logActivity(tabId, `✓ ${material.name} COMPLETE (${material.allocated}/${material.original})`, 'success');
             }
         }
 
-        function updateStats() {
+        function updateStats(tabId) {
+            if (!tabs[tabId]) return;
+            
+            const materials = tabs[tabId].materials;
             const totalItems = materials.length;
             const totalNeeded = materials.reduce((sum, m) => sum + m.needed, 0);
             const totalAllocated = materials.reduce((sum, m) => sum + m.allocated, 0);
             const completedItems = materials.filter(m => m.needed <= 0).length;
             const completionRate = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
-            document.getElementById('totalItems').textContent = totalItems;
-            document.getElementById('totalNeeded').textContent = totalNeeded;
-            document.getElementById('totalAllocated').textContent = totalAllocated;
-            document.getElementById('completionRate').textContent = completionRate + '%';
+            const totalItemsEl = document.getElementById(`totalItems-${tabId}`);
+            const totalNeededEl = document.getElementById(`totalNeeded-${tabId}`);
+            const totalAllocatedEl = document.getElementById(`totalAllocated-${tabId}`);
+            const completionRateEl = document.getElementById(`completionRate-${tabId}`);
+            
+            if (totalItemsEl) totalItemsEl.textContent = totalItems;
+            if (totalNeededEl) totalNeededEl.textContent = totalNeeded;
+            if (totalAllocatedEl) totalAllocatedEl.textContent = totalAllocated;
+            if (completionRateEl) completionRateEl.textContent = completionRate + '%';
         }
 
-        function finalizeSession() {
-            if (!sessionActive) return;
+        function finalizeSession(tabId) {
+            if (!tabs[tabId] || !tabs[tabId].sessionActive) return;
             
+            const materials = tabs[tabId].materials;
             const completedCount = materials.filter(m => m.needed <= 0).length;
             const totalCount = materials.length;
             
-            if (confirm(`Finalize this session?\n\nCompleted: ${completedCount}/${totalCount} materials\n\nThis will save the current state and reset for a new session.`)) {
+            if (confirm(`Finalize session for "${tabs[tabId].name}"?\n\nCompleted: ${completedCount}/${totalCount} materials\n\nThis will close this job tab.`)) {
                 
                 // Log final session summary
-                logActivity(`=== SESSION FINALIZED ===`, 'success');
-                logActivity(`Completed materials: ${completedCount}/${totalCount}`, 'success');
+                logActivity(tabId, `=== SESSION FINALIZED ===`, 'success');
+                logActivity(tabId, `Completed materials: ${completedCount}/${totalCount}`, 'success');
                 
                 materials.forEach(material => {
                     if (material.allocated > 0) {
-                        logActivity(`Final: ${material.name} - ${material.allocated}/${material.original} allocated`, 'info');
+                        logActivity(tabId, `Final: ${material.name} - ${material.allocated}/${material.original} allocated`, 'info');
                     }
                 });
                 
-                logActivity(`=== SESSION END ===`, 'success');
+                logActivity(tabId, `=== SESSION END ===`, 'success');
                 
-                // Reset for new session
+                // Close the tab after a brief delay
                 setTimeout(() => {
-                    clearSession();
+                    closeTab(tabId, { stopPropagation: () => {} });
                 }, 2000);
             }
         }
 
-        function clearSession() {
-            materials = [];
-            sessionActive = false;
+        function clearSession(tabId) {
+            if (!tabs[tabId]) return;
             
-            // Save current cargo capacity before clearing state
-            const currentCargoCapacity = cargoCapacity;
-            
-            // Clear saved state but preserve cargo capacity
-            const state = {
-                materials: [],
-                activityLog: [],
-                sessionActive: false,
-                cargoCapacity: currentCargoCapacity,
-                timestamp: new Date().toISOString()
-            };
-            localStorage.setItem('sonderOS_state', JSON.stringify(state));
+            tabs[tabId].materials = [];
+            tabs[tabId].sessionActive = false;
+            tabs[tabId].activityLog = [];
             
             // Reset UI
-            document.getElementById('commoditiesPaste').value = '';
-            document.getElementById('inputSection').style.display = 'block';
-            document.getElementById('statsSection').style.display = 'none';
-            document.getElementById('materialsSection').style.display = 'none';
-            document.getElementById('actionButtons').style.display = 'none';
+            document.getElementById(`commoditiesPaste-${tabId}`).value = '';
+            document.getElementById(`inputSection-${tabId}`).style.display = 'block';
+            document.getElementById(`statsSection-${tabId}`).style.display = 'none';
+            document.getElementById(`materialsSection-${tabId}`).style.display = 'none';
+            document.getElementById(`actionButtons-${tabId}`).style.display = 'none';
             
             // Reset buttons
-            document.getElementById('scrubberBtn').disabled = false;
-            document.getElementById('confirmBtn').disabled = true;
-            document.getElementById('scrubber-text').textContent = 'SCRUB & PARSE DATA';
+            document.getElementById(`scrubberBtn-${tabId}`).disabled = false;
+            document.getElementById(`confirmBtn-${tabId}`).disabled = true;
+            document.getElementById(`scrubber-text-${tabId}`).textContent = 'SCRUB & PARSE DATA';
             
-            scrubberActive = false;
+            tabs[tabId].scrubberActive = false;
             
-            logActivity('Session cleared - ready for new commodities list', 'info');
-            if (currentCargoCapacity > 0) {
-                logActivity(`Cargo capacity preserved: ${currentCargoCapacity} tons`, 'info');
-            }
+            logActivity(tabId, 'Session cleared - ready for new commodities list', 'info');
+            saveState();
         }
 
-        function clearSavedData() {
-            if (confirm('Clear all saved browser data?\n\nThis will permanently remove your saved session and activity log from this browser.')) {
-                clearSavedState();
-                logActivity('All saved browser data has been cleared', 'success');
-            }
-        }
-
-        function exportData() {
+        function exportData(tabId) {
+            if (!tabs[tabId]) return;
+            
+            const tab = tabs[tabId];
             const data = {
+                tabName: tab.name,
                 timestamp: new Date().toISOString(),
                 sessionSummary: {
-                    totalMaterials: materials.length,
-                    completedMaterials: materials.filter(m => m.needed <= 0).length,
-                    totalAllocated: materials.reduce((sum, m) => sum + m.allocated, 0),
-                    totalOriginal: materials.reduce((sum, m) => sum + m.original, 0)
+                    totalMaterials: tab.materials.length,
+                    completedMaterials: tab.materials.filter(m => m.needed <= 0).length,
+                    totalAllocated: tab.materials.reduce((sum, m) => sum + m.allocated, 0),
+                    totalOriginal: tab.materials.reduce((sum, m) => sum + m.original, 0)
                 },
-                materials: materials,
-                activityLog: activityLog
+                materials: tab.materials,
+                activityLog: tab.activityLog
             };
             
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `sonderOS_session_${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `sonderOS_${tab.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.json`;
             a.click();
             URL.revokeObjectURL(url);
             
-            logActivity('Session data exported successfully', 'success');
+            logActivity(tabId, 'Session data exported successfully', 'success');
         }
 
         // Initialize
-        logActivity('SonderOS Materials Management System initialized', 'info');
-        
-        // Try to restore previous session
-        const restored = loadState();
-        if (!restored) {
-            // Even if no session restored, try to load cargo capacity
-            try {
-                const savedState = localStorage.getItem('sonderOS_state');
-                if (savedState) {
-                    const state = JSON.parse(savedState);
-                    if (state.cargoCapacity > 0) {
-                        cargoCapacity = state.cargoCapacity;
-                        document.getElementById('cargoCapacity').value = cargoCapacity;
-                        logActivity(`Cargo capacity loaded: ${cargoCapacity} tons`, 'info');
-                    }
-                }
-            } catch (e) {
-                console.error('Error loading cargo capacity:', e);
-            }
+        function initializeApp() {
+            console.log('Initializing SonderOS Enhanced...');
             
-            logActivity('Ready to receive commodities list for scrubbing', 'info');
+            try {
+                const restored = loadState();
+                if (!restored) {
+                    console.log('No saved state found, creating new tab...');
+                    createNewTab();
+                } else {
+                    console.log('Restored previous state with', Object.keys(tabs).length, 'tabs');
+                }
+            } catch (error) {
+                console.error('Error during initialization:', error);
+                // Fallback: create a new tab
+                createNewTab();
+            }
         }
+
+        // Multiple initialization methods to ensure it works in all environments
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else if (document.readyState === 'interactive' || document.readyState === 'complete') {
+            initializeApp();
+        }
+
+        window.addEventListener('load', () => {
+            // Final fallback: ensure at least one tab exists
+            setTimeout(() => {
+                if (Object.keys(tabs).length === 0) {
+                    console.log('Fallback: Creating tab after window load');
+                    createNewTab();
+                }
+            }, 100);
+        });
     </script>
 </body>
 </html>
