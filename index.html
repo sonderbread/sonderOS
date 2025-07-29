@@ -19,6 +19,8 @@
             overflow-x: hidden;
         }
 
+
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -129,6 +131,45 @@
             margin-bottom: 10px;
             text-shadow: 0 0 20px #00ffff;
             animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        .promotional-message {
+            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            border-radius: 8px;
+            font-size: 14px;
+            color: #00ff88;
+            animation: promotional-glow 3s ease-in-out infinite alternate;
+        }
+
+        .promotional-message.visible {
+            display: block;
+        }
+
+        .promotional-message a {
+            color: #00ffff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .promotional-message a:hover {
+            color: #ffffff;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        @keyframes promotional-glow {
+            from { 
+                box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+                border-color: rgba(0, 255, 0, 0.3);
+            }
+            to { 
+                box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+                border-color: rgba(0, 255, 0, 0.6);
+            }
         }
 
         @keyframes glow {
@@ -575,6 +616,14 @@
             line-height: 1.5;
         }
 
+        .footer.branded {
+            display: block;
+        }
+
+        .footer:not(.branded) {
+            display: none;
+        }
+
         .footer a {
             color: #00ffff;
             text-decoration: none;
@@ -598,6 +647,10 @@
         <div class="header">
             <h1>SonderOS Materials Management</h1>
             <p>Enhanced Multi-Job Tracking System v3.2</p>
+            <div class="promotional-message" id="promotionalMessage">
+                This tool brought to you by <strong>F.R.E.I.G.H.T.</strong> Come let us know how you like it! 
+                <a href="https://discord.gg/freight" target="_blank">discord.gg/freight</a>
+            </div>
         </div>
 
         <!-- Tab System -->
@@ -610,7 +663,7 @@
         <!-- Tab Contents Container -->
         <div id="tabContents"></div>
 
-        <div class="footer">
+        <div class="footer" id="footer">
             <div>
                 Brought to you by <strong>CMDR Sonderbread</strong> of <strong>F.R.E.I.G.H.T.</strong> 
                 • <a href="https://discord.gg/freight" target="_blank">discord.gg/freight</a>
@@ -626,6 +679,53 @@
         let currentTabId = null;
         let globalCargoCapacity = 0;
         let nextTabId = 1;
+        let usageCount = 0;
+
+        // Usage tracking functions
+        function loadUsageCount() {
+            const savedCount = localStorage.getItem('sonderOS_usage_count');
+            usageCount = savedCount ? parseInt(savedCount) : 0;
+            console.log('Loaded usage count:', usageCount);
+            updateBrandingDisplay();
+        }
+
+        function incrementUsageCount() {
+            usageCount++;
+            localStorage.setItem('sonderOS_usage_count', usageCount.toString());
+            console.log('Usage count incremented to:', usageCount);
+            
+            if (usageCount >= 15) {
+                updateBrandingDisplay();
+            }
+        }
+
+        function updateBrandingDisplay() {
+            const promotionalMessage = document.getElementById('promotionalMessage');
+            const footer = document.getElementById('footer');
+            
+            if (usageCount >= 15) {
+                // Show promotional message
+                if (promotionalMessage) {
+                    promotionalMessage.classList.add('visible');
+                }
+                
+                // Show footer
+                if (footer) {
+                    footer.classList.add('branded');
+                }
+                
+                console.log('Branding activated at usage count:', usageCount);
+            } else {
+                // Hide promotional elements
+                if (promotionalMessage) {
+                    promotionalMessage.classList.remove('visible');
+                }
+                
+                if (footer) {
+                    footer.classList.remove('branded');
+                }
+            }
+        }
 
         // Tab Content Template
         function createTabContentHTML(tabId) {
@@ -1180,6 +1280,9 @@ The scrubber will automatically detect and parse your format!"></textarea>
                     if (parsedMaterials.length > 0) {
                         tabs[tabId].materials = parsedMaterials;
                         tabs[tabId].sessionActive = true;
+                        
+                        // Increment usage count on successful scrub
+                        incrementUsageCount();
                         
                         saveState();
                         
@@ -1876,6 +1979,9 @@ The scrubber will automatically detect and parse your format!"></textarea>
             console.log('Initializing SonderOS Enhanced...');
             
             try {
+                // Load usage count first
+                loadUsageCount();
+                
                 const restored = loadState();
                 if (!restored) {
                     console.log('No saved state found, creating new tab...');
