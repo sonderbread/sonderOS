@@ -1155,7 +1155,10 @@ The scrubber will automatically detect and parse your format!"></textarea>
                 // If pipe format didn't work, try standard quantity + name format
                 if (!foundCommodity) {
                     // Try to match any commodity name in the line with a quantity
-                    for (const commodityName of commodityNames) {
+                    // Sort commodity names by length (longest first) to prioritize more specific matches
+                    const sortedCommodityNames = [...commodityNames].sort((a, b) => b.length - a.length);
+                    
+                    for (const commodityName of sortedCommodityNames) {
                         const commodityWords = commodityName.split(/\s+/);
                         
                         // Check if all words of this commodity are present in the line
@@ -1167,6 +1170,22 @@ The scrubber will automatically detect and parse your format!"></textarea>
                         );
                         
                         if (allWordsPresent) {
+                            // For multi-word commodities, ensure we're not just matching a subset
+                            // e.g., prefer "water purifiers" over just "water"
+                            if (commodityWords.length > 1) {
+                                // Check that the words appear in sequence or close proximity
+                                const lineText = line.toLowerCase();
+                                const commodityText = commodityName.toLowerCase();
+                                
+                                // Simple check: if the commodity name appears as a substring (allowing for punctuation)
+                                const normalizedLine = lineText.replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ');
+                                const normalizedCommodity = commodityText.replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ');
+                                
+                                if (!normalizedLine.includes(normalizedCommodity)) {
+                                    continue; // Skip this match, words aren't together
+                                }
+                            }
+                            
                             // Find quantity in the line
                             const qtyMatch = line.match(/(\d+(?:[,\.]\d+)*k?)/i);
                             if (qtyMatch) {
@@ -1179,7 +1198,7 @@ The scrubber will automatically detect and parse your format!"></textarea>
                                         processed++;
                                         foundCommodity = true;
                                         console.log(`✓ Pattern match: ${commodityName} (${quantity})`); // Debug
-                                        break;
+                                        break; // Stop at first match (longest/most specific)
                                     }
                                 }
                             }
@@ -2179,7 +2198,7 @@ The scrubber will automatically detect and parse your format!"></textarea>
             return parsedMaterials;
         }
 
-        // Material Rendering and Control
+        // Material Rendering and Control - Enhanced with alphabetical sorting by category
         function renderMaterials(tabId) {
             if (!tabs[tabId]) return;
             
@@ -2188,49 +2207,91 @@ The scrubber will automatically detect and parse your format!"></textarea>
             
             grid.innerHTML = '';
             
+            // Group materials by category and sort alphabetically
+            const materialsByCategory = {};
             tabs[tabId].materials.forEach(material => {
-                const remaining = material.needed;
-                const status = remaining <= 0 ? 'complete' : 
-                              material.allocated > 0 ? 'partial' : 'needed';
-                
-                const itemDiv = document.createElement('div');
-                itemDiv.className = `material-item ${status}`;
-                
-                // Determine cargo button allocation amount and text
-                const cargoAllocation = Math.min(globalCargoCapacity, remaining);
-                const cargoButtonDisabled = globalCargoCapacity <= 0 || remaining <= 0;
-                const cargoButtonText = globalCargoCapacity > 0 ? `${cargoAllocation}T` : 'Set Cargo';
-                
-                // Check if undo is available
-                const undoAvailable = material.undoHistory && material.undoHistory.length > 0;
-                
-                // Display category and group info if available
-                const categoryInfo = material.category !== 'Unknown' ? 
-                    `<div style="font-size: 11px; color: rgba(0, 255, 255, 0.6); margin-top: 2px;">${material.category} (${material.group})</div>` : '';
-                
-                itemDiv.innerHTML = `
-                    <div class="material-name">
-                        ${material.name}
-                        ${categoryInfo}
-                    </div>
-                    <div class="material-progress">
-                        Need: ${material.needed}<br>
-                        Allocated: ${material.allocated}
-                    </div>
-                    <div class="material-controls">
-                        <input type="number" class="material-input" 
-                               value="0" min="0" max="${remaining}"
-                               onkeypress="handleEnterKey(event, ${tabId}, ${material.id}, this)"
-                               placeholder="0">
-                        <button class="cargo-btn" ${cargoButtonDisabled ? 'disabled' : ''} 
-                                onclick="allocateCargoCapacity(${tabId}, ${material.id})">${cargoButtonText}</button>
-                        <button class="undo-btn" ${undoAvailable ? '' : 'disabled'} 
-                                onclick="undoLastAllocation(${tabId}, ${material.id})">UNDO</button>
-                    </div>
-                    <div class="status-indicator status-${status}"></div>
+                const category = material.category || 'Unknown';
+                if (!materialsByCategory[category]) {
+                    materialsByCategory[category] = [];
+                }
+                materialsByCategory[category].push(material);
+            });
+            
+            // Sort categories alphabetically
+            const sortedCategories = Object.keys(materialsByCategory).sort();
+            
+            // Sort materials within each category alphabetically
+            sortedCategories.forEach(category => {
+                materialsByCategory[category].sort((a, b) => a.name.localeCompare(b.name));
+            });
+            
+            // Render materials grouped by category
+            sortedCategories.forEach(category => {
+                // Add category header
+                const categoryHeader = document.createElement('div');
+                categoryHeader.style.cssText = `
+                    grid-column: 1 / -1;
+                    background: rgba(0, 255, 255, 0.15);
+                    border: 1px solid rgba(0, 255, 255, 0.4);
+                    border-radius: 6px;
+                    padding: 10px 15px;
+                    margin: 10px 0 5px 0;
+                    font-weight: bold;
+                    font-size: 16px;
+                    color: #00ffff;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    text-align: center;
+                    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
                 `;
+                categoryHeader.textContent = `${category} (${materialsByCategory[category].length} items)`;
+                grid.appendChild(categoryHeader);
                 
-                grid.appendChild(itemDiv);
+                // Render materials in this category
+                materialsByCategory[category].forEach(material => {
+                    const remaining = material.needed;
+                    const status = remaining <= 0 ? 'complete' : 
+                                  material.allocated > 0 ? 'partial' : 'needed';
+                    
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = `material-item ${status}`;
+                    
+                    // Determine cargo button allocation amount and text
+                    const cargoAllocation = Math.min(globalCargoCapacity, remaining);
+                    const cargoButtonDisabled = globalCargoCapacity <= 0 || remaining <= 0;
+                    const cargoButtonText = globalCargoCapacity > 0 ? `${cargoAllocation}T` : 'Set Cargo';
+                    
+                    // Check if undo is available
+                    const undoAvailable = material.undoHistory && material.undoHistory.length > 0;
+                    
+                    // Display group info if available
+                    const groupInfo = material.group && material.group !== 'unknown' ? 
+                        `<div style="font-size: 11px; color: rgba(0, 255, 255, 0.6); margin-top: 2px;">${material.group}</div>` : '';
+                    
+                    itemDiv.innerHTML = `
+                        <div class="material-name">
+                            ${material.name}
+                            ${groupInfo}
+                        </div>
+                        <div class="material-progress">
+                            Need: ${material.needed}<br>
+                            Allocated: ${material.allocated}
+                        </div>
+                        <div class="material-controls">
+                            <input type="number" class="material-input" 
+                                   value="0" min="0" max="${remaining}"
+                                   onkeypress="handleEnterKey(event, ${tabId}, ${material.id}, this)"
+                                   placeholder="0">
+                            <button class="cargo-btn" ${cargoButtonDisabled ? 'disabled' : ''} 
+                                    onclick="allocateCargoCapacity(${tabId}, ${material.id})">${cargoButtonText}</button>
+                            <button class="undo-btn" ${undoAvailable ? '' : 'disabled'} 
+                                    onclick="undoLastAllocation(${tabId}, ${material.id})">UNDO</button>
+                        </div>
+                        <div class="status-indicator status-${status}"></div>
+                    `;
+                    
+                    grid.appendChild(itemDiv);
+                });
             });
         }
 
