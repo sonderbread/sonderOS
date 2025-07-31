@@ -320,6 +320,20 @@
             justify-content: center;
             gap: 20px;
             margin-bottom: 30px;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-scrub {
+            background: linear-gradient(45deg, #6a4c93, #9b59b6);
+            color: white;
+            border: 1px solid #8e44ad;
+        }
+
+        .btn-scrub:hover {
+            background: linear-gradient(45deg, #5a3a83, #8b4fb6);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(155, 89, 182, 0.3);
         }
 
         .scrubber-btn {
@@ -646,7 +660,7 @@
     <div class="container">
         <div class="header">
             <h1>SonderOS Materials Management</h1>
-            <p>Enhanced Multi-Job Tracking System v3.2</p>
+            <p>Enhanced Multi-Job Tracking System v3.2 with SonderOS Scrubbing</p>
             <div class="promotional-message" id="promotionalMessage">
                 This tool brought to you by <strong>F.R.E.I.G.H.T.</strong> Come let us know how you like it! 
                 <a href="https://discord.gg/freight" target="_blank">discord.gg/freight</a>
@@ -675,6 +689,126 @@
     </div>
 
     <script>
+        // Complete category map from SBcategory_map.txt
+        const categoryMap = {
+            // Chemicals
+            'pesticides': { category: 'Chemicals', average: '412', group: 'small batch' },
+            'water': { category: 'Chemicals', average: '260', group: 'small batch' },
+            'liquid oxygen': { category: 'Chemicals', average: '1375', group: 'bulk' },
+            'surface stabilisers': { category: 'Chemicals', average: '668', group: 'bulk' },
+            'surface stabiliser': { category: 'Chemicals', average: '668', group: 'bulk' },
+            
+            // Consumer Items
+            'evacuation shelter': { category: 'Consumer Items', average: '500', group: 'small batch' },
+            'survival equipment': { category: 'Consumer Items', average: '666', group: 'small batch' },
+            
+            // Legal Drugs
+            'beer': { category: 'Legal Drugs', average: '350', group: 'small batch' },
+            'liquor': { category: 'Legal Drugs', average: '774', group: 'small batch' },
+            'wine': { category: 'Legal Drugs', average: '417', group: 'small batch' },
+            
+            // Foods
+            'animal meat': { category: 'Foods', average: '1462', group: 'small batch' },
+            'animal meats': { category: 'Foods', average: '1462', group: 'small batch' },
+            'coffee': { category: 'Foods', average: '1425', group: 'small batch' },
+            'fish': { category: 'Foods', average: '613', group: 'small batch' },
+            'food cartridges': { category: 'Foods', average: '252', group: 'small batch' },
+            'food cartridge': { category: 'Foods', average: '252', group: 'small batch' },
+            'fruit and vegetables': { category: 'Foods', average: '483', group: 'small batch' },
+            'fruits and vegetables': { category: 'Foods', average: '483', group: 'small batch' },
+            'fruit and vegetable': { category: 'Foods', average: '483', group: 'small batch' },
+            'fruits and vegetable': { category: 'Foods', average: '483', group: 'small batch' },
+            'grain': { category: 'Foods', average: '387', group: 'small batch' },
+            'tea': { category: 'Foods', average: '1603', group: 'small batch' },
+            
+            // Industrial Materials
+            'ceramic composites': { category: 'Industrial Materials', average: '402', group: 'ground' },
+            'ceramic composite': { category: 'Industrial Materials', average: '402', group: 'ground' },
+            'cmm composite': { category: 'Industrial Materials', average: '5972', group: 'ground' },
+            'cmm composites': { category: 'Industrial Materials', average: '5972', group: 'ground' },
+            'cmc composite': { category: 'Industrial Materials', average: '6113', group: 'ground' },
+            'insulating membrane': { category: 'Industrial Materials', average: '10605', group: 'small batch' },
+            'insulating membranes': { category: 'Industrial Materials', average: '10605', group: 'small batch' },
+            'polymers': { category: 'Industrial Materials', average: '306', group: 'ground' },
+            'semiconductors': { category: 'Industrial Materials', average: '1084', group: 'ground' },
+            'superconductors': { category: 'Industrial Materials', average: '6551', group: 'ground' },
+            'meta alloys': { category: 'Industrial Materials', average: '88148', group: 'bulk' },
+            'micro weave cooling hoses': { category: 'Industrial Materials', average: '1901', group: 'small batch' },
+            
+            // Machinery
+            'building fabricators': { category: 'Machinery', average: '2224', group: 'small batch' },
+            'crop harvesters': { category: 'Machinery', average: '2211', group: 'small batch' },
+            'emergency power cells': { category: 'Machinery', average: '2038', group: 'small batch' },
+            'geological equipment': { category: 'Machinery', average: '1830', group: 'small batch' },
+            'microbial furnaces': { category: 'Machinery', average: '418', group: 'small batch' },
+            'mineral extractors': { category: 'Machinery', average: '791', group: 'small batch' },
+            'power generators': { category: 'Machinery', average: '2388', group: 'small batch' },
+            'thermal cooling units': { category: 'Machinery', average: '3700', group: 'small batch' },
+            'water purifiers': { category: 'Machinery', average: '447', group: 'small batch' },
+            'articulation motors': { category: 'Machinery', average: '4997', group: 'ground' },
+            'energy grid assembly': { category: 'Machinery', average: '1684', group: 'ground' },
+            'power converter': { category: 'Machinery', average: '246', group: 'ground' },
+            'power transfer bus': { category: 'Machinery', average: '849', group: 'ground' },
+            'radiation baffle': { category: 'Machinery', average: '383', group: 'ground' },
+            'reinforced mounting plate': { category: 'Machinery', average: '1074', group: 'ground' },
+            'heatsink interlink': { category: 'Machinery', average: '729', group: 'ground' },
+            'magnetic emitter coil': { category: 'Machinery', average: '199', group: 'ground' },
+            'ion distributor': { category: 'Machinery', average: '986', group: 'small batch' },
+            
+            // Medicines
+            'agri-medicines': { category: 'Medicines', average: '1197', group: 'small batch' },
+            'basic medicines': { category: 'Medicines', average: '489', group: 'small batch' },
+            'combat stabilizers': { category: 'Medicines', average: '3392', group: 'small batch' },
+            
+            // Metals
+            'aluminium': { category: 'Metals', average: '2540', group: 'bulk' },
+            'aluminum': { category: 'Metals', average: '2540', group: 'bulk' },
+            'copper': { category: 'Metals', average: '631', group: 'ground' },
+            'steel': { category: 'Metals', average: '4179', group: 'bulk' },
+            'titanium': { category: 'Metals', average: '4446', group: 'bulk' },
+            
+            // Technology
+            'advanced catalysers': { category: 'Technology', average: '2863', group: 'small batch' },
+            'auto-fabricators': { category: 'Technology', average: '3621', group: 'small batch' },
+            'bioreducing lichen': { category: 'Technology', average: '1178', group: 'small batch' },
+            'computer components': { category: 'Technology', average: '708', group: 'small batch' },
+            'h.e. suits': { category: 'Technology', average: '518', group: 'small batch' },
+            'he suits': { category: 'Technology', average: '518', group: 'small batch' },
+            'land enrichment systems': { category: 'Technology', average: '4693', group: 'small batch' },
+            'medical diagnostic equipment': { category: 'Technology', average: '2944', group: 'small batch' },
+            'micro controllers': { category: 'Technology', average: '5404', group: 'small batch' },
+            'muon imager': { category: 'Technology', average: '6166', group: 'small batch' },
+            'resonating seperators': { category: 'Technology', average: '5692', group: 'small batch' },
+            'robotics': { category: 'Technology', average: '1915', group: 'small batch' },
+            'structural regulators': { category: 'Technology', average: '1909', group: 'small batch' },
+            'modular terminals': { category: 'Technology', average: '6958', group: 'ground' },
+            'telemetry suite': { category: 'Technology', average: '2080', group: 'small batch' },
+            
+            // Textiles
+            'military grade fabrics': { category: 'Textiles', average: '899', group: 'small batch' },
+            
+            // Waste
+            'biowaste': { category: 'Waste', average: '271', group: 'small batch' },
+            
+            // Weapons
+            'battle weapons': { category: 'Weapons', average: '7137', group: 'small batch' },
+            'non lethal weapons': { category: 'Weapons', average: '1848', group: 'small batch' },
+            'nonlethal weapons': { category: 'Weapons', average: '1848', group: 'small batch' },
+            'non-lethal weapons': { category: 'Weapons', average: '1848', group: 'small batch' },
+            'reactive armour': { category: 'Weapons', average: '2102', group: 'small batch' }
+        };
+
+        // Global state
+        let currentDistance = null;
+        let currentSystem = null;
+        let currentItems = [];
+        let jobType = 'orbital';
+        let jobsiteName = '';
+        let orderNumber = '';
+        let jobMultiplier = 1;
+        let claimJumps = 0;
+        
+        // Job management state
         let tabs = {};
         let currentTabId = null;
         let globalCargoCapacity = 0;
@@ -751,7 +885,17 @@ Steel Plates: 100
 Copper Wire: 250
 Circuit Boards: 50
 
+🧹 NEW: Use 'Scrub List' first for messy data from emails/PDFs!
 The scrubber will automatically detect and parse your format!"></textarea>
+                        
+                        <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <button class="btn btn-scrub" onclick="scrubList(${tabId})" style="background: linear-gradient(45deg, #6a4c93, #9b59b6); border: 1px solid #8e44ad; color: white; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; transition: all 0.3s ease;">
+                                <span>🧹</span> Scrub List
+                            </button>
+                            <div style="color: rgba(0, 255, 255, 0.7); font-size: 12px; font-style: italic; flex: 1; min-width: 200px;">
+                                📧 Messy data from emails/PDFs? Use Scrub List first to clean and standardize format!
+                            </div>
+                        </div>
                         
                         <div class="cargo-capacity-section">
                             <label for="cargoCapacity-${tabId}" class="cargo-label">Your Ship's Cargo Capacity (tons):</label>
@@ -769,6 +913,12 @@ The scrubber will automatically detect and parse your format!"></textarea>
                             • Material Name | Quantity <em>or</em> Quantity | Material Name<br>
                             • Material Name [tab] Quantity <em>or</em> Quantity [tab] Material Name<br>
                             • Material Name [space] Quantity <em>or</em> Quantity [space] Material Name<br>
+                            <br><strong>🧹 NEW: Scrub List Feature</strong><br>
+                            • Use "Scrub List" for messy data from emails/PDFs<br>
+                            • Automatically recognizes ${Object.keys(categoryMap).length} commodity types<br>
+                            • Cleans punctuation and standardizes format<br>
+                            • Preserves K notation (20k = 20,000)<br>
+                            • Fuzzy matches similar names to known commodities<br>
                             <br><strong>Quantity formats supported:</strong><br>
                             • Plain numbers: 784, 1250<br>
                             • With commas: 28,000<br>
@@ -780,6 +930,14 @@ The scrubber will automatically detect and parse your format!"></textarea>
                     </div>
 
                     <div class="controls-section">
+                        <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <button class="btn btn-scrub" onclick="scrubList(${tabId})" style="background: linear-gradient(45deg, #6a4c93, #9b59b6); border: 1px solid #8e44ad; color: white; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; transition: all 0.3s ease;">
+                                <span>🧹</span> Scrub List
+                            </button>
+                            <div style="color: rgba(0, 255, 255, 0.7); font-size: 12px; font-style: italic; flex: 1; min-width: 200px;">
+                                📧 Messy data from emails/PDFs? Use Scrub List first to clean and standardize format!
+                            </div>
+                        </div>
                         <button class="scrubber-btn" id="scrubberBtn-${tabId}" onclick="runDataScrubber(${tabId})">
                             <span id="scrubber-text-${tabId}">SCRUB & PARSE DATA</span>
                         </button>
@@ -823,6 +981,234 @@ The scrubber will automatically detect and parse your format!"></textarea>
                     </div>
                 </div>
             `;
+        }
+
+        // Exact parseQuantity function from sonderOS
+        function parseQuantity(quantityStr) {
+            if (!quantityStr) return 0;
+            
+            let cleanStr = quantityStr.toString().replace(/,/g, '').toLowerCase();
+            
+            // Handle K notation
+            if (cleanStr.includes('k')) {
+                const num = parseFloat(cleanStr.replace('k', ''));
+                return Math.floor(num * 1000);
+            }
+            
+            // Handle M notation
+            if (cleanStr.includes('m')) {
+                const num = parseFloat(cleanStr.replace('m', ''));
+                return Math.floor(num * 1000000);
+            }
+            
+            return parseInt(cleanStr) || 0;
+        }
+
+        // SCRUB LIST FUNCTION - Enhanced commodity-first approach
+        function scrubList(tabId) {
+            const pasteArea = document.getElementById(`commoditiesPaste-${tabId}`);
+            if (!pasteArea) return;
+            
+            const input = pasteArea.value.trim();
+            if (!input) {
+                logActivity(tabId, 'No list to scrub - please paste some data first', 'warning');
+                return;
+            }
+
+            // Step 1: Protect K notation patterns (like 1.5k, 20K) by temporarily replacing them
+            const kNotationPattern = /(\d+\.?\d*)k/gi;
+            const protectedTokens = [];
+            let tokenIndex = 0;
+            
+            let protectedInput = input.replace(kNotationPattern, (match) => {
+                const token = `__KTOKEN${tokenIndex}__`;
+                protectedTokens[tokenIndex] = match;
+                tokenIndex++;
+                return token;
+            });
+
+            // Step 2: Remove special characters and punctuation (keep numbers, letters, and whitespace)
+            let cleaned = protectedInput.replace(/[^\w\s]|_/g, "");
+            
+            // Step 3: Restore K notation patterns
+            protectedTokens.forEach((originalValue, index) => {
+                cleaned = cleaned.replace(`KTOKEN${index}`, originalValue);
+            });
+
+            // Step 4: Split by lines and filter empty
+            let lines = cleaned.split("\n").filter(line => line.trim() !== "");
+            
+            // Step 5: COMMODITY-FIRST APPROACH - Check if line contains commodities BEFORE filtering
+            let commodityLines = [];
+            let seenCommodities = new Set(); // Prevent duplicates
+            let processed = 0;
+            let failed = 0;
+            
+            // Create a lookup set of all commodity words for faster searching
+            const commodityWords = new Set();
+            const commodityNames = Object.keys(categoryMap);
+            commodityNames.forEach(name => {
+                name.split(/\s+/).forEach(word => commodityWords.add(word.toLowerCase()));
+            });
+            
+            logActivity(tabId, `Scanning for commodities from database of ${commodityNames.length} known items...`, 'info');
+            
+            // Process each line
+            for (let line of lines) {
+                let foundCommodity = false;
+                const originalLine = line;
+                
+                console.log(`Processing line: "${line}"`); // Debug
+                
+                // FIRST: Check if this line contains any commodity words - if so, don't filter it out
+                const lineWords = line.toLowerCase().split(/\s+/);
+                const hasKnownCommodityWords = lineWords.some(word => commodityWords.has(word));
+                
+                // Only apply aggressive filtering if the line doesn't contain any commodity words
+                if (!hasKnownCommodityWords) {
+                    const lowerLine = line.toLowerCase().trim();
+                    if (lowerLine.includes('consolidated') || 
+                        lowerLine.includes('system') || 
+                        lowerLine.includes('jobsite') || 
+                        lowerLine.includes('order') || 
+                        lowerLine.includes('job type') ||
+                        lowerLine.includes('total') ||
+                        lowerLine.includes('deadline') ||
+                        lowerLine.includes('status') ||
+                        lowerLine.includes('materials') ||
+                        lowerLine.includes('item') ||
+                        lowerLine.includes('qty') ||
+                        lowerLine.includes('contract') ||
+                        lowerLine.includes('multiplier') ||
+                        lowerLine.includes('additional') ||
+                        lowerLine.includes('note:') ||
+                        // Category headers (only exact matches)
+                        lowerLine === 'chemicals' ||
+                        lowerLine === 'consumer items' ||
+                        lowerLine === 'foods' ||
+                        lowerLine === 'industrial materials' ||
+                        lowerLine === 'machinery' ||
+                        lowerLine === 'metals' ||
+                        lowerLine === 'technology' ||
+                        lowerLine === 'textiles' ||
+                        lowerLine === 'weapons' ||
+                        lowerLine === 'waste' ||
+                        lowerLine === 'medicines' ||
+                        lowerLine === 'legal drugs' ||
+                        lowerLine.match(/^\s*=+\s*/) ||
+                        lowerLine.match(/^\s*-+\s*$/)) {
+                        console.log(`Filtered out: "${line}" (no commodity words found)`); // Debug
+                        continue;
+                    }
+                } else {
+                    console.log(`Line contains commodity words, processing: "${line}"`); // Debug
+                }
+                
+                // Try pipe-separated format first (Item | Qty)
+                const pipeMatch = line.match(/^(.+?)\s*\|\s*(.+)$/);
+                if (pipeMatch) {
+                    let itemName = pipeMatch[1].trim();
+                    let quantity = parseQuantity(pipeMatch[2]);
+                    
+                    console.log(`Pipe match found: "${itemName}" | ${quantity}`); // Debug
+                    
+                    if (quantity > 0) {
+                        // Handle arrow notation: "Thermal Cooling (→thermal cooling units)"
+                        const arrowMatch = itemName.match(/^(.+?)\s*\(→(.+?)\)$/);
+                        if (arrowMatch) {
+                            itemName = arrowMatch[2].trim(); // Use the mapped name
+                            console.log(`Arrow notation: ${arrowMatch[1].trim()} → ${itemName}`); // Debug
+                        }
+                        
+                        const normalizedName = normalizeItemName(itemName);
+                        console.log(`Normalized: "${itemName}" → "${normalizedName}"`); // Debug
+                        
+                        // Check if it's a known commodity
+                        if (categoryMap[normalizedName]) {
+                            const commodityKey = `${quantity}-${normalizedName}`;
+                            if (!seenCommodities.has(commodityKey)) {
+                                commodityLines.push(`${quantity} ${normalizedName}`);
+                                seenCommodities.add(commodityKey);
+                                processed++;
+                                foundCommodity = true;
+                                console.log(`✓ Exact match: ${normalizedName}`); // Debug
+                            }
+                        } else {
+                            // Try fuzzy matching
+                            const closestMatch = findClosestMatch(normalizedName, commodityNames);
+                            if (closestMatch) {
+                                console.log(`Fuzzy match: "${normalizedName}" → "${closestMatch}"`); // Debug
+                                const commodityKey = `${quantity}-${closestMatch}`;
+                                if (!seenCommodities.has(commodityKey)) {
+                                    commodityLines.push(`${quantity} ${closestMatch}*`);
+                                    seenCommodities.add(commodityKey);
+                                    processed++;
+                                    foundCommodity = true;
+                                }
+                            } else {
+                                console.log(`✗ No match for: "${normalizedName}"`); // Debug
+                            }
+                        }
+                    }
+                }
+                
+                // If pipe format didn't work, try standard quantity + name format
+                if (!foundCommodity) {
+                    // Try to match any commodity name in the line with a quantity
+                    for (const commodityName of commodityNames) {
+                        const commodityWords = commodityName.split(/\s+/);
+                        
+                        // Check if all words of this commodity are present in the line
+                        const allWordsPresent = commodityWords.every(word => 
+                            lineWords.some(lineWord => 
+                                lineWord.toLowerCase().includes(word.toLowerCase()) || 
+                                word.toLowerCase().includes(lineWord.toLowerCase())
+                            )
+                        );
+                        
+                        if (allWordsPresent) {
+                            // Find quantity in the line
+                            const qtyMatch = line.match(/(\d+(?:[,\.]\d+)*k?)/i);
+                            if (qtyMatch) {
+                                const quantity = parseQuantity(qtyMatch[1]);
+                                if (quantity > 0) {
+                                    const commodityKey = `${quantity}-${commodityName}`;
+                                    if (!seenCommodities.has(commodityKey)) {
+                                        commodityLines.push(`${quantity} ${commodityName}`);
+                                        seenCommodities.add(commodityKey);
+                                        processed++;
+                                        foundCommodity = true;
+                                        console.log(`✓ Pattern match: ${commodityName} (${quantity})`); // Debug
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if (!foundCommodity) {
+                    failed++;
+                    console.log(`✗ Failed to find commodity in: "${line}"`); // Debug
+                }
+            }
+
+            // Update the textarea with only the commodity lines
+            const output = commodityLines.join("\n");
+            pasteArea.value = output;
+            
+            // Show status
+            let statusMsg = `Enhanced commodity scan complete: ${processed} unique commodities identified`;
+            if (failed > 0) {
+                statusMsg += `, ${failed} non-commodity lines filtered out`;
+            }
+            statusMsg += '. Arrow notation and fuzzy matching applied!';
+            
+            logActivity(tabId, statusMsg, 'success');
+            logActivity(tabId, `✨ Smart commodity-first filtering preserved all known items from database`, 'info');
+            if (commodityLines.some(line => line.includes('*'))) {
+                logActivity(tabId, `🎯 Items with * were fuzzy-matched to known commodities`, 'info');
+            }
         }
 
         // Tab Management
@@ -1317,187 +1703,153 @@ The scrubber will automatically detect and parse your format!"></textarea>
             }, 500);
         }
 
-        // Centralized quantity parsing function - strips ALL punctuation except 'k' suffix
-        function parseQuantity(quantityStr) {
-            if (!quantityStr) return 0;
-            
-            let cleanStr = quantityStr.toString().trim();
-            
-            // Handle 'k' or 'K' suffix (thousands) - check this BEFORE stripping punctuation
-            const kMatch = cleanStr.match(/(\d+(?:[,.]\d+)?)\s*[kK](?:\s*[tT](?:ons?)?)?/i);
-            if (kMatch) {
-                // Strip punctuation from the number part and multiply by 1000
-                const baseNumber = kMatch[1].replace(/[^\d]/g, '');
-                return parseInt(baseNumber) * 1000;
-            }
-            
-            // Strip ALL punctuation except digits (includes commas, periods, colons, pipes, etc.)
-            cleanStr = cleanStr.replace(/[^\d]/g, '');
-            
-            // Return parsed integer or 0 if invalid
-            return parseInt(cleanStr) || 0;
-        }
-
         function parseRawData(tabId, rawData) {
-            // Check for Consolidated Contract format
+            // Check for Consolidated Contract format (only if not scrubbed yet)
             if (rawData.includes('ALL MATERIALS:') && rawData.includes('===')) {
                 return parseConsolidatedContract(tabId, rawData);
             }
             
-            // Check if this is a Discord ticket format
+            // Check if this is a Discord ticket format (only if not scrubbed yet)
             if (rawData.includes('ITEMS:') || rawData.includes('CONTRACT:')) {
                 return parseDiscordTicket(tabId, rawData);
             }
             
-            // Check for 3-column pipe format (Item | Qty | Price)
+            // Check for 3-column pipe format (only if not scrubbed yet)
             if (rawData.includes('|') && (rawData.includes('Qty') || rawData.includes('Buy Price'))) {
                 return parseThreeColumnFormat(tabId, rawData);
             }
             
-            // Original parsing for other formats
+            // SIMPLIFIED: Parse post-scrubbed list directly
+            // Expected format: "quantity commodity_name" or "quantity commodity_name*"
             const lines = rawData.split('\n').map(line => line.trim()).filter(line => line);
             const parsedMaterials = [];
             let id = 1;
+            let processed = 0;
+            let skipped = 0;
+            
+            logActivity(tabId, 'Processing scrubbed commodity list...', 'info');
             
             for (const line of lines) {
-                // Try different separator patterns
-                let match = null;
-                let name = '';
-                let quantity = 0;
+                // Skip empty lines
+                if (!line) continue;
                 
-                // Pattern matching logic using centralized parseQuantity
-                match = line.match(/^(.+?):\s*(.+)$/);
+                // Expected format: "quantity commodity_name" or "quantity commodity_name*"
+                const match = line.match(/^(\d+(?:k|K)?)\s+(.+)$/);
+                
                 if (match) {
-                    name = match[1].trim();
-                    quantity = parseQuantity(match[2]);
-                } else {
-                    match = line.match(/^(.+?)\s*:\s*(.+)$/);
-                    if (match) {
-                        // Try parsing first part as quantity, second as name
-                        const firstPart = parseQuantity(match[1]);
-                        if (firstPart > 0) {
-                            quantity = firstPart;
-                            name = match[2].trim();
-                        } else {
-                            name = match[1].trim();
-                            quantity = parseQuantity(match[2]);
-                        }
-                    }
-                }
-                
-                if (!match) {
-                    match = line.match(/^(.+?),\s*(.+)$/);
-                    if (match) {
-                        name = match[1].trim();
-                        quantity = parseQuantity(match[2]);
-                        // If first parse failed, try reverse
-                        if (quantity === 0) {
-                            const firstPart = parseQuantity(match[1]);
-                            if (firstPart > 0) {
-                                quantity = firstPart;
-                                name = match[2].trim();
-                            }
-                        }
-                    }
-                }
-                
-                if (!match) {
-                    match = line.match(/^(.+?)\s*-\s*(.+)$/);
-                    if (match) {
-                        name = match[1].trim();
-                        quantity = parseQuantity(match[2]);
-                        // If first parse failed, try reverse
-                        if (quantity === 0) {
-                            const firstPart = parseQuantity(match[1]);
-                            if (firstPart > 0) {
-                                quantity = firstPart;
-                                name = match[2].trim();
-                            }
-                        }
-                    }
-                }
-                
-                if (!match) {
-                    match = line.match(/^(.+?)\s*\|\s*(.+)$/);
-                    if (match) {
-                        name = match[1].trim();
-                        quantity = parseQuantity(match[2]);
-                        // If first parse failed, try reverse
-                        if (quantity === 0) {
-                            const firstPart = parseQuantity(match[1]);
-                            if (firstPart > 0) {
-                                quantity = firstPart;
-                                name = match[2].trim();
-                            }
-                        }
-                    }
-                }
-                
-                if (!match) {
-                    match = line.match(/^(.+?)\t+(.+)$/);
-                    if (match) {
-                        name = match[1].trim();
-                        quantity = parseQuantity(match[2]);
-                        // If first parse failed, try reverse
-                        if (quantity === 0) {
-                            const firstPart = parseQuantity(match[1]);
-                            if (firstPart > 0) {
-                                quantity = firstPart;
-                                name = match[2].trim();
-                            }
-                        }
-                    }
-                }
-                
-                if (!match) {
-                    match = line.match(/^(.+?)\s{2,}(.+)$/);
-                    if (match) {
-                        name = match[1].trim();
-                        quantity = parseQuantity(match[2]);
-                        // If first parse failed, try reverse
-                        if (quantity === 0) {
-                            const firstPart = parseQuantity(match[1]);
-                            if (firstPart > 0) {
-                                quantity = firstPart;
-                                name = match[2].trim();
-                            }
-                        }
-                    }
-                }
-                
-                if (!match) {
-                    match = line.match(/^(.+?)\s+(.+)$/);
-                    if (match) {
-                        name = match[1].trim();
-                        quantity = parseQuantity(match[2]);
-                        // If first parse failed, try reverse
-                        if (quantity === 0) {
-                            const firstPart = parseQuantity(match[1]);
-                            if (firstPart > 0) {
-                                quantity = firstPart;
-                                name = match[2].trim();
-                            }
-                        }
-                    }
-                }
-                
-                if (match && name && quantity > 0) {
-                    parsedMaterials.push({
-                        id: id++,
-                        name: name,
-                        needed: quantity,
-                        original: quantity,
-                        allocated: 0,
-                        undoHistory: []
-                    });
+                    const quantity = parseQuantity(match[1]);
+                    let commodityName = match[2].trim();
                     
-                    logActivity(tabId, `Parsed: ${name} (${quantity} needed)`, 'info');
+                    // Handle asterisk from scrub list (indicates fuzzy match)
+                    const isFuzzyMatch = commodityName.endsWith('*');
+                    if (isFuzzyMatch) {
+                        commodityName = commodityName.slice(0, -1).trim(); // Remove asterisk
+                    }
+                    
+                    // Normalize the commodity name
+                    const normalizedName = normalizeItemName(commodityName);
+                    
+                    // Look up in categoryMap
+                    const itemData = categoryMap[normalizedName];
+                    
+                    if (itemData && quantity > 0) {
+                        parsedMaterials.push({
+                            id: id++,
+                            name: normalizedName,
+                            needed: quantity,
+                            original: quantity,
+                            allocated: 0,
+                            undoHistory: [],
+                            category: itemData.category,
+                            group: itemData.group
+                        });
+                        
+                        const matchType = isFuzzyMatch ? ' (fuzzy matched)' : '';
+                        logActivity(tabId, `✓ Added: ${normalizedName} (${quantity} needed)${matchType}`, 'info');
+                        processed++;
+                    } else {
+                        logActivity(tabId, `✗ Skipped: "${commodityName}" - not found in commodity database`, 'warning');
+                        skipped++;
+                    }
                 } else {
-                    logActivity(tabId, `Warning: Could not parse line: "${line}"`, 'warning');
+                    // If line doesn't match expected format, skip it
+                    logActivity(tabId, `✗ Skipped malformed line: "${line}"`, 'warning');
+                    skipped++;
                 }
             }
             
+            // Summary
+            if (processed > 0) {
+                let resultMsg = `Successfully processed ${processed} commodities from scrubbed list`;
+                if (skipped > 0) {
+                    resultMsg += ` (skipped ${skipped} invalid items)`;
+                }
+                logActivity(tabId, resultMsg, 'success');
+            } else {
+                logActivity(tabId, 'No valid commodities found. Try using "Scrub List" first!', 'warning');
+            }
+            
             return parsedMaterials;
+        }
+
+        // Normalize item name (from sonderOS approach)
+        function normalizeItemName(name) {
+            return name.toLowerCase()
+                .replace(/-/g, ' ')
+                .replace(/\./g, '')
+                .replace('equipement', 'equipment')
+                .replace('purfiers', 'purifiers')
+                .trim();
+        }
+
+        // Find closest match using simple string similarity
+        function findClosestMatch(target, candidates) {
+            let bestMatch = null;
+            let bestScore = 0;
+            const threshold = 0.5; // Lowered threshold for better fuzzy matching
+            
+            for (const candidate of candidates) {
+                const score = similarity(target, candidate);
+                if (score > threshold && score > bestScore) {
+                    bestScore = score;
+                    bestMatch = candidate;
+                }
+            }
+            
+            return bestMatch;
+        }
+
+        // Simple string similarity function
+        function similarity(s1, s2) {
+            const longer = s1.length > s2.length ? s1 : s2;
+            const shorter = s1.length > s2.length ? s2 : s1;
+            
+            if (longer.length === 0) return 1.0;
+            
+            const editDistance = levenshteinDistance(longer, shorter);
+            return (longer.length - editDistance) / longer.length;
+        }
+
+        // Levenshtein distance calculation
+        function levenshteinDistance(s1, s2) {
+            const costs = [];
+            for (let i = 0; i <= s1.length; i++) {
+                let lastValue = i;
+                for (let j = 0; j <= s2.length; j++) {
+                    if (i === 0) {
+                        costs[j] = j;
+                    } else if (j > 0) {
+                        let newValue = costs[j - 1];
+                        if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {
+                            newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                        }
+                        costs[j - 1] = lastValue;
+                        lastValue = newValue;
+                    }
+                }
+                if (i > 0) costs[s2.length] = lastValue;
+            }
+            return costs[s2.length];
         }
 
         // NEW: Parse Consolidated Contract format
@@ -1507,6 +1859,7 @@ The scrubber will automatically detect and parse your format!"></textarea>
             let id = 1;
             let inMaterialsSection = false;
             let contractInfo = {};
+            let skippedUnrecognized = 0;
             
             // Extract contract info
             for (const line of lines) {
@@ -1556,22 +1909,32 @@ The scrubber will automatically detect and parse your format!"></textarea>
                 
                 if (!inMaterialsSection) continue;
                 
-                // Skip category headers, separators, and header lines
+                // Skip category headers, separators, header lines, and other non-commodity lines
                 if (line.startsWith('===') || 
-                    line.includes('Item') || 
+                    line.includes('Item') && line.includes('Qty') ||
                     line.includes('---') || 
-                    line.includes('Qty') ||
+                    line.includes('Buy Price') ||
+                    line.includes('Status:') ||
+                    line.includes('Deadline:') ||
+                    line.includes('chunks') ||
                     line.trim() === '' ||
-                    line.startsWith('=')) {
+                    line.startsWith('=') ||
+                    line.startsWith('-') ||
+                    /^\s*\|\s*$/.test(line)) {
                     continue;
                 }
                 
-                // Parse material lines (format: Material Name | Quantity)
-                const itemMatch = line.match(/^(.+?)\s*\|\s*(.+)$/);
+                // Parse material lines (format: Material Name | Quantity | Price)
+                const itemMatch = line.match(/^(.+?)\s*\|\s*(.+?)(?:\s*\|\s*(.+))?$/);
                 
                 if (itemMatch) {
                     let name = itemMatch[1].trim();
                     const quantity = parseQuantity(itemMatch[2]);
+                    
+                    // Skip if no valid quantity found
+                    if (!quantity || quantity <= 0) {
+                        continue;
+                    }
                     
                     // Handle arrow notation (→) for alternative names
                     const arrowMatch = name.match(/^(.+?)\s*\(→(.+?)\)$/);
@@ -1581,27 +1944,52 @@ The scrubber will automatically detect and parse your format!"></textarea>
                     }
                     
                     if (name && quantity > 0) {
-                        parsedMaterials.push({
-                            id: id++,
-                            name: name,
-                            needed: quantity,
-                            original: quantity,
-                            allocated: 0,
-                            undoHistory: []
-                        });
+                        // Normalize and match against categoryMap
+                        const normalizedName = normalizeItemName(name);
+                        let finalName = null;
+                        let itemData = categoryMap[normalizedName];
                         
-                        logActivity(tabId, `Parsed: ${name} (${quantity} needed)`, 'info');
-                    }
-                } else {
-                    // Log lines that couldn't be parsed for debugging
-                    if (line.length > 0 && !line.startsWith('=') && !line.includes('--')) {
-                        logActivity(tabId, `Skipped line: "${line}"`, 'warning');
+                        if (itemData) {
+                            finalName = normalizedName;
+                        } else {
+                            // Try fuzzy matching
+                            const closestMatch = findClosestMatch(normalizedName, Object.keys(categoryMap));
+                            if (closestMatch) {
+                                finalName = closestMatch;
+                                itemData = categoryMap[closestMatch];
+                                logActivity(tabId, `Fuzzy matched: "${normalizedName}" → "${closestMatch}"`, 'info');
+                            }
+                        }
+                        
+                        // Only add if we found a match in the categoryMap
+                        if (finalName && itemData) {
+                            parsedMaterials.push({
+                                id: id++,
+                                name: finalName,
+                                needed: quantity,
+                                original: quantity,
+                                allocated: 0,
+                                undoHistory: [],
+                                category: itemData.category,
+                                group: itemData.group
+                            });
+                            
+                            logActivity(tabId, `Parsed: ${finalName} (${quantity} needed)`, 'info');
+                        } else {
+                            // Skip unrecognized commodities
+                            skippedUnrecognized++;
+                            logActivity(tabId, `Skipped unrecognized commodity: "${normalizedName}"`, 'warning');
+                        }
                     }
                 }
             }
             
             if (parsedMaterials.length > 0) {
-                logActivity(tabId, `Successfully parsed ${parsedMaterials.length} items from consolidated contract`, 'success');
+                let resultMsg = `Successfully parsed ${parsedMaterials.length} recognized commodities from consolidated contract`;
+                if (skippedUnrecognized > 0) {
+                    resultMsg += ` (skipped ${skippedUnrecognized} unrecognized items)`;
+                }
+                logActivity(tabId, resultMsg, 'success');
             }
             
             return parsedMaterials;
@@ -1611,6 +1999,7 @@ The scrubber will automatically detect and parse your format!"></textarea>
             const lines = rawData.split('\n').map(line => line.trim()).filter(line => line);
             const parsedMaterials = [];
             let id = 1;
+            let skippedUnrecognized = 0;
             
             logActivity(tabId, 'Detected 3-column pipe format (Item | Qty | Price)', 'info');
             
@@ -1631,26 +2020,52 @@ The scrubber will automatically detect and parse your format!"></textarea>
                     const price = parseQuantity(match[3]);
                     
                     if (name && quantity > 0) {
-                        parsedMaterials.push({
-                            id: id++,
-                            name: name,
-                            needed: quantity,
-                            original: quantity,
-                            allocated: 0,
-                            undoHistory: []
-                        });
+                        // Normalize and match against categoryMap
+                        const normalizedName = normalizeItemName(name);
+                        let finalName = null;
+                        let itemData = categoryMap[normalizedName];
                         
-                        logActivity(tabId, `Parsed: ${name} (${quantity} needed @ ${price} credits)`, 'info');
-                    }
-                } else {
-                    if (line.length > 0) {
-                        logActivity(tabId, `Skipped line: "${line}"`, 'warning');
+                        if (itemData) {
+                            finalName = normalizedName;
+                        } else {
+                            // Try fuzzy matching
+                            const closestMatch = findClosestMatch(normalizedName, Object.keys(categoryMap));
+                            if (closestMatch) {
+                                finalName = closestMatch;
+                                itemData = categoryMap[closestMatch];
+                                logActivity(tabId, `Fuzzy matched: "${normalizedName}" → "${closestMatch}"`, 'info');
+                            }
+                        }
+                        
+                        // Only add if we found a match in the categoryMap
+                        if (finalName && itemData) {
+                            parsedMaterials.push({
+                                id: id++,
+                                name: finalName,
+                                needed: quantity,
+                                original: quantity,
+                                allocated: 0,
+                                undoHistory: [],
+                                category: itemData.category,
+                                group: itemData.group
+                            });
+                            
+                            logActivity(tabId, `Parsed: ${finalName} (${quantity} needed @ ${price} credits)`, 'info');
+                        } else {
+                            // Skip unrecognized commodities
+                            skippedUnrecognized++;
+                            logActivity(tabId, `Skipped unrecognized commodity: "${normalizedName}"`, 'warning');
+                        }
                     }
                 }
             }
             
             if (parsedMaterials.length > 0) {
-                logActivity(tabId, `Successfully parsed ${parsedMaterials.length} items from 3-column format`, 'success');
+                let resultMsg = `Successfully parsed ${parsedMaterials.length} recognized commodities from 3-column format`;
+                if (skippedUnrecognized > 0) {
+                    resultMsg += ` (skipped ${skippedUnrecognized} unrecognized items)`;
+                }
+                logActivity(tabId, resultMsg, 'success');
             }
             
             return parsedMaterials;
@@ -1662,6 +2077,7 @@ The scrubber will automatically detect and parse your format!"></textarea>
             let id = 1;
             let inItemsSection = false;
             let contractInfo = {};
+            let skippedUnrecognized = 0;
             
             // Extract contract info
             for (const line of lines) {
@@ -1712,22 +2128,52 @@ The scrubber will automatically detect and parse your format!"></textarea>
                     const quantity = parseQuantity(itemMatch[2]);
                     
                     if (name && quantity > 0) {
-                        parsedMaterials.push({
-                            id: id++,
-                            name: name,
-                            needed: quantity,
-                            original: quantity,
-                            allocated: 0,
-                            undoHistory: []
-                        });
+                        // Normalize and match against categoryMap
+                        const normalizedName = normalizeItemName(name);
+                        let finalName = null;
+                        let itemData = categoryMap[normalizedName];
                         
-                        logActivity(tabId, `Parsed: ${name} (${quantity} needed)`, 'info');
+                        if (itemData) {
+                            finalName = normalizedName;
+                        } else {
+                            // Try fuzzy matching
+                            const closestMatch = findClosestMatch(normalizedName, Object.keys(categoryMap));
+                            if (closestMatch) {
+                                finalName = closestMatch;
+                                itemData = categoryMap[closestMatch];
+                                logActivity(tabId, `Fuzzy matched: "${normalizedName}" → "${closestMatch}"`, 'info');
+                            }
+                        }
+                        
+                        // Only add if we found a match in the categoryMap
+                        if (finalName && itemData) {
+                            parsedMaterials.push({
+                                id: id++,
+                                name: finalName,
+                                needed: quantity,
+                                original: quantity,
+                                allocated: 0,
+                                undoHistory: [],
+                                category: itemData.category,
+                                group: itemData.group
+                            });
+                            
+                            logActivity(tabId, `Parsed: ${finalName} (${quantity} needed)`, 'info');
+                        } else {
+                            // Skip unrecognized commodities
+                            skippedUnrecognized++;
+                            logActivity(tabId, `Skipped unrecognized commodity: "${normalizedName}"`, 'warning');
+                        }
                     }
                 }
             }
             
             if (parsedMaterials.length > 0) {
-                logActivity(tabId, `Successfully parsed ${parsedMaterials.length} items from Discord ticket`, 'success');
+                let resultMsg = `Successfully parsed ${parsedMaterials.length} recognized commodities from Discord ticket`;
+                if (skippedUnrecognized > 0) {
+                    resultMsg += ` (skipped ${skippedUnrecognized} unrecognized items)`;
+                }
+                logActivity(tabId, resultMsg, 'success');
             }
             
             return parsedMaterials;
@@ -1758,8 +2204,15 @@ The scrubber will automatically detect and parse your format!"></textarea>
                 // Check if undo is available
                 const undoAvailable = material.undoHistory && material.undoHistory.length > 0;
                 
+                // Display category and group info if available
+                const categoryInfo = material.category !== 'Unknown' ? 
+                    `<div style="font-size: 11px; color: rgba(0, 255, 255, 0.6); margin-top: 2px;">${material.category} (${material.group})</div>` : '';
+                
                 itemDiv.innerHTML = `
-                    <div class="material-name">${material.name}</div>
+                    <div class="material-name">
+                        ${material.name}
+                        ${categoryInfo}
+                    </div>
                     <div class="material-progress">
                         Need: ${material.needed}<br>
                         Allocated: ${material.allocated}
@@ -1960,8 +2413,24 @@ The scrubber will automatically detect and parse your format!"></textarea>
                     totalOriginal: tab.materials.reduce((sum, m) => sum + m.original, 0)
                 },
                 materials: tab.materials,
-                activityLog: tab.activityLog
+                activityLog: tab.activityLog,
+                categoryBreakdown: {}
             };
+            
+            // Add category breakdown
+            tab.materials.forEach(material => {
+                const category = material.category || 'Unknown';
+                if (!data.categoryBreakdown[category]) {
+                    data.categoryBreakdown[category] = {
+                        count: 0,
+                        totalAllocated: 0,
+                        totalOriginal: 0
+                    };
+                }
+                data.categoryBreakdown[category].count++;
+                data.categoryBreakdown[category].totalAllocated += material.allocated;
+                data.categoryBreakdown[category].totalOriginal += material.original;
+            });
             
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
@@ -1976,7 +2445,7 @@ The scrubber will automatically detect and parse your format!"></textarea>
 
         // Initialize
         function initializeApp() {
-            console.log('Initializing SonderOS Enhanced...');
+            console.log('Initializing SonderOS Enhanced with SonderOS Scrubbing...');
             
             try {
                 // Load usage count first
@@ -2012,6 +2481,19 @@ The scrubber will automatically detect and parse your format!"></textarea>
                 }
             }, 100);
         });
+
+        // Keyboard shortcut for scrubbing
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'S') {
+                e.preventDefault();
+                if (currentTabId) {
+                    scrubList(currentTabId);
+                }
+            }
+        });
+
+        console.log('SonderTracker Enhanced with SonderOS Scrubbing v3.2 loaded successfully!');
+        console.log(`Commodity database loaded with ${Object.keys(categoryMap).length} known items`);
     </script>
 </body>
 </html>
