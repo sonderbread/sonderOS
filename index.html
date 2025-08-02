@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SonderOS - Materials Management System</title>
+    <title>sonderOS - Elite Dangerous Tools</title>
     <style>
         * {
             margin: 0;
@@ -19,157 +19,47 @@
             overflow-x: hidden;
         }
 
-
-
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        /* Tab System Styles */
-        .tabs-container {
-            margin-bottom: 20px;
-            border-bottom: 2px solid rgba(0, 255, 255, 0.3);
-        }
-
-        .tabs-header {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            overflow-x: auto;
-            padding-bottom: 2px;
-        }
-
-        .tab {
-            background: rgba(0, 100, 100, 0.2);
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            border-bottom: none;
-            color: rgba(0, 255, 255, 0.7);
-            padding: 12px 20px;
-            cursor: pointer;
-            border-radius: 8px 8px 0 0;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            min-width: 120px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            position: relative;
-        }
-
-        .tab:hover {
-            background: rgba(0, 150, 150, 0.3);
-            color: #00ffff;
-        }
-
-        .tab.active {
-            background: rgba(0, 255, 255, 0.1);
-            color: #00ffff;
-            border-color: #00ffff;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-        }
-
-        .tab-close {
-            background: rgba(255, 100, 100, 0.8);
-            border: none;
-            color: white;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-            transition: all 0.2s ease;
-            margin-left: auto;
-        }
-
-        .tab-close:hover {
-            background: rgba(255, 50, 50, 1);
-            transform: scale(1.1);
-        }
-
-        .new-tab-btn {
-            background: linear-gradient(45deg, #00cc00, #00ff00);
-            border: none;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px 8px 0 0;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-
-        .new-tab-btn:hover {
-            background: linear-gradient(45deg, #00ff00, #44ff44);
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
-            transform: translateY(-1px);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
+            margin-bottom: 50px;
+            padding: 40px 20px;
             background: rgba(0, 255, 255, 0.1);
             border: 1px solid #00ffff;
-            border-radius: 10px;
+            border-radius: 15px;
             backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
         }
 
         .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
             text-shadow: 0 0 20px #00ffff;
             animation: glow 2s ease-in-out infinite alternate;
+            background: linear-gradient(45deg, #00ffff, #00cccc, #0099aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .promotional-message {
-            display: none;
-            margin-top: 15px;
-            padding: 10px;
-            background: rgba(0, 255, 0, 0.1);
-            border: 1px solid rgba(0, 255, 0, 0.3);
-            border-radius: 8px;
-            font-size: 14px;
-            color: #00ff88;
-            animation: promotional-glow 3s ease-in-out infinite alternate;
+        .header .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #00dddd;
+            font-weight: 300;
         }
 
-        .promotional-message.visible {
-            display: block;
-        }
-
-        .promotional-message a {
-            color: #00ffff;
-            text-decoration: none;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .promotional-message a:hover {
-            color: #ffffff;
-            text-shadow: 0 0 10px #00ffff;
-        }
-
-        @keyframes promotional-glow {
-            from { 
-                box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-                border-color: rgba(0, 255, 0, 0.3);
-            }
-            to { 
-                box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
-                border-color: rgba(0, 255, 0, 0.6);
-            }
+        .header .description {
+            font-size: 1.1rem;
+            color: rgba(0, 255, 255, 0.8);
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         @keyframes glow {
@@ -177,2384 +67,340 @@
             to { text-shadow: 0 0 30px #00ffff, 0 0 40px #00ffff; }
         }
 
-        .input-section {
-            background: rgba(0, 100, 100, 0.1);
-            border: 1px solid #006666;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-
-        .paste-area {
-            width: 100%;
-            height: 200px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #00ffff;
-            border-radius: 8px;
-            color: #00ffff;
-            padding: 15px;
-            font-family: monospace;
-            font-size: 14px;
-            resize: vertical;
-            margin-bottom: 15px;
-        }
-
-        .paste-area:focus {
-            outline: none;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-        }
-
-        .paste-area::placeholder {
-            color: rgba(0, 255, 255, 0.5);
-        }
-
-        .cargo-capacity-section {
-            background: rgba(0, 255, 255, 0.05);
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .cargo-label {
-            color: #00ffff;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .cargo-input {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #00ffff;
-            color: #00ffff;
-            padding: 10px 15px;
-            border-radius: 6px;
-            width: 150px;
-            text-align: center;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .cargo-input:focus {
-            outline: none;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-        }
-
-        .cargo-hint {
-            color: rgba(0, 255, 255, 0.6);
-            font-size: 12px;
-            font-style: italic;
-        }
-
-        .job-name-section {
-            background: rgba(0, 255, 255, 0.05);
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .job-name-input {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #00ffff;
-            color: #00ffff;
-            padding: 10px 15px;
-            border-radius: 6px;
-            flex: 1;
-            min-width: 250px;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .job-name-input:focus {
-            outline: none;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-        }
-
-        .cargo-btn {
-            background: linear-gradient(45deg, #4CAF50, #45a049);
-            border: none;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-            transition: all 0.2s ease;
-            margin-left: 8px;
-            min-width: 80px;
-        }
-
-        .cargo-btn:hover {
-            background: linear-gradient(45deg, #45a049, #4CAF50);
-            box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
-            transform: translateY(-1px);
-        }
-
-        .cargo-btn:disabled {
-            background: linear-gradient(45deg, #333, #666);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .sample-format {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 15px;
-            font-family: monospace;
-            font-size: 12px;
-            color: rgba(0, 255, 255, 0.7);
-        }
-
-        .controls-section {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 30px;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .btn-scrub {
-            background: linear-gradient(45deg, #6a4c93, #9b59b6);
-            color: white;
-            border: 1px solid #8e44ad;
-        }
-
-        .btn-scrub:hover {
-            background: linear-gradient(45deg, #5a3a83, #8b4fb6);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(155, 89, 182, 0.3);
-        }
-
-        .scrubber-btn {
-            background: linear-gradient(45deg, #ff6600, #ffaa00);
-            border: none;
-            color: white;
-            padding: 15px 30px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            min-width: 200px;
-        }
-
-        .scrubber-btn:hover {
-            background: linear-gradient(45deg, #ffaa00, #ffdd00);
-            box-shadow: 0 0 20px rgba(255, 170, 0, 0.5);
-            transform: translateY(-2px);
-        }
-
-        .scrubber-btn.active {
-            background: linear-gradient(45deg, #00cc00, #00ff00);
-            animation: pulse 1s infinite;
-        }
-
-        .scrubber-btn:disabled {
-            background: linear-gradient(45deg, #333, #666);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.5); }
-            50% { box-shadow: 0 0 30px rgba(0, 255, 0, 0.8); }
-            100% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.5); }
-        }
-
-        .confirm-btn {
-            background: linear-gradient(45deg, #006666, #00cccc);
-            border: none;
-            color: white;
-            padding: 15px 30px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            min-width: 200px;
-        }
-
-        .confirm-btn:hover {
-            background: linear-gradient(45deg, #00cccc, #00ffff);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-            transform: translateY(-2px);
-        }
-
-        .confirm-btn:disabled {
-            background: linear-gradient(45deg, #333, #666);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .stats-section {
+        .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
         }
 
-        .stat-card {
-            background: rgba(0, 255, 255, 0.1);
-            border: 1px solid #00ffff;
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
+        .tool-card {
+            background: rgba(0, 100, 100, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .stat-value {
-            font-size: 1.8rem;
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+            border-radius: 15px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+            border-color: #00ffff;
+        }
+
+        .tool-card:hover::before {
+            opacity: 1;
+        }
+
+        .tool-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .tool-icon {
+            font-size: 2.5rem;
+            margin-right: 15px;
+            text-shadow: 0 0 15px currentColor;
+        }
+
+        .tool-title {
+            font-size: 2rem;
             font-weight: bold;
-            margin-bottom: 5px;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         }
 
-        .stat-label {
-            font-size: 12px;
-            opacity: 0.8;
+        .tool-version {
+            font-size: 0.9rem;
+            color: rgba(0, 255, 255, 0.6);
+            margin-left: 10px;
+            font-weight: normal;
+        }
+
+        .tool-description {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: rgba(0, 255, 255, 0.9);
+            margin-bottom: 20px;
+        }
+
+        .tool-features {
+            margin-bottom: 25px;
+        }
+
+        .tool-features h4 {
+            color: #00ffff;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .features-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .features-list li {
+            padding: 5px 0;
+            color: rgba(0, 255, 255, 0.8);
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .features-list li::before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            color: #00ffff;
+            font-size: 0.8rem;
+        }
+
+        .tool-link {
+            display: inline-block;
+            background: linear-gradient(45deg, #006666, #00cccc);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: 1px solid #00ffff;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
-        .materials-section {
-            margin-bottom: 30px;
+        .tool-link:hover {
+            background: linear-gradient(45deg, #00cccc, #00ffff);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            transform: translateY(-2px);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
         }
 
-        .materials-grid {
+        .stats-section {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
 
-        .material-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px;
-            margin-bottom: 8px;
-            background: rgba(0, 255, 255, 0.05);
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            border-radius: 6px;
-            transition: all 0.3s ease;
-        }
-
-        .material-item:hover {
-            background: rgba(0, 255, 255, 0.1);
-            border-color: #00ffff;
-        }
-
-        .material-item.complete {
-            border-left: 4px solid #00ff00;
-            background: rgba(0, 255, 0, 0.1);
-        }
-
-        .material-item.partial {
-            border-left: 4px solid #ffaa00;
-        }
-
-        .material-item.needed {
-            border-left: 4px solid #ff4444;
-        }
-
-        .material-name {
-            flex: 1;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .material-progress {
-            color: #ffaa00;
-            margin: 0 15px;
-            min-width: 120px;
-            font-size: 12px;
-            text-align: center;
-        }
-
-        .material-input {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #00ffff;
-            color: #00ffff;
-            padding: 8px 12px;
-            border-radius: 4px;
-            width: 80px;
-            text-align: center;
-            font-size: 14px;
-        }
-
-        .material-input:focus {
-            outline: none;
-            box-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
-        }
-
-        .material-controls {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .undo-btn {
-            background: linear-gradient(45deg, #ff6600, #ff9900);
-            border: none;
-            color: white;
-            padding: 6px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-            transition: all 0.2s ease;
-            min-width: 60px;
-        }
-
-        .undo-btn:hover {
-            background: linear-gradient(45deg, #ff9900, #ffcc00);
-            box-shadow: 0 0 8px rgba(255, 153, 0, 0.5);
-            transform: translateY(-1px);
-        }
-
-        .undo-btn:disabled {
-            background: linear-gradient(45deg, #333, #666);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .status-indicator {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            margin-left: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .status-complete {
-            background: #00ff00;
-            box-shadow: 0 0 8px #00ff00;
-        }
-
-        .status-partial {
-            background: #ffaa00;
-            box-shadow: 0 0 8px #ffaa00;
-        }
-
-        .status-needed {
-            background: #ff4444;
-            box-shadow: 0 0 8px #ff4444;
-        }
-
-        .log-section {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid #00ffff;
-            border-radius: 10px;
+        .stat-item {
             padding: 20px;
-            max-height: 400px;
-            overflow-y: auto;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
         }
 
-        .log-entry {
-            padding: 8px 12px;
-            margin-bottom: 4px;
-            background: rgba(0, 255, 255, 0.05);
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 12px;
-            border-left: 3px solid #00ffff;
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         }
 
-        .log-entry.warning {
-            border-left-color: #ffaa00;
-            background: rgba(255, 170, 0, 0.05);
-        }
-
-        .log-entry.success {
-            border-left-color: #00ff00;
-            background: rgba(0, 255, 0, 0.05);
-        }
-
-        .log-entry.allocation {
-            border-left-color: #ff00ff;
-            background: rgba(255, 0, 255, 0.05);
-        }
-
-        .log-entry.undo {
-            border-left-color: #ff6600;
-            background: rgba(255, 102, 0, 0.05);
-        }
-
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .btn {
-            background: linear-gradient(45deg, #666, #999);
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .btn:hover {
-            background: linear-gradient(45deg, #999, #ccc);
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-
-        .hidden {
-            display: none;
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(0, 255, 255, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
         }
 
         .footer {
-            margin-top: 40px;
-            padding: 20px;
             text-align: center;
+            padding: 30px;
             background: rgba(0, 255, 255, 0.05);
             border-top: 1px solid rgba(0, 255, 255, 0.3);
-            border-radius: 10px 10px 0 0;
-            font-size: 14px;
+            border-radius: 15px 15px 0 0;
+            font-size: 1rem;
             color: rgba(0, 255, 255, 0.8);
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
-        .footer.branded {
-            display: block;
-        }
-
-        .footer:not(.branded) {
-            display: none;
-        }
-
-        .footer a {
+        .footer .commander-info {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
             color: #00ffff;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .footer a:hover {
-            color: #ffffff;
-            text-shadow: 0 0 10px #00ffff;
+            font-weight: bold;
         }
 
         .footer .license-text {
-            margin-top: 8px;
-            font-size: 12px;
+            font-size: 0.9rem;
             opacity: 0.7;
+            margin-top: 15px;
+        }
+
+        .elite-dangerous {
+            color: #ff8800;
+            font-weight: bold;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tool-card {
+                padding: 20px;
+            }
+            
+            .tool-title {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>SonderOS Materials Management</h1>
-            <p>Enhanced Multi-Job Tracking System v3.2 with SonderOS Scrubbing</p>
-            <div class="promotional-message" id="promotionalMessage">
-                This tool brought to you by <strong>F.R.E.I.G.H.T.</strong> Come let us know how you like it! 
-                <a href="https://discord.gg/freight" target="_blank">discord.gg/freight</a>
+            <h1>sonderOS</h1>
+            <div class="subtitle">Elite Dangerous Commander Tools</div>
+            <div class="description">
+                A collection of web-based tools designed to streamline the most tedious aspects of <span class="elite-dangerous">Elite Dangerous</span>. 
+                Say goodbye to pen-and-paper tracking and endless spreadsheets. These tools are built by commanders, for commanders, 
+                to help you focus on what matters most - exploring the galaxy and having fun.
             </div>
         </div>
 
-        <!-- Tab System -->
-        <div class="tabs-container">
-            <div class="tabs-header" id="tabsHeader">
-                <button class="new-tab-btn" onclick="createNewTab()">+ NEW JOB</button>
+        <div class="stats-section">
+            <h2>Simplifying Commander Life</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">Active Tools</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100+</div>
+                    <div class="stat-label">Commodities Tracked</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">25</div>
+                    <div class="stat-label">Engineers Supported</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Hours Saved</div>
+                </div>
             </div>
         </div>
 
-        <!-- Tab Contents Container -->
-        <div id="tabContents"></div>
+        <div class="tools-grid">
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon">📦</div>
+                    <div>
+                        <div class="tool-title">sonderTracker <span class="tool-version">v3.2</span></div>
+                    </div>
+                </div>
+                <div class="tool-description">
+                    Advanced materials management system that revolutionizes how you handle commodity contracts and cargo tracking. 
+                    Perfect for freight haulers, miners, and anyone dealing with bulk material transportation.
+                </div>
+                <div class="tool-features">
+                    <h4>Key Features:</h4>
+                    <ul class="features-list">
+                        <li>Multi-job tracking with tabbed interface</li>
+                        <li>Smart data scrubbing for messy email/PDF inputs</li>
+                        <li>Auto-detection of contract formats (Consolidated, Discord, etc.)</li>
+                        <li>Cargo capacity optimization with one-click allocation</li>
+                        <li>Real-time progress tracking and completion statistics</li>
+                        <li>Undo system for allocation mistakes</li>
+                        <li>Data export for record keeping</li>
+                        <li>Fuzzy matching for 100+ known commodities</li>
+                    </ul>
+                </div>
+                <a href="sonderTracker.html" class="tool-link">Launch sonderTracker</a>
+            </div>
 
-        <div class="footer" id="footer">
+            <div class="tool-card">
+                <div class="tool-header">
+                    <div class="tool-icon">🔧</div>
+                    <div>
+                        <div class="tool-title">sonderPIN <span class="tool-version">v1.0</span></div>
+                    </div>
+                </div>
+                <div class="tool-description">
+                    Blueprint pin planner that takes the guesswork out of engineering. Optimize your engineer assignments, 
+                    track unlock progress, and plan your engineering sessions with precision.
+                </div>
+                <div class="tool-features">
+                    <h4>Key Features:</h4>
+                    <ul class="features-list">
+                        <li>Complete database of all 25 engineers and their specialties</li>
+                        <li>Track engineer unlock status and grade progression</li>
+                        <li>Smart assignment system prevents double-booking engineers</li>
+                        <li>Comprehensive blueprint coverage (Core, Defensive, Weapons, Utility, Optional)</li>
+                        <li>Visual indicators for engineer availability and assignments</li>
+                        <li>Regional engineer information (Bubble vs Colonia)</li>
+                        <li>Statistics tracking for planning efficiency</li>
+                        <li>Persistent state saving across sessions</li>
+                    </ul>
+                </div>
+                <a href="sonderPIN.html" class="tool-link">Launch sonderPIN</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="commander-info">CMDR Sonderbread</div>
             <div>
-                Brought to you by <strong>CMDR Sonderbread</strong> of <strong>F.R.E.I.G.H.T.</strong> 
-                • <a href="https://discord.gg/freight" target="_blank">discord.gg/freight</a>
+                Tools designed to eliminate the tedious paperwork and spreadsheet management that often comes with 
+                serious <span class="elite-dangerous">Elite Dangerous</span> gameplay. These web applications run entirely in your browser, 
+                save your progress locally, and are completely free to use.
             </div>
             <div class="license-text">
-                Licensed for free use • Not for hosting or commercial modification without permission
+                Licensed for free use • Built with ❤️ for the Elite Dangerous community
             </div>
         </div>
     </div>
 
     <script>
-        // Complete category map from SBcategory_map.txt
-        const categoryMap = {
-            // Chemicals
-            'pesticides': { category: 'Chemicals', average: '412', group: 'small batch' },
-            'water': { category: 'Chemicals', average: '260', group: 'small batch' },
-            'liquid oxygen': { category: 'Chemicals', average: '1375', group: 'bulk' },
-            'surface stabilisers': { category: 'Chemicals', average: '668', group: 'bulk' },
-            'surface stabiliser': { category: 'Chemicals', average: '668', group: 'bulk' },
-            
-            // Consumer Items
-            'evacuation shelter': { category: 'Consumer Items', average: '500', group: 'small batch' },
-            'survival equipment': { category: 'Consumer Items', average: '666', group: 'small batch' },
-            
-            // Legal Drugs
-            'beer': { category: 'Legal Drugs', average: '350', group: 'small batch' },
-            'liquor': { category: 'Legal Drugs', average: '774', group: 'small batch' },
-            'wine': { category: 'Legal Drugs', average: '417', group: 'small batch' },
-            
-            // Foods
-            'animal meat': { category: 'Foods', average: '1462', group: 'small batch' },
-            'animal meats': { category: 'Foods', average: '1462', group: 'small batch' },
-            'coffee': { category: 'Foods', average: '1425', group: 'small batch' },
-            'fish': { category: 'Foods', average: '613', group: 'small batch' },
-            'food cartridges': { category: 'Foods', average: '252', group: 'small batch' },
-            'food cartridge': { category: 'Foods', average: '252', group: 'small batch' },
-            'fruit and vegetables': { category: 'Foods', average: '483', group: 'small batch' },
-            'fruits and vegetables': { category: 'Foods', average: '483', group: 'small batch' },
-            'fruit and vegetable': { category: 'Foods', average: '483', group: 'small batch' },
-            'fruits and vegetable': { category: 'Foods', average: '483', group: 'small batch' },
-            'grain': { category: 'Foods', average: '387', group: 'small batch' },
-            'tea': { category: 'Foods', average: '1603', group: 'small batch' },
-            
-            // Industrial Materials
-            'ceramic composites': { category: 'Industrial Materials', average: '402', group: 'ground' },
-            'ceramic composite': { category: 'Industrial Materials', average: '402', group: 'ground' },
-            'cmm composite': { category: 'Industrial Materials', average: '5972', group: 'ground' },
-            'cmm composites': { category: 'Industrial Materials', average: '5972', group: 'ground' },
-            'cmc composite': { category: 'Industrial Materials', average: '6113', group: 'ground' },
-            'insulating membrane': { category: 'Industrial Materials', average: '10605', group: 'small batch' },
-            'insulating membranes': { category: 'Industrial Materials', average: '10605', group: 'small batch' },
-            'polymers': { category: 'Industrial Materials', average: '306', group: 'ground' },
-            'semiconductors': { category: 'Industrial Materials', average: '1084', group: 'ground' },
-            'superconductors': { category: 'Industrial Materials', average: '6551', group: 'ground' },
-            'meta alloys': { category: 'Industrial Materials', average: '88148', group: 'bulk' },
-            'micro weave cooling hoses': { category: 'Industrial Materials', average: '1901', group: 'small batch' },
-            
-            // Machinery
-            'building fabricators': { category: 'Machinery', average: '2224', group: 'small batch' },
-            'crop harvesters': { category: 'Machinery', average: '2211', group: 'small batch' },
-            'emergency power cells': { category: 'Machinery', average: '2038', group: 'small batch' },
-            'geological equipment': { category: 'Machinery', average: '1830', group: 'small batch' },
-            'microbial furnaces': { category: 'Machinery', average: '418', group: 'small batch' },
-            'mineral extractors': { category: 'Machinery', average: '791', group: 'small batch' },
-            'power generators': { category: 'Machinery', average: '2388', group: 'small batch' },
-            'thermal cooling units': { category: 'Machinery', average: '3700', group: 'small batch' },
-            'water purifiers': { category: 'Machinery', average: '447', group: 'small batch' },
-            'articulation motors': { category: 'Machinery', average: '4997', group: 'ground' },
-            'energy grid assembly': { category: 'Machinery', average: '1684', group: 'ground' },
-            'power converter': { category: 'Machinery', average: '246', group: 'ground' },
-            'power transfer bus': { category: 'Machinery', average: '849', group: 'ground' },
-            'radiation baffle': { category: 'Machinery', average: '383', group: 'ground' },
-            'reinforced mounting plate': { category: 'Machinery', average: '1074', group: 'ground' },
-            'heatsink interlink': { category: 'Machinery', average: '729', group: 'ground' },
-            'magnetic emitter coil': { category: 'Machinery', average: '199', group: 'ground' },
-            'ion distributor': { category: 'Machinery', average: '986', group: 'small batch' },
-            
-            // Medicines
-            'agri-medicines': { category: 'Medicines', average: '1197', group: 'small batch' },
-            'basic medicines': { category: 'Medicines', average: '489', group: 'small batch' },
-            'combat stabilizers': { category: 'Medicines', average: '3392', group: 'small batch' },
-            
-            // Metals
-            'aluminium': { category: 'Metals', average: '2540', group: 'bulk' },
-            'aluminum': { category: 'Metals', average: '2540', group: 'bulk' },
-            'copper': { category: 'Metals', average: '631', group: 'ground' },
-            'steel': { category: 'Metals', average: '4179', group: 'bulk' },
-            'titanium': { category: 'Metals', average: '4446', group: 'bulk' },
-            
-            // Technology
-            'advanced catalysers': { category: 'Technology', average: '2863', group: 'small batch' },
-            'auto-fabricators': { category: 'Technology', average: '3621', group: 'small batch' },
-            'bioreducing lichen': { category: 'Technology', average: '1178', group: 'small batch' },
-            'computer components': { category: 'Technology', average: '708', group: 'small batch' },
-            'h.e. suits': { category: 'Technology', average: '518', group: 'small batch' },
-            'he suits': { category: 'Technology', average: '518', group: 'small batch' },
-            'land enrichment systems': { category: 'Technology', average: '4693', group: 'small batch' },
-            'medical diagnostic equipment': { category: 'Technology', average: '2944', group: 'small batch' },
-            'micro controllers': { category: 'Technology', average: '5404', group: 'small batch' },
-            'muon imager': { category: 'Technology', average: '6166', group: 'small batch' },
-            'resonating seperators': { category: 'Technology', average: '5692', group: 'small batch' },
-            'robotics': { category: 'Technology', average: '1915', group: 'small batch' },
-            'structural regulators': { category: 'Technology', average: '1909', group: 'small batch' },
-            'modular terminals': { category: 'Technology', average: '6958', group: 'ground' },
-            'telemetry suite': { category: 'Technology', average: '2080', group: 'small batch' },
-            
-            // Textiles
-            'military grade fabrics': { category: 'Textiles', average: '899', group: 'small batch' },
-            
-            // Waste
-            'biowaste': { category: 'Waste', average: '271', group: 'small batch' },
-            
-            // Weapons
-            'battle weapons': { category: 'Weapons', average: '7137', group: 'small batch' },
-            'non lethal weapons': { category: 'Weapons', average: '1848', group: 'small batch' },
-            'nonlethal weapons': { category: 'Weapons', average: '1848', group: 'small batch' },
-            'non-lethal weapons': { category: 'Weapons', average: '1848', group: 'small batch' },
-            'reactive armour': { category: 'Weapons', average: '2102', group: 'small batch' }
-        };
-
-        // Global state
-        let currentDistance = null;
-        let currentSystem = null;
-        let currentItems = [];
-        let jobType = 'orbital';
-        let jobsiteName = '';
-        let orderNumber = '';
-        let jobMultiplier = 1;
-        let claimJumps = 0;
-        
-        // Job management state
-        let tabs = {};
-        let currentTabId = null;
-        let globalCargoCapacity = 0;
-        let nextTabId = 1;
-        let usageCount = 0;
-
-        // Usage tracking functions
-        function loadUsageCount() {
-            const savedCount = localStorage.getItem('sonderOS_usage_count');
-            usageCount = savedCount ? parseInt(savedCount) : 0;
-            console.log('Loaded usage count:', usageCount);
-            updateBrandingDisplay();
-        }
-
-        function incrementUsageCount() {
-            usageCount++;
-            localStorage.setItem('sonderOS_usage_count', usageCount.toString());
-            console.log('Usage count incremented to:', usageCount);
-            
-            if (usageCount >= 15) {
-                updateBrandingDisplay();
-            }
-        }
-
-        function updateBrandingDisplay() {
-            const promotionalMessage = document.getElementById('promotionalMessage');
-            const footer = document.getElementById('footer');
-            
-            if (usageCount >= 15) {
-                // Show promotional message
-                if (promotionalMessage) {
-                    promotionalMessage.classList.add('visible');
-                }
+        // Add some subtle animations on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.tool-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
                 
-                // Show footer
-                if (footer) {
-                    footer.classList.add('branded');
-                }
-                
-                console.log('Branding activated at usage count:', usageCount);
-            } else {
-                // Hide promotional elements
-                if (promotionalMessage) {
-                    promotionalMessage.classList.remove('visible');
-                }
-                
-                if (footer) {
-                    footer.classList.remove('branded');
-                }
-            }
-        }
-
-        // Tab Content Template
-        function createTabContentHTML(tabId) {
-            return `
-                <div class="tab-content" id="tab-content-${tabId}">
-                    <div class="input-section" id="inputSection-${tabId}">
-                        <h3>Setup New Job</h3>
-                        <div class="job-name-section">
-                            <label for="jobName-${tabId}" class="cargo-label">Job Name:</label>
-                            <input type="text" id="jobName-${tabId}" class="job-name-input" 
-                                   placeholder="Enter job name (e.g., Mining Contract Alpha)" 
-                                   oninput="updateJobName(${tabId}, this.value)"
-                                   maxlength="50">
-                            <div class="cargo-hint">This will be displayed on the tab</div>
-                        </div>
-                        <h4 style="margin-top: 20px;">Paste SonderOS Commodities List</h4>
-                        <textarea class="paste-area" id="commoditiesPaste-${tabId}" placeholder="Paste your commodities list here...
-
-✓ Consolidated Contract Format (full contract paste)
-✓ Discord Ticket Format (full ticket paste)
-✓ Simple formats like:
-Steel Plates: 100
-Copper Wire: 250
-Circuit Boards: 50
-
-🧹 NEW: Use 'Scrub List' first for messy data from emails/PDFs!
-The scrubber will automatically detect and parse your format!"></textarea>
-                        
-                        <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                            <button class="btn btn-scrub" onclick="scrubList(${tabId})" style="background: linear-gradient(45deg, #6a4c93, #9b59b6); border: 1px solid #8e44ad; color: white; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; transition: all 0.3s ease;">
-                                <span>🧹</span> Scrub List
-                            </button>
-                            <div style="color: rgba(0, 255, 255, 0.7); font-size: 12px; font-style: italic; flex: 1; min-width: 200px;">
-                                📧 Messy data from emails/PDFs? Use Scrub List first to clean and standardize format!
-                            </div>
-                        </div>
-                        
-                        <div class="cargo-capacity-section">
-                            <label for="cargoCapacity-${tabId}" class="cargo-label">Your Ship's Cargo Capacity (tons):</label>
-                            <input type="number" id="cargoCapacity-${tabId}" class="cargo-input" placeholder="e.g., 500" min="1" max="10000" oninput="saveCargoCapacity(${tabId})">
-                            <div class="cargo-hint">This will be saved globally for all jobs</div>
-                        </div>
-                        
-                        <div class="sample-format">
-                            <strong>Auto-detected formats:</strong><br>
-                            • <strong>Consolidated Contracts</strong> - Full contract paste with "ALL MATERIALS:" and categories<br>
-                            • <strong>Discord Tickets</strong> - Full ticket paste with ITEMS section<br>
-                            • Material Name: Quantity <em>or</em> Quantity: Material Name<br>
-                            • Material Name, Quantity <em>or</em> Quantity, Material Name<br>
-                            • Material Name - Quantity <em>or</em> Quantity - Material Name<br>
-                            • Material Name | Quantity <em>or</em> Quantity | Material Name<br>
-                            • Material Name [tab] Quantity <em>or</em> Quantity [tab] Material Name<br>
-                            • Material Name [space] Quantity <em>or</em> Quantity [space] Material Name<br>
-                            <br><strong>🧹 NEW: Scrub List Feature</strong><br>
-                            • Use "Scrub List" for messy data from emails/PDFs<br>
-                            • Automatically recognizes ${Object.keys(categoryMap).length} commodity types<br>
-                            • Cleans punctuation and standardizes format<br>
-                            • Preserves K notation (20k = 20,000)<br>
-                            • Fuzzy matches similar names to known commodities<br>
-                            <br><strong>Quantity formats supported:</strong><br>
-                            • Plain numbers: 784, 1250<br>
-                            • With commas: 28,000<br>
-                            • With periods: 28.000 (European format)<br>
-                            • With k suffix: 28k, 28K (= 28,000)<br>
-                            • With tons suffix: 784t, 784T, 784 tons<br>
-                            • Combined: 28kt, 1.5k tons
-                        </div>
-                    </div>
-
-                    <div class="controls-section">
-                        <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                            <button class="btn btn-scrub" onclick="scrubList(${tabId})" style="background: linear-gradient(45deg, #6a4c93, #9b59b6); border: 1px solid #8e44ad; color: white; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; transition: all 0.3s ease;">
-                                <span>🧹</span> Scrub List
-                            </button>
-                            <div style="color: rgba(0, 255, 255, 0.7); font-size: 12px; font-style: italic; flex: 1; min-width: 200px;">
-                                📧 Messy data from emails/PDFs? Use Scrub List first to clean and standardize format!
-                            </div>
-                        </div>
-                        <button class="scrubber-btn" id="scrubberBtn-${tabId}" onclick="runDataScrubber(${tabId})">
-                            <span id="scrubber-text-${tabId}">SCRUB & PARSE DATA</span>
-                        </button>
-                        <button class="confirm-btn" id="confirmBtn-${tabId}" onclick="finalizeSession(${tabId})" disabled>
-                            FINALIZE SESSION
-                        </button>
-                    </div>
-
-                    <div class="stats-section" id="statsSection-${tabId}" style="display: none;">
-                        <div class="stat-card">
-                            <div class="stat-value" id="totalItems-${tabId}">0</div>
-                            <div class="stat-label">Total Materials</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="totalNeeded-${tabId}">0</div>
-                            <div class="stat-label">Total Needed</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="totalAllocated-${tabId}">0</div>
-                            <div class="stat-label">Total Allocated</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="completionRate-${tabId}">0%</div>
-                            <div class="stat-label">Completion Rate</div>
-                        </div>
-                    </div>
-
-                    <div class="materials-section" id="materialsSection-${tabId}" style="display: none;">
-                        <h3>Materials Tracking</h3>
-                        <div class="materials-grid" id="materialsGrid-${tabId}"></div>
-                    </div>
-
-                    <div class="action-buttons" id="actionButtons-${tabId}" style="display: none;">
-                        <button class="btn" onclick="clearSession(${tabId})">Clear Session</button>
-                        <button class="btn" onclick="exportData(${tabId})">Export Data</button>
-                    </div>
-
-                    <div class="log-section">
-                        <h3>System Activity Log</h3>
-                        <div id="activityLog-${tabId}"></div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Exact parseQuantity function from sonderOS
-        function parseQuantity(quantityStr) {
-            if (!quantityStr) return 0;
-            
-            let cleanStr = quantityStr.toString().replace(/,/g, '').toLowerCase();
-            
-            // Handle K notation
-            if (cleanStr.includes('k')) {
-                const num = parseFloat(cleanStr.replace('k', ''));
-                return Math.floor(num * 1000);
-            }
-            
-            // Handle M notation
-            if (cleanStr.includes('m')) {
-                const num = parseFloat(cleanStr.replace('m', ''));
-                return Math.floor(num * 1000000);
-            }
-            
-            return parseInt(cleanStr) || 0;
-        }
-
-        // SCRUB LIST FUNCTION - Enhanced commodity-first approach
-        function scrubList(tabId) {
-            const pasteArea = document.getElementById(`commoditiesPaste-${tabId}`);
-            if (!pasteArea) return;
-            
-            const input = pasteArea.value.trim();
-            if (!input) {
-                logActivity(tabId, 'No list to scrub - please paste some data first', 'warning');
-                return;
-            }
-
-            // Step 1: Protect K notation patterns (like 1.5k, 20K) by temporarily replacing them
-            const kNotationPattern = /(\d+\.?\d*)k/gi;
-            const protectedTokens = [];
-            let tokenIndex = 0;
-            
-            let protectedInput = input.replace(kNotationPattern, (match) => {
-                const token = `__KTOKEN${tokenIndex}__`;
-                protectedTokens[tokenIndex] = match;
-                tokenIndex++;
-                return token;
-            });
-
-            // Step 2: Remove special characters and punctuation (keep numbers, letters, and whitespace)
-            let cleaned = protectedInput.replace(/[^\w\s]|_/g, "");
-            
-            // Step 3: Restore K notation patterns
-            protectedTokens.forEach((originalValue, index) => {
-                cleaned = cleaned.replace(`KTOKEN${index}`, originalValue);
-            });
-
-            // Step 4: Split by lines and filter empty
-            let lines = cleaned.split("\n").filter(line => line.trim() !== "");
-            
-            // Step 5: COMMODITY-FIRST APPROACH - Check if line contains commodities BEFORE filtering
-            let commodityLines = [];
-            let seenCommodities = new Set(); // Prevent duplicates
-            let processed = 0;
-            let failed = 0;
-            
-            // Create a lookup set of all commodity words for faster searching
-            const commodityWords = new Set();
-            const commodityNames = Object.keys(categoryMap);
-            commodityNames.forEach(name => {
-                name.split(/\s+/).forEach(word => commodityWords.add(word.toLowerCase()));
-            });
-            
-            logActivity(tabId, `Scanning for commodities from database of ${commodityNames.length} known items...`, 'info');
-            
-            // Process each line
-            for (let line of lines) {
-                let foundCommodity = false;
-                const originalLine = line;
-                
-                console.log(`Processing line: "${line}"`); // Debug
-                
-                // FIRST: Check if this line contains any commodity words - if so, don't filter it out
-                const lineWords = line.toLowerCase().split(/\s+/);
-                const hasKnownCommodityWords = lineWords.some(word => commodityWords.has(word));
-                
-                // Only apply aggressive filtering if the line doesn't contain any commodity words
-                if (!hasKnownCommodityWords) {
-                    const lowerLine = line.toLowerCase().trim();
-                    if (lowerLine.includes('consolidated') || 
-                        lowerLine.includes('system') || 
-                        lowerLine.includes('jobsite') || 
-                        lowerLine.includes('order') || 
-                        lowerLine.includes('job type') ||
-                        lowerLine.includes('total') ||
-                        lowerLine.includes('deadline') ||
-                        lowerLine.includes('status') ||
-                        lowerLine.includes('materials') ||
-                        lowerLine.includes('item') ||
-                        lowerLine.includes('qty') ||
-                        lowerLine.includes('contract') ||
-                        lowerLine.includes('multiplier') ||
-                        lowerLine.includes('additional') ||
-                        lowerLine.includes('note:') ||
-                        // Category headers (only exact matches)
-                        lowerLine === 'chemicals' ||
-                        lowerLine === 'consumer items' ||
-                        lowerLine === 'foods' ||
-                        lowerLine === 'industrial materials' ||
-                        lowerLine === 'machinery' ||
-                        lowerLine === 'metals' ||
-                        lowerLine === 'technology' ||
-                        lowerLine === 'textiles' ||
-                        lowerLine === 'weapons' ||
-                        lowerLine === 'waste' ||
-                        lowerLine === 'medicines' ||
-                        lowerLine === 'legal drugs' ||
-                        lowerLine.match(/^\s*=+\s*/) ||
-                        lowerLine.match(/^\s*-+\s*$/)) {
-                        console.log(`Filtered out: "${line}" (no commodity words found)`); // Debug
-                        continue;
-                    }
-                } else {
-                    console.log(`Line contains commodity words, processing: "${line}"`); // Debug
-                }
-                
-                // Try pipe-separated format first (Item | Qty)
-                const pipeMatch = line.match(/^(.+?)\s*\|\s*(.+)$/);
-                if (pipeMatch) {
-                    let itemName = pipeMatch[1].trim();
-                    let quantity = parseQuantity(pipeMatch[2]);
-                    
-                    console.log(`Pipe match found: "${itemName}" | ${quantity}`); // Debug
-                    
-                    if (quantity > 0) {
-                        // Handle arrow notation: "Thermal Cooling (→thermal cooling units)"
-                        const arrowMatch = itemName.match(/^(.+?)\s*\(→(.+?)\)$/);
-                        if (arrowMatch) {
-                            itemName = arrowMatch[2].trim(); // Use the mapped name
-                            console.log(`Arrow notation: ${arrowMatch[1].trim()} → ${itemName}`); // Debug
-                        }
-                        
-                        const normalizedName = normalizeItemName(itemName);
-                        console.log(`Normalized: "${itemName}" → "${normalizedName}"`); // Debug
-                        
-                        // Check if it's a known commodity
-                        if (categoryMap[normalizedName]) {
-                            const commodityKey = `${quantity}-${normalizedName}`;
-                            if (!seenCommodities.has(commodityKey)) {
-                                commodityLines.push(`${quantity} ${normalizedName}`);
-                                seenCommodities.add(commodityKey);
-                                processed++;
-                                foundCommodity = true;
-                                console.log(`✓ Exact match: ${normalizedName}`); // Debug
-                            }
-                        } else {
-                            // Try fuzzy matching
-                            const closestMatch = findClosestMatch(normalizedName, commodityNames);
-                            if (closestMatch) {
-                                console.log(`Fuzzy match: "${normalizedName}" → "${closestMatch}"`); // Debug
-                                const commodityKey = `${quantity}-${closestMatch}`;
-                                if (!seenCommodities.has(commodityKey)) {
-                                    commodityLines.push(`${quantity} ${closestMatch}*`);
-                                    seenCommodities.add(commodityKey);
-                                    processed++;
-                                    foundCommodity = true;
-                                }
-                            } else {
-                                console.log(`✗ No match for: "${normalizedName}"`); // Debug
-                            }
-                        }
-                    }
-                }
-                
-                // If pipe format didn't work, try standard quantity + name format
-                if (!foundCommodity) {
-                    // Try to match any commodity name in the line with a quantity
-                    // Sort commodity names by length (longest first) to prioritize more specific matches
-                    const sortedCommodityNames = [...commodityNames].sort((a, b) => b.length - a.length);
-                    
-                    for (const commodityName of sortedCommodityNames) {
-                        const commodityWords = commodityName.split(/\s+/);
-                        
-                        // Check if all words of this commodity are present in the line
-                        const allWordsPresent = commodityWords.every(word => 
-                            lineWords.some(lineWord => 
-                                lineWord.toLowerCase().includes(word.toLowerCase()) || 
-                                word.toLowerCase().includes(lineWord.toLowerCase())
-                            )
-                        );
-                        
-                        if (allWordsPresent) {
-                            // For multi-word commodities, ensure we're not just matching a subset
-                            // e.g., prefer "water purifiers" over just "water"
-                            if (commodityWords.length > 1) {
-                                // Check that the words appear in sequence or close proximity
-                                const lineText = line.toLowerCase();
-                                const commodityText = commodityName.toLowerCase();
-                                
-                                // Simple check: if the commodity name appears as a substring (allowing for punctuation)
-                                const normalizedLine = lineText.replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ');
-                                const normalizedCommodity = commodityText.replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ');
-                                
-                                if (!normalizedLine.includes(normalizedCommodity)) {
-                                    continue; // Skip this match, words aren't together
-                                }
-                            }
-                            
-                            // Find quantity in the line
-                            const qtyMatch = line.match(/(\d+(?:[,\.]\d+)*k?)/i);
-                            if (qtyMatch) {
-                                const quantity = parseQuantity(qtyMatch[1]);
-                                if (quantity > 0) {
-                                    const commodityKey = `${quantity}-${commodityName}`;
-                                    if (!seenCommodities.has(commodityKey)) {
-                                        commodityLines.push(`${quantity} ${commodityName}`);
-                                        seenCommodities.add(commodityKey);
-                                        processed++;
-                                        foundCommodity = true;
-                                        console.log(`✓ Pattern match: ${commodityName} (${quantity})`); // Debug
-                                        break; // Stop at first match (longest/most specific)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                if (!foundCommodity) {
-                    failed++;
-                    console.log(`✗ Failed to find commodity in: "${line}"`); // Debug
-                }
-            }
-
-            // Update the textarea with only the commodity lines
-            const output = commodityLines.join("\n");
-            pasteArea.value = output;
-            
-            // Show status
-            let statusMsg = `Enhanced commodity scan complete: ${processed} unique commodities identified`;
-            if (failed > 0) {
-                statusMsg += `, ${failed} non-commodity lines filtered out`;
-            }
-            statusMsg += '. Arrow notation and fuzzy matching applied!';
-            
-            logActivity(tabId, statusMsg, 'success');
-            logActivity(tabId, `✨ Smart commodity-first filtering preserved all known items from database`, 'info');
-            if (commodityLines.some(line => line.includes('*'))) {
-                logActivity(tabId, `🎯 Items with * were fuzzy-matched to known commodities`, 'info');
-            }
-        }
-
-        // Tab Management
-        function createNewTab() {
-            console.log('Creating new tab...');
-            
-            const tabId = nextTabId++;
-            const tabName = `Job ${tabId}`;
-            
-            try {
-                // Create tab data structure
-                tabs[tabId] = {
-                    id: tabId,
-                    name: tabName,
-                    materials: [],
-                    activityLog: [],
-                    sessionActive: false,
-                    scrubberActive: false
-                };
-                
-                // Create tab UI
-                const tabsHeader = document.getElementById('tabsHeader');
-                const newTabBtn = tabsHeader.querySelector('.new-tab-btn');
-                
-                if (!tabsHeader || !newTabBtn) {
-                    console.error('Required elements not found:', { tabsHeader, newTabBtn });
-                    return;
-                }
-                
-                const tabElement = document.createElement('div');
-                tabElement.className = 'tab';
-                tabElement.id = `tab-${tabId}`;
-                tabElement.innerHTML = `
-                    <span id="tab-name-${tabId}">${tabName}</span>
-                    <button class="tab-close" onclick="closeTab(${tabId}, event)">×</button>
-                `;
-                tabElement.onclick = (e) => {
-                    if (e.target.className !== 'tab-close') {
-                        switchToTab(tabId);
-                    }
-                };
-                
-                tabsHeader.insertBefore(tabElement, newTabBtn);
-                
-                // Create tab content
-                const tabContents = document.getElementById('tabContents');
-                if (!tabContents) {
-                    console.error('tabContents element not found');
-                    return;
-                }
-                
-                tabContents.insertAdjacentHTML('beforeend', createTabContentHTML(tabId));
-                
-                // Wait for DOM to process the inserted HTML before switching tabs
                 setTimeout(() => {
-                    // Switch to new tab
-                    switchToTab(tabId);
-                    
-                    // Set focus to job name input
-                    setTimeout(() => {
-                        const jobNameInput = document.getElementById(`jobName-${tabId}`);
-                        if (jobNameInput) {
-                            jobNameInput.focus();
-                            jobNameInput.select();
-                        } else {
-                            console.warn('Job name input not found:', `jobName-${tabId}`);
-                        }
-                    }, 50);
-                    
-                    // Log activity
-                    logActivity(tabId, `New job "${tabName}" created`, 'success');
-                    saveState();
-                    
-                    console.log('Tab created successfully:', tabId);
-                }, 10);
-                
-            } catch (error) {
-                console.error('Error creating tab:', error);
-            }
-        }
-
-        // Job Name Management
-        function updateJobName(tabId, newName) {
-            if (!tabs[tabId]) return;
-            
-            newName = newName.trim();
-            if (newName === '') {
-                newName = `Job ${tabId}`;
-            }
-            
-            // Limit name length
-            if (newName.length > 50) {
-                newName = newName.substring(0, 50);
-                document.getElementById(`jobName-${tabId}`).value = newName;
-            }
-            
-            const oldName = tabs[tabId].name;
-            tabs[tabId].name = newName;
-            
-            // Update tab display
-            const tabNameElement = document.getElementById(`tab-name-${tabId}`);
-            if (tabNameElement) {
-                tabNameElement.textContent = newName;
-            }
-            
-            if (oldName !== newName) {
-                logActivity(tabId, `Job renamed from "${oldName}" to "${newName}"`, 'info');
-                saveState();
-            }
-        }
-
-        function switchToTab(tabId) {
-            // Deactivate current tab
-            if (currentTabId) {
-                const currentTab = document.getElementById(`tab-${currentTabId}`);
-                const currentContent = document.getElementById(`tab-content-${currentTabId}`);
-                if (currentTab) currentTab.classList.remove('active');
-                if (currentContent) currentContent.classList.remove('active');
-            }
-            
-            // Activate new tab
-            currentTabId = tabId;
-            const newTab = document.getElementById(`tab-${tabId}`);
-            const newContent = document.getElementById(`tab-content-${tabId}`);
-            
-            if (newTab) {
-                newTab.classList.add('active');
-            } else {
-                console.error('Tab element not found:', `tab-${tabId}`);
-            }
-            
-            if (newContent) {
-                newContent.classList.add('active');
-            } else {
-                console.error('Tab content not found:', `tab-content-${tabId}`);
-            }
-            
-            // Update cargo capacity display
-            if (globalCargoCapacity > 0) {
-                const cargoInput = document.getElementById(`cargoCapacity-${tabId}`);
-                if (cargoInput) {
-                    cargoInput.value = globalCargoCapacity;
-                }
-            }
-            
-            // Update job name input
-            const jobNameInput = document.getElementById(`jobName-${tabId}`);
-            if (jobNameInput && tabs[tabId]) {
-                jobNameInput.value = tabs[tabId].name;
-            }
-            
-            saveState();
-        }
-
-        function closeTab(tabId, event) {
-            event.stopPropagation();
-            
-            const tab = tabs[tabId];
-            if (!tab) return;
-            
-            // Ask for confirmation if session is active
-            if (tab.sessionActive) {
-                const completedCount = tab.materials.filter(m => m.needed <= 0).length;
-                const totalCount = tab.materials.length;
-                
-                if (!confirm(`Close job "${tab.name}"?\n\nThis job has ${completedCount}/${totalCount} materials completed.\n\nAll progress will be lost!`)) {
-                    return;
-                }
-            }
-            
-            // Remove tab from UI
-            document.getElementById(`tab-${tabId}`).remove();
-            document.getElementById(`tab-content-${tabId}`).remove();
-            
-            // Remove tab data
-            delete tabs[tabId];
-            
-            // Switch to another tab if this was the current tab
-            if (currentTabId === tabId) {
-                const remainingTabs = Object.keys(tabs);
-                if (remainingTabs.length > 0) {
-                    switchToTab(parseInt(remainingTabs[0]));
-                } else {
-                    currentTabId = null;
-                    // Create a new tab if no tabs remain
-                    createNewTab();
-                }
-            }
-            
-            saveState();
-        }
-
-        // Enhanced State Management
-        function saveState() {
-            const state = {
-                tabs: tabs,
-                currentTabId: currentTabId,
-                globalCargoCapacity: globalCargoCapacity,
-                nextTabId: nextTabId,
-                timestamp: new Date().toISOString()
-            };
-            localStorage.setItem('sonderOS_enhanced_state', JSON.stringify(state));
-        }
-
-        function loadState() {
-            try {
-                const savedState = localStorage.getItem('sonderOS_enhanced_state');
-                if (savedState) {
-                    const state = JSON.parse(savedState);
-                    
-                    tabs = state.tabs || {};
-                    currentTabId = state.currentTabId || null;
-                    globalCargoCapacity = state.globalCargoCapacity || 0;
-                    nextTabId = state.nextTabId || 1;
-                    
-                    // Restore tabs UI
-                    const tabsHeader = document.getElementById('tabsHeader');
-                    const tabContents = document.getElementById('tabContents');
-                    
-                    // Clear existing content except new tab button
-                    const newTabBtn = tabsHeader.querySelector('.new-tab-btn');
-                    tabsHeader.innerHTML = '';
-                    tabsHeader.appendChild(newTabBtn);
-                    tabContents.innerHTML = '';
-                    
-                    // Recreate tabs
-                    for (const [tabId, tabData] of Object.entries(tabs)) {
-                        const id = parseInt(tabId);
-                        
-                        // Create tab UI
-                        const tabElement = document.createElement('div');
-                        tabElement.className = 'tab';
-                        tabElement.id = `tab-${id}`;
-                        tabElement.innerHTML = `
-                            <span id="tab-name-${id}">${tabData.name}</span>
-                            <button class="tab-close" onclick="closeTab(${id}, event)">×</button>
-                        `;
-                        tabElement.onclick = (e) => {
-                            if (e.target.className !== 'tab-close') {
-                                switchToTab(id);
-                            }
-                        };
-                        tabsHeader.insertBefore(tabElement, newTabBtn);
-                        
-                        // Create tab content
-                        tabContents.insertAdjacentHTML('beforeend', createTabContentHTML(id));
-                        
-                        // Wait for DOM to process before restoring state
-                        setTimeout(() => {
-                            // Restore tab state
-                            if (tabData.sessionActive) {
-                                const inputSection = document.getElementById(`inputSection-${id}`);
-                                const statsSection = document.getElementById(`statsSection-${id}`);
-                                const materialsSection = document.getElementById(`materialsSection-${id}`);
-                                const actionButtons = document.getElementById(`actionButtons-${id}`);
-                                const confirmBtn = document.getElementById(`confirmBtn-${id}`);
-                                const scrubberText = document.getElementById(`scrubber-text-${id}`);
-                                
-                                if (inputSection) inputSection.style.display = 'none';
-                                if (statsSection) statsSection.style.display = 'grid';
-                                if (materialsSection) materialsSection.style.display = 'block';
-                                if (actionButtons) actionButtons.style.display = 'flex';
-                                if (confirmBtn) confirmBtn.disabled = false;
-                                if (scrubberText) scrubberText.textContent = 'SCRUB COMPLETE';
-                                
-                                renderMaterials(id);
-                                updateStats(id);
-                            }
-                            
-                            renderActivityLog(id);
-                            
-                            // Set cargo capacity
-                            if (globalCargoCapacity > 0) {
-                                const cargoInput = document.getElementById(`cargoCapacity-${id}`);
-                                if (cargoInput) {
-                                    cargoInput.value = globalCargoCapacity;
-                                }
-                            }
-                            
-                            // Set job name in input field
-                            const jobNameInput = document.getElementById(`jobName-${id}`);
-                            if (jobNameInput) {
-                                jobNameInput.value = tabData.name;
-                            }
-                        }, 10);
-                    }
-                    
-                    // Switch to current tab after a delay to ensure all content is loaded
-                    setTimeout(() => {
-                        if (currentTabId && tabs[currentTabId]) {
-                            switchToTab(currentTabId);
-                        } else if (Object.keys(tabs).length > 0) {
-                            switchToTab(parseInt(Object.keys(tabs)[0]));
-                        }
-                    }, 50);
-                    
-                    return true;
-                }
-            } catch (e) {
-                console.error('Error loading saved state:', e);
-                localStorage.removeItem('sonderOS_enhanced_state');
-            }
-            return false;
-        }
-
-        function saveCargoCapacity(tabId) {
-            const input = document.getElementById(`cargoCapacity-${tabId}`);
-            globalCargoCapacity = parseInt(input.value) || 0;
-            
-            // Update all other tab inputs
-            for (const otherTabId of Object.keys(tabs)) {
-                if (parseInt(otherTabId) !== tabId) {
-                    const otherInput = document.getElementById(`cargoCapacity-${otherTabId}`);
-                    if (otherInput) {
-                        otherInput.value = globalCargoCapacity;
-                    }
-                }
-            }
-            
-            saveState();
-            
-            if (globalCargoCapacity > 0) {
-                logActivity(tabId, `Global cargo capacity set to ${globalCargoCapacity} tons`, 'info');
-            }
-        }
-
-        // Activity Logging
-        function logActivity(tabId, message, type = 'info') {
-            if (!tabs[tabId]) return;
-            
-            const timestamp = new Date().toLocaleTimeString();
-            const logEntry = `[${timestamp}] ${message}`;
-            
-            tabs[tabId].activityLog.unshift({ message: logEntry, type });
-            if (tabs[tabId].activityLog.length > 100) {
-                tabs[tabId].activityLog = tabs[tabId].activityLog.slice(0, 100);
-            }
-            
-            renderActivityLog(tabId);
-            saveState();
-        }
-
-        function renderActivityLog(tabId) {
-            if (!tabs[tabId]) return;
-            
-            const logContainer = document.getElementById(`activityLog-${tabId}`);
-            if (!logContainer) return;
-            
-            logContainer.innerHTML = '';
-            
-            tabs[tabId].activityLog.forEach(entry => {
-                const logDiv = document.createElement('div');
-                logDiv.className = `log-entry ${entry.type}`;
-                logDiv.textContent = entry.message;
-                logContainer.appendChild(logDiv);
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 200 * index);
             });
-        }
-
-        // Material Management with Undo
-        function addUndoHistory(tabId, materialId, action, oldValue, newValue) {
-            const material = tabs[tabId].materials.find(m => m.id === materialId);
-            if (!material) return;
-            
-            if (!material.undoHistory) {
-                material.undoHistory = [];
-            }
-            
-            material.undoHistory.unshift({
-                action: action,
-                oldNeeded: oldValue.needed,
-                oldAllocated: oldValue.allocated,
-                newNeeded: newValue.needed,
-                newAllocated: newValue.allocated,
-                timestamp: new Date().toISOString()
-            });
-            
-            // Keep only last 10 undo actions per material
-            if (material.undoHistory.length > 10) {
-                material.undoHistory = material.undoHistory.slice(0, 10);
-            }
-        }
-
-        function undoLastAllocation(tabId, materialId) {
-            if (!tabs[tabId]) return;
-            
-            const material = tabs[tabId].materials.find(m => m.id === materialId);
-            if (!material || !material.undoHistory || material.undoHistory.length === 0) {
-                logActivity(tabId, `No undo history for ${material ? material.name : 'unknown material'}`, 'warning');
-                return;
-            }
-            
-            const lastAction = material.undoHistory.shift();
-            
-            // Restore previous values
-            material.needed = lastAction.oldNeeded;
-            material.allocated = lastAction.oldAllocated;
-            
-            logActivity(tabId, `UNDO: ${material.name} restored to ${lastAction.oldAllocated} allocated, ${lastAction.oldNeeded} needed`, 'undo');
-            
-            renderMaterials(tabId);
-            updateStats(tabId);
-            saveState();
-        }
-
-        // Data Scrubbing
-        function runDataScrubber(tabId) {
-            console.log('runDataScrubber called for tab:', tabId);
-            
-            if (!tabs[tabId]) {
-                console.error('Tab not found:', tabId);
-                return;
-            }
-            
-            const pasteArea = document.getElementById(`commoditiesPaste-${tabId}`);
-            if (!pasteArea) {
-                console.error('Paste area not found for tab:', tabId);
-                return;
-            }
-            
-            const rawData = pasteArea.value.trim();
-            console.log('Raw data length:', rawData.length);
-            
-            if (!rawData) {
-                logActivity(tabId, 'Error: No data to scrub. Please paste commodities list first.', 'warning');
-                return;
-            }
-            
-            if (tabs[tabId].scrubberActive) {
-                console.log('Scrubber already active for tab:', tabId);
-                return;
-            }
-            
-            tabs[tabId].scrubberActive = true;
-            const scrubberBtn = document.getElementById(`scrubberBtn-${tabId}`);
-            const scrubberText = document.getElementById(`scrubber-text-${tabId}`);
-            
-            scrubberBtn.classList.add('active');
-            scrubberText.textContent = 'SCRUBBING DATA...';
-            scrubberBtn.disabled = true;
-            
-            logActivity(tabId, 'Data scrubber initiated - parsing commodities list', 'info');
-            
-            // Simulate scrubbing process with progress
-            let progress = 0;
-            const scrubberInterval = setInterval(() => {
-                progress += 25;
-                scrubberText.textContent = `SCRUBBING... ${progress}%`;
-                
-                if (progress >= 100) {
-                    clearInterval(scrubberInterval);
-                    
-                    // Parse the data
-                    const parsedMaterials = parseRawData(tabId, rawData);
-                    
-                    if (parsedMaterials.length > 0) {
-                        tabs[tabId].materials = parsedMaterials;
-                        tabs[tabId].sessionActive = true;
-                        
-                        // Increment usage count on successful scrub
-                        incrementUsageCount();
-                        
-                        saveState();
-                        
-                        scrubberText.textContent = 'SCRUB COMPLETE';
-                        scrubberBtn.classList.remove('active');
-                        
-                        // Show materials section
-                        document.getElementById(`statsSection-${tabId}`).style.display = 'grid';
-                        document.getElementById(`materialsSection-${tabId}`).style.display = 'block';
-                        document.getElementById(`actionButtons-${tabId}`).style.display = 'flex';
-                        document.getElementById(`confirmBtn-${tabId}`).disabled = false;
-                        
-                        renderMaterials(tabId);
-                        updateStats(tabId);
-                        
-                        logActivity(tabId, `Successfully parsed ${parsedMaterials.length} materials from input`, 'success');
-                        
-                        // Hide input section
-                        document.getElementById(`inputSection-${tabId}`).style.display = 'none';
-                        
-                    } else {
-                        scrubberText.textContent = 'SCRUB FAILED';
-                        logActivity(tabId, 'Error: Could not parse any valid materials from input', 'warning');
-                        
-                        setTimeout(() => {
-                            scrubberText.textContent = 'SCRUB & PARSE DATA';
-                            scrubberBtn.disabled = false;
-                            tabs[tabId].scrubberActive = false;
-                        }, 2000);
-                    }
-                }
-            }, 500);
-        }
-
-        function parseRawData(tabId, rawData) {
-            // Check for Consolidated Contract format (only if not scrubbed yet)
-            if (rawData.includes('ALL MATERIALS:') && rawData.includes('===')) {
-                return parseConsolidatedContract(tabId, rawData);
-            }
-            
-            // Check if this is a Discord ticket format (only if not scrubbed yet)
-            if (rawData.includes('ITEMS:') || rawData.includes('CONTRACT:')) {
-                return parseDiscordTicket(tabId, rawData);
-            }
-            
-            // Check for 3-column pipe format (only if not scrubbed yet)
-            if (rawData.includes('|') && (rawData.includes('Qty') || rawData.includes('Buy Price'))) {
-                return parseThreeColumnFormat(tabId, rawData);
-            }
-            
-            // SIMPLIFIED: Parse post-scrubbed list directly
-            // Expected format: "quantity commodity_name" or "quantity commodity_name*"
-            const lines = rawData.split('\n').map(line => line.trim()).filter(line => line);
-            const parsedMaterials = [];
-            let id = 1;
-            let processed = 0;
-            let skipped = 0;
-            
-            logActivity(tabId, 'Processing scrubbed commodity list...', 'info');
-            
-            for (const line of lines) {
-                // Skip empty lines
-                if (!line) continue;
-                
-                // Expected format: "quantity commodity_name" or "quantity commodity_name*"
-                const match = line.match(/^(\d+(?:k|K)?)\s+(.+)$/);
-                
-                if (match) {
-                    const quantity = parseQuantity(match[1]);
-                    let commodityName = match[2].trim();
-                    
-                    // Handle asterisk from scrub list (indicates fuzzy match)
-                    const isFuzzyMatch = commodityName.endsWith('*');
-                    if (isFuzzyMatch) {
-                        commodityName = commodityName.slice(0, -1).trim(); // Remove asterisk
-                    }
-                    
-                    // Normalize the commodity name
-                    const normalizedName = normalizeItemName(commodityName);
-                    
-                    // Look up in categoryMap
-                    const itemData = categoryMap[normalizedName];
-                    
-                    if (itemData && quantity > 0) {
-                        parsedMaterials.push({
-                            id: id++,
-                            name: normalizedName,
-                            needed: quantity,
-                            original: quantity,
-                            allocated: 0,
-                            undoHistory: [],
-                            category: itemData.category,
-                            group: itemData.group
-                        });
-                        
-                        const matchType = isFuzzyMatch ? ' (fuzzy matched)' : '';
-                        logActivity(tabId, `✓ Added: ${normalizedName} (${quantity} needed)${matchType}`, 'info');
-                        processed++;
-                    } else {
-                        logActivity(tabId, `✗ Skipped: "${commodityName}" - not found in commodity database`, 'warning');
-                        skipped++;
-                    }
-                } else {
-                    // If line doesn't match expected format, skip it
-                    logActivity(tabId, `✗ Skipped malformed line: "${line}"`, 'warning');
-                    skipped++;
-                }
-            }
-            
-            // Summary
-            if (processed > 0) {
-                let resultMsg = `Successfully processed ${processed} commodities from scrubbed list`;
-                if (skipped > 0) {
-                    resultMsg += ` (skipped ${skipped} invalid items)`;
-                }
-                logActivity(tabId, resultMsg, 'success');
-            } else {
-                logActivity(tabId, 'No valid commodities found. Try using "Scrub List" first!', 'warning');
-            }
-            
-            return parsedMaterials;
-        }
-
-        // Normalize item name (from sonderOS approach)
-        function normalizeItemName(name) {
-            return name.toLowerCase()
-                .replace(/-/g, ' ')
-                .replace(/\./g, '')
-                .replace('equipement', 'equipment')
-                .replace('purfiers', 'purifiers')
-                .trim();
-        }
-
-        // Find closest match using simple string similarity
-        function findClosestMatch(target, candidates) {
-            let bestMatch = null;
-            let bestScore = 0;
-            const threshold = 0.5; // Lowered threshold for better fuzzy matching
-            
-            for (const candidate of candidates) {
-                const score = similarity(target, candidate);
-                if (score > threshold && score > bestScore) {
-                    bestScore = score;
-                    bestMatch = candidate;
-                }
-            }
-            
-            return bestMatch;
-        }
-
-        // Simple string similarity function
-        function similarity(s1, s2) {
-            const longer = s1.length > s2.length ? s1 : s2;
-            const shorter = s1.length > s2.length ? s2 : s1;
-            
-            if (longer.length === 0) return 1.0;
-            
-            const editDistance = levenshteinDistance(longer, shorter);
-            return (longer.length - editDistance) / longer.length;
-        }
-
-        // Levenshtein distance calculation
-        function levenshteinDistance(s1, s2) {
-            const costs = [];
-            for (let i = 0; i <= s1.length; i++) {
-                let lastValue = i;
-                for (let j = 0; j <= s2.length; j++) {
-                    if (i === 0) {
-                        costs[j] = j;
-                    } else if (j > 0) {
-                        let newValue = costs[j - 1];
-                        if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {
-                            newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
-                        }
-                        costs[j - 1] = lastValue;
-                        lastValue = newValue;
-                    }
-                }
-                if (i > 0) costs[s2.length] = lastValue;
-            }
-            return costs[s2.length];
-        }
-
-        // NEW: Parse Consolidated Contract format
-        function parseConsolidatedContract(tabId, rawData) {
-            const lines = rawData.split('\n').map(line => line.trim());
-            const parsedMaterials = [];
-            let id = 1;
-            let inMaterialsSection = false;
-            let contractInfo = {};
-            let skippedUnrecognized = 0;
-            
-            // Extract contract info
-            for (const line of lines) {
-                if (line.includes('CONSOLIDATED CONTRACT')) {
-                    contractInfo.type = 'Consolidated Contract';
-                } else if (line.includes('System:')) {
-                    contractInfo.system = line.split(':')[1]?.trim();
-                } else if (line.includes('Order:')) {
-                    contractInfo.order = line.split(':')[1]?.trim();
-                } else if (line.includes('Total Tonnage:')) {
-                    contractInfo.tonnage = line.split(':')[1]?.trim();
-                } else if (line.includes('TOTAL CONTRACT PRICE:')) {
-                    contractInfo.price = line.split(':')[1]?.trim();
-                }
-            }
-            
-            // Log contract info
-            if (contractInfo.type) {
-                logActivity(tabId, `Processing: ${contractInfo.type}`, 'info');
-                if (contractInfo.system) logActivity(tabId, `System: ${contractInfo.system}`, 'info');
-                if (contractInfo.order) logActivity(tabId, `Order: ${contractInfo.order}`, 'info');
-                if (contractInfo.tonnage) logActivity(tabId, `Total Tonnage: ${contractInfo.tonnage}`, 'info');
-                if (contractInfo.price) logActivity(tabId, `Contract Price: ${contractInfo.price}`, 'info');
-                
-                // Update tab name based on order
-                if (contractInfo.order) {
-                    tabs[tabId].name = contractInfo.order;
-                    const tabNameElement = document.getElementById(`tab-name-${tabId}`);
-                    if (tabNameElement) {
-                        tabNameElement.textContent = contractInfo.order;
-                    }
-                    
-                    // Update job name input
-                    const jobNameInput = document.getElementById(`jobName-${tabId}`);
-                    if (jobNameInput) {
-                        jobNameInput.value = contractInfo.order;
-                    }
-                }
-            }
-            
-            for (const line of lines) {
-                // Start processing materials after "ALL MATERIALS:" section
-                if (line.includes('ALL MATERIALS:')) {
-                    inMaterialsSection = true;
-                    continue;
-                }
-                
-                if (!inMaterialsSection) continue;
-                
-                // Skip category headers, separators, header lines, and other non-commodity lines
-                if (line.startsWith('===') || 
-                    line.includes('Item') && line.includes('Qty') ||
-                    line.includes('---') || 
-                    line.includes('Buy Price') ||
-                    line.includes('Status:') ||
-                    line.includes('Deadline:') ||
-                    line.includes('chunks') ||
-                    line.trim() === '' ||
-                    line.startsWith('=') ||
-                    line.startsWith('-') ||
-                    /^\s*\|\s*$/.test(line)) {
-                    continue;
-                }
-                
-                // Parse material lines (format: Material Name | Quantity | Price)
-                const itemMatch = line.match(/^(.+?)\s*\|\s*(.+?)(?:\s*\|\s*(.+))?$/);
-                
-                if (itemMatch) {
-                    let name = itemMatch[1].trim();
-                    const quantity = parseQuantity(itemMatch[2]);
-                    
-                    // Skip if no valid quantity found
-                    if (!quantity || quantity <= 0) {
-                        continue;
-                    }
-                    
-                    // Handle arrow notation (→) for alternative names
-                    const arrowMatch = name.match(/^(.+?)\s*\(→(.+?)\)$/);
-                    if (arrowMatch) {
-                        name = arrowMatch[2].trim(); // Use the name after the arrow
-                        logActivity(tabId, `Using alternative name: ${arrowMatch[1].trim()} → ${name}`, 'info');
-                    }
-                    
-                    if (name && quantity > 0) {
-                        // Normalize and match against categoryMap
-                        const normalizedName = normalizeItemName(name);
-                        let finalName = null;
-                        let itemData = categoryMap[normalizedName];
-                        
-                        if (itemData) {
-                            finalName = normalizedName;
-                        } else {
-                            // Try fuzzy matching
-                            const closestMatch = findClosestMatch(normalizedName, Object.keys(categoryMap));
-                            if (closestMatch) {
-                                finalName = closestMatch;
-                                itemData = categoryMap[closestMatch];
-                                logActivity(tabId, `Fuzzy matched: "${normalizedName}" → "${closestMatch}"`, 'info');
-                            }
-                        }
-                        
-                        // Only add if we found a match in the categoryMap
-                        if (finalName && itemData) {
-                            parsedMaterials.push({
-                                id: id++,
-                                name: finalName,
-                                needed: quantity,
-                                original: quantity,
-                                allocated: 0,
-                                undoHistory: [],
-                                category: itemData.category,
-                                group: itemData.group
-                            });
-                            
-                            logActivity(tabId, `Parsed: ${finalName} (${quantity} needed)`, 'info');
-                        } else {
-                            // Skip unrecognized commodities
-                            skippedUnrecognized++;
-                            logActivity(tabId, `Skipped unrecognized commodity: "${normalizedName}"`, 'warning');
-                        }
-                    }
-                }
-            }
-            
-            if (parsedMaterials.length > 0) {
-                let resultMsg = `Successfully parsed ${parsedMaterials.length} recognized commodities from consolidated contract`;
-                if (skippedUnrecognized > 0) {
-                    resultMsg += ` (skipped ${skippedUnrecognized} unrecognized items)`;
-                }
-                logActivity(tabId, resultMsg, 'success');
-            }
-            
-            return parsedMaterials;
-        }
-
-        function parseThreeColumnFormat(tabId, rawData) {
-            const lines = rawData.split('\n').map(line => line.trim()).filter(line => line);
-            const parsedMaterials = [];
-            let id = 1;
-            let skippedUnrecognized = 0;
-            
-            logActivity(tabId, 'Detected 3-column pipe format (Item | Qty | Price)', 'info');
-            
-            for (const line of lines) {
-                if (line.includes('Item') && line.includes('Qty') ||
-                    line.includes('---') ||
-                    line.includes('===') ||
-                    line.startsWith('=') ||
-                    line.trim() === '') {
-                    continue;
-                }
-                
-                const match = line.match(/^(.+?)\s*\|\s*(.+?)\s*\|\s*(.+)$/);
-                
-                if (match) {
-                    const name = match[1].trim();
-                    const quantity = parseQuantity(match[2]);
-                    const price = parseQuantity(match[3]);
-                    
-                    if (name && quantity > 0) {
-                        // Normalize and match against categoryMap
-                        const normalizedName = normalizeItemName(name);
-                        let finalName = null;
-                        let itemData = categoryMap[normalizedName];
-                        
-                        if (itemData) {
-                            finalName = normalizedName;
-                        } else {
-                            // Try fuzzy matching
-                            const closestMatch = findClosestMatch(normalizedName, Object.keys(categoryMap));
-                            if (closestMatch) {
-                                finalName = closestMatch;
-                                itemData = categoryMap[closestMatch];
-                                logActivity(tabId, `Fuzzy matched: "${normalizedName}" → "${closestMatch}"`, 'info');
-                            }
-                        }
-                        
-                        // Only add if we found a match in the categoryMap
-                        if (finalName && itemData) {
-                            parsedMaterials.push({
-                                id: id++,
-                                name: finalName,
-                                needed: quantity,
-                                original: quantity,
-                                allocated: 0,
-                                undoHistory: [],
-                                category: itemData.category,
-                                group: itemData.group
-                            });
-                            
-                            logActivity(tabId, `Parsed: ${finalName} (${quantity} needed @ ${price} credits)`, 'info');
-                        } else {
-                            // Skip unrecognized commodities
-                            skippedUnrecognized++;
-                            logActivity(tabId, `Skipped unrecognized commodity: "${normalizedName}"`, 'warning');
-                        }
-                    }
-                }
-            }
-            
-            if (parsedMaterials.length > 0) {
-                let resultMsg = `Successfully parsed ${parsedMaterials.length} recognized commodities from 3-column format`;
-                if (skippedUnrecognized > 0) {
-                    resultMsg += ` (skipped ${skippedUnrecognized} unrecognized items)`;
-                }
-                logActivity(tabId, resultMsg, 'success');
-            }
-            
-            return parsedMaterials;
-        }
-
-        function parseDiscordTicket(tabId, rawData) {
-            const lines = rawData.split('\n');
-            const parsedMaterials = [];
-            let id = 1;
-            let inItemsSection = false;
-            let contractInfo = {};
-            let skippedUnrecognized = 0;
-            
-            // Extract contract info
-            for (const line of lines) {
-                if (line.includes('CONTRACT:')) {
-                    contractInfo.contract = line.split(':')[1]?.trim();
-                } else if (line.includes('System:')) {
-                    contractInfo.system = line.split(':')[1]?.trim();
-                } else if (line.includes('Order:')) {
-                    contractInfo.order = line.split(':')[1]?.trim();
-                } else if (line.includes('Total Tonnage:')) {
-                    contractInfo.tonnage = line.split(':')[1]?.trim();
-                }
-            }
-            
-            // Log contract info
-            if (contractInfo.contract) {
-                logActivity(tabId, `Processing ticket: ${contractInfo.contract}`, 'info');
-                if (contractInfo.system) logActivity(tabId, `System: ${contractInfo.system}`, 'info');
-                if (contractInfo.order) logActivity(tabId, `Order: ${contractInfo.order}`, 'info');
-                if (contractInfo.tonnage) logActivity(tabId, `Total Tonnage: ${contractInfo.tonnage}`, 'info');
-                
-                // Update tab name based on contract
-                tabs[tabId].name = contractInfo.contract;
-                const tabNameElement = document.getElementById(`tab-name-${tabId}`);
-                if (tabNameElement) {
-                    tabNameElement.textContent = contractInfo.contract;
-                }
-            }
-            
-            for (const line of lines) {
-                if (line.includes('ITEMS:')) {
-                    inItemsSection = true;
-                    continue;
-                }
-                
-                if (!inItemsSection || 
-                    line.includes('Item') || 
-                    line.includes('---') || 
-                    line.includes('===') ||
-                    line.trim() === '') {
-                    continue;
-                }
-                
-                const itemMatch = line.match(/^(.+?)\s*\|\s*(.+?)\s*\|\s*(.+)$/);
-                
-                if (itemMatch) {
-                    const name = itemMatch[1].trim();
-                    const quantity = parseQuantity(itemMatch[2]);
-                    
-                    if (name && quantity > 0) {
-                        // Normalize and match against categoryMap
-                        const normalizedName = normalizeItemName(name);
-                        let finalName = null;
-                        let itemData = categoryMap[normalizedName];
-                        
-                        if (itemData) {
-                            finalName = normalizedName;
-                        } else {
-                            // Try fuzzy matching
-                            const closestMatch = findClosestMatch(normalizedName, Object.keys(categoryMap));
-                            if (closestMatch) {
-                                finalName = closestMatch;
-                                itemData = categoryMap[closestMatch];
-                                logActivity(tabId, `Fuzzy matched: "${normalizedName}" → "${closestMatch}"`, 'info');
-                            }
-                        }
-                        
-                        // Only add if we found a match in the categoryMap
-                        if (finalName && itemData) {
-                            parsedMaterials.push({
-                                id: id++,
-                                name: finalName,
-                                needed: quantity,
-                                original: quantity,
-                                allocated: 0,
-                                undoHistory: [],
-                                category: itemData.category,
-                                group: itemData.group
-                            });
-                            
-                            logActivity(tabId, `Parsed: ${finalName} (${quantity} needed)`, 'info');
-                        } else {
-                            // Skip unrecognized commodities
-                            skippedUnrecognized++;
-                            logActivity(tabId, `Skipped unrecognized commodity: "${normalizedName}"`, 'warning');
-                        }
-                    }
-                }
-            }
-            
-            if (parsedMaterials.length > 0) {
-                let resultMsg = `Successfully parsed ${parsedMaterials.length} recognized commodities from Discord ticket`;
-                if (skippedUnrecognized > 0) {
-                    resultMsg += ` (skipped ${skippedUnrecognized} unrecognized items)`;
-                }
-                logActivity(tabId, resultMsg, 'success');
-            }
-            
-            return parsedMaterials;
-        }
-
-        // Material Rendering and Control - Enhanced with alphabetical sorting by category
-        function renderMaterials(tabId) {
-            if (!tabs[tabId]) return;
-            
-            const grid = document.getElementById(`materialsGrid-${tabId}`);
-            if (!grid) return;
-            
-            grid.innerHTML = '';
-            
-            // Group materials by category and sort alphabetically
-            const materialsByCategory = {};
-            tabs[tabId].materials.forEach(material => {
-                const category = material.category || 'Unknown';
-                if (!materialsByCategory[category]) {
-                    materialsByCategory[category] = [];
-                }
-                materialsByCategory[category].push(material);
-            });
-            
-            // Sort categories alphabetically
-            const sortedCategories = Object.keys(materialsByCategory).sort();
-            
-            // Sort materials within each category alphabetically
-            sortedCategories.forEach(category => {
-                materialsByCategory[category].sort((a, b) => a.name.localeCompare(b.name));
-            });
-            
-            // Render materials grouped by category
-            sortedCategories.forEach(category => {
-                // Add category header
-                const categoryHeader = document.createElement('div');
-                categoryHeader.style.cssText = `
-                    grid-column: 1 / -1;
-                    background: rgba(0, 255, 255, 0.15);
-                    border: 1px solid rgba(0, 255, 255, 0.4);
-                    border-radius: 6px;
-                    padding: 10px 15px;
-                    margin: 10px 0 5px 0;
-                    font-weight: bold;
-                    font-size: 16px;
-                    color: #00ffff;
-                    text-transform: uppercase;
-                    letter-spacing: 1px;
-                    text-align: center;
-                    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
-                `;
-                categoryHeader.textContent = `${category} (${materialsByCategory[category].length} items)`;
-                grid.appendChild(categoryHeader);
-                
-                // Render materials in this category
-                materialsByCategory[category].forEach(material => {
-                    const remaining = material.needed;
-                    const status = remaining <= 0 ? 'complete' : 
-                                  material.allocated > 0 ? 'partial' : 'needed';
-                    
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = `material-item ${status}`;
-                    
-                    // Determine cargo button allocation amount and text
-                    const cargoAllocation = Math.min(globalCargoCapacity, remaining);
-                    const cargoButtonDisabled = globalCargoCapacity <= 0 || remaining <= 0;
-                    const cargoButtonText = globalCargoCapacity > 0 ? `${cargoAllocation}T` : 'Set Cargo';
-                    
-                    // Check if undo is available
-                    const undoAvailable = material.undoHistory && material.undoHistory.length > 0;
-                    
-                    // Display group info if available
-                    const groupInfo = material.group && material.group !== 'unknown' ? 
-                        `<div style="font-size: 11px; color: rgba(0, 255, 255, 0.6); margin-top: 2px;">${material.group}</div>` : '';
-                    
-                    itemDiv.innerHTML = `
-                        <div class="material-name">
-                            ${material.name}
-                            ${groupInfo}
-                        </div>
-                        <div class="material-progress">
-                            Need: ${material.needed}<br>
-                            Allocated: ${material.allocated}
-                        </div>
-                        <div class="material-controls">
-                            <input type="number" class="material-input" 
-                                   value="0" min="0" max="${remaining}"
-                                   onkeypress="handleEnterKey(event, ${tabId}, ${material.id}, this)"
-                                   placeholder="0">
-                            <button class="cargo-btn" ${cargoButtonDisabled ? 'disabled' : ''} 
-                                    onclick="allocateCargoCapacity(${tabId}, ${material.id})">${cargoButtonText}</button>
-                            <button class="undo-btn" ${undoAvailable ? '' : 'disabled'} 
-                                    onclick="undoLastAllocation(${tabId}, ${material.id})">UNDO</button>
-                        </div>
-                        <div class="status-indicator status-${status}"></div>
-                    `;
-                    
-                    grid.appendChild(itemDiv);
-                });
-            });
-        }
-
-        function handleEnterKey(event, tabId, materialId, inputElement) {
-            if (event.key === 'Enter') {
-                const quantity = parseInt(inputElement.value) || 0;
-                
-                if (quantity > 0) {
-                    allocateMaterial(tabId, materialId, quantity);
-                    inputElement.value = '0';
-                    inputElement.focus();
-                }
-            }
-        }
-
-        function allocateCargoCapacity(tabId, materialId) {
-            if (!tabs[tabId]) return;
-            
-            if (globalCargoCapacity <= 0) {
-                logActivity(tabId, 'Error: Set your cargo capacity first', 'warning');
-                return;
-            }
-            
-            const material = tabs[tabId].materials.find(m => m.id === materialId);
-            if (!material) return;
-            
-            const allocatable = Math.min(globalCargoCapacity, material.needed);
-            
-            if (allocatable <= 0) {
-                logActivity(tabId, `${material.name} already fully allocated`, 'warning');
-                return;
-            }
-            
-            // Store undo history
-            addUndoHistory(tabId, materialId, 'cargo_allocation', 
-                          { needed: material.needed, allocated: material.allocated },
-                          { needed: material.needed - allocatable, allocated: material.allocated + allocatable });
-            
-            // Allocate the cargo capacity amount
-            material.needed -= allocatable;
-            material.allocated += allocatable;
-            
-            // Log the allocation
-            logActivity(tabId, `Full cargo load: ${allocatable}T ${material.name} (Remaining: ${material.needed})`, 'allocation');
-            
-            // Re-render and update stats
-            renderMaterials(tabId);
-            updateStats(tabId);
-            saveState();
-            
-            // Check if material is complete
-            if (material.needed <= 0) {
-                logActivity(tabId, `✓ ${material.name} COMPLETE (${material.allocated}/${material.original})`, 'success');
-            }
-        }
-
-        function allocateMaterial(tabId, materialId, quantity) {
-            if (!tabs[tabId]) return;
-            
-            const material = tabs[tabId].materials.find(m => m.id === materialId);
-            if (!material) return;
-            
-            const allocatable = Math.min(quantity, material.needed);
-            
-            if (allocatable <= 0) {
-                logActivity(tabId, `Warning: ${material.name} already fully allocated`, 'warning');
-                return;
-            }
-            
-            // Store undo history
-            addUndoHistory(tabId, materialId, 'manual_allocation', 
-                          { needed: material.needed, allocated: material.allocated },
-                          { needed: material.needed - allocatable, allocated: material.allocated + allocatable });
-            
-            // Subtract from needed and add to allocated
-            material.needed -= allocatable;
-            material.allocated += allocatable;
-            
-            // Log the allocation
-            logActivity(tabId, `Allocated ${allocatable} ${material.name} (Remaining: ${material.needed})`, 'allocation');
-            
-            // Re-render and update stats
-            renderMaterials(tabId);
-            updateStats(tabId);
-            saveState();
-            
-            // Check if material is complete
-            if (material.needed <= 0) {
-                logActivity(tabId, `✓ ${material.name} COMPLETE (${material.allocated}/${material.original})`, 'success');
-            }
-        }
-
-        function updateStats(tabId) {
-            if (!tabs[tabId]) return;
-            
-            const materials = tabs[tabId].materials;
-            const totalItems = materials.length;
-            const totalNeeded = materials.reduce((sum, m) => sum + m.needed, 0);
-            const totalAllocated = materials.reduce((sum, m) => sum + m.allocated, 0);
-            const totalOriginal = materials.reduce((sum, m) => sum + m.original, 0);
-            
-            // Calculate completion rate based on tonnage, not item count
-            const completionRate = totalOriginal > 0 ? Math.round((totalAllocated / totalOriginal) * 100) : 0;
-
-            const totalItemsEl = document.getElementById(`totalItems-${tabId}`);
-            const totalNeededEl = document.getElementById(`totalNeeded-${tabId}`);
-            const totalAllocatedEl = document.getElementById(`totalAllocated-${tabId}`);
-            const completionRateEl = document.getElementById(`completionRate-${tabId}`);
-            
-            if (totalItemsEl) totalItemsEl.textContent = totalItems;
-            if (totalNeededEl) totalNeededEl.textContent = totalNeeded;
-            if (totalAllocatedEl) totalAllocatedEl.textContent = totalAllocated;
-            if (completionRateEl) completionRateEl.textContent = completionRate + '%';
-        }
-
-        function finalizeSession(tabId) {
-            if (!tabs[tabId] || !tabs[tabId].sessionActive) return;
-            
-            const materials = tabs[tabId].materials;
-            const completedCount = materials.filter(m => m.needed <= 0).length;
-            const totalCount = materials.length;
-            
-            if (confirm(`Finalize session for "${tabs[tabId].name}"?\n\nCompleted: ${completedCount}/${totalCount} materials\n\nThis will close this job tab.`)) {
-                
-                // Log final session summary
-                logActivity(tabId, `=== SESSION FINALIZED ===`, 'success');
-                logActivity(tabId, `Completed materials: ${completedCount}/${totalCount}`, 'success');
-                
-                materials.forEach(material => {
-                    if (material.allocated > 0) {
-                        logActivity(tabId, `Final: ${material.name} - ${material.allocated}/${material.original} allocated`, 'info');
-                    }
-                });
-                
-                logActivity(tabId, `=== SESSION END ===`, 'success');
-                
-                // Close the tab after a brief delay
-                setTimeout(() => {
-                    closeTab(tabId, { stopPropagation: () => {} });
-                }, 2000);
-            }
-        }
-
-        function clearSession(tabId) {
-            if (!tabs[tabId]) return;
-            
-            tabs[tabId].materials = [];
-            tabs[tabId].sessionActive = false;
-            tabs[tabId].activityLog = [];
-            
-            // Reset UI
-            document.getElementById(`commoditiesPaste-${tabId}`).value = '';
-            document.getElementById(`inputSection-${tabId}`).style.display = 'block';
-            document.getElementById(`statsSection-${tabId}`).style.display = 'none';
-            document.getElementById(`materialsSection-${tabId}`).style.display = 'none';
-            document.getElementById(`actionButtons-${tabId}`).style.display = 'none';
-            
-            // Reset buttons
-            document.getElementById(`scrubberBtn-${tabId}`).disabled = false;
-            document.getElementById(`confirmBtn-${tabId}`).disabled = true;
-            document.getElementById(`scrubber-text-${tabId}`).textContent = 'SCRUB & PARSE DATA';
-            
-            tabs[tabId].scrubberActive = false;
-            
-            logActivity(tabId, 'Session cleared - ready for new commodities list', 'info');
-            saveState();
-        }
-
-        function exportData(tabId) {
-            if (!tabs[tabId]) return;
-            
-            const tab = tabs[tabId];
-            const data = {
-                tabName: tab.name,
-                timestamp: new Date().toISOString(),
-                sessionSummary: {
-                    totalMaterials: tab.materials.length,
-                    completedMaterials: tab.materials.filter(m => m.needed <= 0).length,
-                    totalAllocated: tab.materials.reduce((sum, m) => sum + m.allocated, 0),
-                    totalOriginal: tab.materials.reduce((sum, m) => sum + m.original, 0)
-                },
-                materials: tab.materials,
-                activityLog: tab.activityLog,
-                categoryBreakdown: {}
-            };
-            
-            // Add category breakdown
-            tab.materials.forEach(material => {
-                const category = material.category || 'Unknown';
-                if (!data.categoryBreakdown[category]) {
-                    data.categoryBreakdown[category] = {
-                        count: 0,
-                        totalAllocated: 0,
-                        totalOriginal: 0
-                    };
-                }
-                data.categoryBreakdown[category].count++;
-                data.categoryBreakdown[category].totalAllocated += material.allocated;
-                data.categoryBreakdown[category].totalOriginal += material.original;
-            });
-            
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `sonderOS_${tab.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            logActivity(tabId, 'Session data exported successfully', 'success');
-        }
-
-        // Initialize
-        function initializeApp() {
-            console.log('Initializing SonderOS Enhanced with SonderOS Scrubbing...');
-            
-            try {
-                // Load usage count first
-                loadUsageCount();
-                
-                const restored = loadState();
-                if (!restored) {
-                    console.log('No saved state found, creating new tab...');
-                    createNewTab();
-                } else {
-                    console.log('Restored previous state with', Object.keys(tabs).length, 'tabs');
-                }
-            } catch (error) {
-                console.error('Error during initialization:', error);
-                // Fallback: create a new tab
-                createNewTab();
-            }
-        }
-
-        // Multiple initialization methods to ensure it works in all environments
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeApp);
-        } else if (document.readyState === 'interactive' || document.readyState === 'complete') {
-            initializeApp();
-        }
-
-        window.addEventListener('load', () => {
-            // Final fallback: ensure at least one tab exists
-            setTimeout(() => {
-                if (Object.keys(tabs).length === 0) {
-                    console.log('Fallback: Creating tab after window load');
-                    createNewTab();
-                }
-            }, 100);
         });
 
-        // Keyboard shortcut for scrubbing
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.shiftKey && e.key === 'S') {
-                e.preventDefault();
-                if (currentTabId) {
-                    scrubList(currentTabId);
-                }
-            }
-        });
-
-        console.log('SonderTracker Enhanced with SonderOS Scrubbing v3.2 loaded successfully!');
-        console.log(`Commodity database loaded with ${Object.keys(categoryMap).length} known items`);
+        console.log('sonderOS Tools loaded successfully!');
+        console.log('CMDR Sonderbread - Fly safe, Commander o7');
     </script>
 </body>
 </html>
