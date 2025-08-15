@@ -161,6 +161,20 @@
             background: linear-gradient(135deg, #868e96 0%, #6c757d 100%);
         }
 
+        .shift-section {
+            background: rgba(64, 164, 223, 0.1);
+            border: 1px solid rgba(64, 164, 223, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .shift-section h4 {
+            color: #5fb3e8;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
         .save-load-section {
             margin-top: 20px;
             padding: 20px;
@@ -288,6 +302,14 @@
         .box-item h4 {
             color: #40a4df;
             margin-bottom: 5px;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            background: rgba(0, 20, 40, 0.6);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(64, 164, 223, 0.2);
         }
 
         .corner-instruction {
@@ -620,6 +642,35 @@
             display: block;
         }
 
+        /* Alignment guides */
+        .alignment-guide {
+            position: absolute;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .alignment-guide-line {
+            stroke: #40a4df;
+            stroke-width: 1;
+            stroke-dasharray: 4,4;
+            opacity: 0.7;
+        }
+
+        .alignment-guide-text {
+            fill: #40a4df;
+            font-size: 10px;
+            font-weight: 500;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+
+        .alignment-guide-bg {
+            fill: rgba(0, 20, 40, 0.8);
+            stroke: rgba(64, 164, 223, 0.3);
+            stroke-width: 0.5;
+            rx: 2;
+        }
+
         /* Touch improvements */
         @media (hover: none) and (pointer: coarse) {
             .box:hover {
@@ -698,6 +749,24 @@
                             </div>
                         </div>
 
+                        <!-- Shift Section (only shown in edit mode) -->
+                        <div class="shift-section" id="shiftSection" style="display: none;">
+                            <h4>🔄 Move Box Position</h4>
+                            <div class="row">
+                                <div class="form-group">
+                                    <label for="shiftX">Shift East (+) / West (-) (ft):</label>
+                                    <input type="number" id="shiftX" step="0.1" value="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="shiftY">Shift South (+) / North (-) (ft):</label>
+                                    <input type="number" id="shiftY" step="0.1" value="0">
+                                </div>
+                            </div>
+                            <small style="color: #b8e6ff; font-style: italic;">
+                                Positive values move the box East/South, negative values move West/North
+                            </small>
+                        </div>
+
                         <div class="form-group">
                             <label for="boxColor">Box Color:</label>
                             <input type="color" id="boxColor" value="#40a4df">
@@ -737,6 +806,7 @@
                             <button class="save-btn" onclick="saveProject()">Save Project</button>
                             <button class="load-btn" onclick="document.getElementById('loadFile').click()">Load Project</button>
                         </div>
+                        <button class="load-btn" onclick="loadStandardLayout()" style="margin-bottom: 15px; background: linear-gradient(135deg, #28a745 0%, #20692e 100%);">Load Standard Layout</button>
                         <div class="file-input">
                             <input type="file" id="loadFile" accept=".json" style="display: none;" onchange="loadProject(event)">
                             <small>Save your layout to share with others or load a previous project</small>
@@ -798,367 +868,6 @@
             return window.innerWidth <= 768;
         }
 
-        // Preloaded data
-        const preloadedData = {
-            "version": "1.0",
-            "created": "2025-08-15T01:29:43.640Z",
-            "siteInfo": {
-                "width": 150,
-                "height": 250
-            },
-            "boxes": [
-                {
-                    "id": 1,
-                    "name": "LC27",
-                    "width": 8,
-                    "height": 20,
-                    "westDistance": 10,
-                    "northDistance": 40,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#ff0000",
-                    "notes": "20 A\nKylie/Rachel 8/15\nKatie 8/20"
-                },
-                {
-                    "id": 2,
-                    "name": "LC03",
-                    "width": 8,
-                    "height": 20,
-                    "westDistance": 27,
-                    "northDistance": 40,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#ff0000",
-                    "notes": "20A\nKaren 8/18\nLisa R 8/20"
-                },
-                {
-                    "id": 3,
-                    "name": "L8173",
-                    "width": 8,
-                    "height": 10,
-                    "westDistance": 27,
-                    "northDistance": 25,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#ff0000",
-                    "notes": "20A"
-                },
-                {
-                    "id": 4,
-                    "name": "10x8",
-                    "width": 8,
-                    "height": 10,
-                    "westDistance": 37,
-                    "northDistance": 25,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#ff0000",
-                    "notes": "20A"
-                },
-                {
-                    "id": 5,
-                    "name": "SC91",
-                    "width": 8,
-                    "height": 20,
-                    "westDistance": 75,
-                    "northDistance": 40,
-                    "measureFromRight": true,
-                    "measureFromBottom": false,
-                    "color": "#ff0000",
-                    "notes": "20A"
-                },
-                {
-                    "id": 6,
-                    "name": "Lounge 1",
-                    "width": 20,
-                    "height": 40,
-                    "westDistance": 75,
-                    "northDistance": 60,
-                    "measureFromRight": true,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 7,
-                    "name": "Lounge 2",
-                    "width": 20,
-                    "height": 30,
-                    "westDistance": 75,
-                    "northDistance": 60,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 8,
-                    "name": "Hammock",
-                    "width": 20,
-                    "height": 10,
-                    "westDistance": 75,
-                    "northDistance": 90,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 9,
-                    "name": "shade 1",
-                    "width": 20,
-                    "height": 20,
-                    "westDistance": 15,
-                    "northDistance": 116,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 10,
-                    "name": "shade 2",
-                    "width": 20,
-                    "height": 20,
-                    "westDistance": 35,
-                    "northDistance": 116,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 11,
-                    "name": "shade 3",
-                    "width": 20,
-                    "height": 20,
-                    "westDistance": 55,
-                    "northDistance": 116,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 12,
-                    "name": "shade 4",
-                    "width": 20,
-                    "height": 20,
-                    "westDistance": 75,
-                    "northDistance": 116,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 13,
-                    "name": "shade 5",
-                    "width": 20,
-                    "height": 20,
-                    "westDistance": 15,
-                    "northDistance": 136,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 14,
-                    "name": "shade 6",
-                    "width": 20,
-                    "height": 20,
-                    "westDistance": 35,
-                    "northDistance": 136,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 15,
-                    "name": "shade 7",
-                    "width": 20,
-                    "height": 20,
-                    "westDistance": 55,
-                    "northDistance": 136,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 16,
-                    "name": "shade 7",
-                    "width": 20,
-                    "height": 20,
-                    "westDistance": 55,
-                    "northDistance": 136,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 17,
-                    "name": "shade 8",
-                    "width": 20,
-                    "height": 20,
-                    "westDistance": 75,
-                    "northDistance": 136,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 18,
-                    "name": "shade 9",
-                    "width": 20,
-                    "height": 24,
-                    "westDistance": 15,
-                    "northDistance": 156,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 19,
-                    "name": "shade 10",
-                    "width": 20,
-                    "height": 24,
-                    "westDistance": 35,
-                    "northDistance": 156,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 20,
-                    "name": "shade 11",
-                    "width": 20,
-                    "height": 24,
-                    "westDistance": 55,
-                    "northDistance": 156,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 21,
-                    "name": "shade 12",
-                    "width": 20,
-                    "height": 24,
-                    "westDistance": 75,
-                    "northDistance": 156,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 22,
-                    "name": "Shade 13",
-                    "width": 20,
-                    "height": 30,
-                    "westDistance": 15,
-                    "northDistance": 180,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 23,
-                    "name": "shade 14",
-                    "width": 20,
-                    "height": 30,
-                    "westDistance": 35,
-                    "northDistance": 180,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 24,
-                    "name": "shade 15",
-                    "width": 20,
-                    "height": 30,
-                    "westDistance": 55,
-                    "northDistance": 180,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 25,
-                    "name": "shade 16",
-                    "width": 20,
-                    "height": 30,
-                    "westDistance": 75,
-                    "northDistance": 180,
-                    "measureFromRight": false,
-                    "measureFromBottom": false,
-                    "color": "#40a4df",
-                    "notes": ""
-                },
-                {
-                    "id": 26,
-                    "name": "Kitchen",
-                    "width": 8,
-                    "height": 28,
-                    "westDistance": 150,
-                    "northDistance": 125,
-                    "measureFromRight": true,
-                    "measureFromBottom": false,
-                    "color": "#ff0000",
-                    "notes": "2x30A"
-                },
-                {
-                    "id": 27,
-                    "name": "Power Crew",
-                    "width": 30,
-                    "height": 20,
-                    "westDistance": 150,
-                    "northDistance": 0,
-                    "measureFromRight": true,
-                    "measureFromBottom": false,
-                    "color": "#c4f415",
-                    "notes": ""
-                }
-            ],
-            "boxCounter": 27
-        };
-
-        // Initialize with preloaded data
-        function initializeWithPreloadedData() {
-            boxes = preloadedData.boxes.map(box => {
-                // Convert old format to new format for compatibility
-                const convertedBox = {
-                    ...box,
-                    horizontalDistance: box.measureFromRight ? siteWidth - box.westDistance + box.width : box.westDistance,
-                    verticalDistance: box.northDistance,
-                    measureFromEast: box.measureFromRight,
-                    measureFromSouth: false
-                };
-                return convertedBox;
-            });
-            boxCounter = preloadedData.boxCounter;
-            
-            // Render all preloaded boxes
-            boxes.forEach(box => {
-                renderBox(box);
-            });
-            
-            // Update UI
-            updateBoxList();
-        }
-
         function feetToFeetInches(decimalFeet) {
             const feet = Math.floor(decimalFeet);
             const totalInches = (decimalFeet - feet) * 12;
@@ -1185,10 +894,22 @@
             return result;
         }
 
-        function getPixelCoordinates(westDistance, northDistance, boxWidth, boxHeight, measureFromRight, measureFromBottom) {
+        function getPixelCoordinates(horizontalDistance, verticalDistance, boxWidth, boxHeight, measureFromEast, measureFromSouth, measureFromRight, measureFromBottom) {
             const grid = document.getElementById('siteGrid');
             const gridWidth = grid.offsetWidth;
             const gridHeight = grid.offsetHeight;
+            
+            // Convert distance measurements to actual west/north coordinates
+            let westDistance = horizontalDistance;
+            let northDistance = verticalDistance;
+            
+            // Adjust for measurement from opposite sides
+            if (measureFromEast) {
+                westDistance = siteWidth - horizontalDistance;
+            }
+            if (measureFromSouth) {
+                northDistance = siteHeight - verticalDistance;
+            }
             
             // Calculate actual box position based on measurement point
             let actualWest = westDistance;
@@ -1290,6 +1011,140 @@
             instructionsDiv.innerHTML = html;
         }
 
+        function findAlignedEdges() {
+            if (boxes.length < 2) return { leftAligned: [], topAligned: [] };
+            
+            // Group boxes by their left edge (actualWest) and top edge (actualNorth)
+            const leftEdges = {};
+            const topEdges = {};
+            
+            boxes.forEach(box => {
+                if (!box.position) return;
+                
+                const leftPos = Math.round(box.position.actualWest * 10) / 10; // Round to nearest 0.1'
+                const topPos = Math.round(box.position.actualNorth * 10) / 10;
+                
+                if (!leftEdges[leftPos]) leftEdges[leftPos] = [];
+                if (!topEdges[topPos]) topEdges[topPos] = [];
+                
+                leftEdges[leftPos].push(box);
+                topEdges[topPos].push(box);
+            });
+            
+            // Only return alignments with 2+ boxes
+            const leftAligned = Object.entries(leftEdges)
+                .filter(([pos, boxes]) => boxes.length >= 2)
+                .map(([pos, boxes]) => ({ position: parseFloat(pos), boxes }));
+                
+            const topAligned = Object.entries(topEdges)
+                .filter(([pos, boxes]) => boxes.length >= 2)
+                .map(([pos, boxes]) => ({ position: parseFloat(pos), boxes }));
+            
+            return { leftAligned, topAligned };
+        }
+
+        function drawAlignmentGuides() {
+            // Remove existing guides
+            const existingGuides = document.querySelectorAll('.alignment-guide');
+            existingGuides.forEach(guide => guide.remove());
+            
+            if (boxes.length < 2) return;
+            
+            const grid = document.getElementById('siteGrid');
+            const gridWidth = grid.offsetWidth;
+            const gridHeight = grid.offsetHeight;
+            
+            const { leftAligned, topAligned } = findAlignedEdges();
+            
+            // Draw left edge alignment guides (vertical lines for aligned left edges)
+            leftAligned.forEach(alignment => {
+                const pixelX = (alignment.position / siteWidth) * gridWidth;
+                const distance = alignment.position;
+                
+                // Create SVG element for this guide
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.classList.add('alignment-guide');
+                svg.style.position = 'absolute';
+                svg.style.left = '0px';
+                svg.style.top = '0px';
+                svg.style.width = gridWidth + 'px';
+                svg.style.height = gridHeight + 'px';
+                svg.style.pointerEvents = 'none';
+                svg.style.zIndex = '5';
+                
+                // Draw vertical dotted line along the aligned left edges
+                const alignmentLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                alignmentLine.classList.add('alignment-guide-line');
+                alignmentLine.setAttribute('x1', pixelX);
+                alignmentLine.setAttribute('y1', '0');
+                alignmentLine.setAttribute('x2', pixelX);
+                alignmentLine.setAttribute('y2', gridHeight);
+                svg.appendChild(alignmentLine);
+                
+                // Add distance text with background positioned along the line
+                const textBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                textBg.classList.add('alignment-guide-bg');
+                textBg.setAttribute('x', pixelX - 15);
+                textBg.setAttribute('y', '5');
+                textBg.setAttribute('width', '30');
+                textBg.setAttribute('height', '16');
+                svg.appendChild(textBg);
+                
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.classList.add('alignment-guide-text');
+                text.setAttribute('x', pixelX);
+                text.setAttribute('y', '13');
+                text.textContent = distance.toFixed(1) + "'";
+                svg.appendChild(text);
+                
+                grid.appendChild(svg);
+            });
+            
+            // Draw top edge alignment guides (horizontal lines for aligned top edges)
+            topAligned.forEach(alignment => {
+                const pixelY = (alignment.position / siteHeight) * gridHeight;
+                const distance = alignment.position;
+                
+                // Create SVG element for this guide
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.classList.add('alignment-guide');
+                svg.style.position = 'absolute';
+                svg.style.left = '0px';
+                svg.style.top = '0px';
+                svg.style.width = gridWidth + 'px';
+                svg.style.height = gridHeight + 'px';
+                svg.style.pointerEvents = 'none';
+                svg.style.zIndex = '5';
+                
+                // Draw horizontal dotted line along the aligned top edges
+                const alignmentLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                alignmentLine.classList.add('alignment-guide-line');
+                alignmentLine.setAttribute('x1', '0');
+                alignmentLine.setAttribute('y1', pixelY);
+                alignmentLine.setAttribute('x2', gridWidth);
+                alignmentLine.setAttribute('y2', pixelY);
+                svg.appendChild(alignmentLine);
+                
+                // Add distance text with background positioned along the line
+                const textBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                textBg.classList.add('alignment-guide-bg');
+                textBg.setAttribute('x', '5');
+                textBg.setAttribute('y', pixelY - 8);
+                textBg.setAttribute('width', '30');
+                textBg.setAttribute('height', '16');
+                svg.appendChild(textBg);
+                
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.classList.add('alignment-guide-text');
+                text.setAttribute('x', '20');
+                text.setAttribute('y', pixelY);
+                text.textContent = distance.toFixed(1) + "'";
+                svg.appendChild(text);
+                
+                grid.appendChild(svg);
+            });
+        }
+
         function renderBox(box) {
             const grid = document.getElementById('siteGrid');
             const boxElement = document.createElement('div');
@@ -1297,10 +1152,12 @@
             boxElement.id = `box-${box.id}`;
             
             const coords = getPixelCoordinates(
-                box.westDistance, 
-                box.northDistance, 
+                box.horizontalDistance, 
+                box.verticalDistance, 
                 box.width, 
                 box.height, 
+                box.measureFromEast,
+                box.measureFromSouth,
                 box.measureFromRight, 
                 box.measureFromBottom
             );
@@ -1324,6 +1181,9 @@
             });
             
             grid.appendChild(boxElement);
+            
+            // Update alignment guides
+            drawAlignmentGuides();
         }
 
         function editBox(boxId) {
@@ -1343,6 +1203,10 @@
             document.getElementById('boxColor').value = box.color;
             document.getElementById('boxNotes').value = box.notes;
             
+            // Reset shift values
+            document.getElementById('shiftX').value = 0;
+            document.getElementById('shiftY').value = 0;
+            
             // Enter edit mode
             isEditMode = true;
             editingBoxId = boxId;
@@ -1350,10 +1214,12 @@
             // Update UI
             const submitBtn = document.getElementById('submitBtn');
             const cancelBtn = document.getElementById('cancelBtn');
+            const shiftSection = document.getElementById('shiftSection');
             
             submitBtn.textContent = 'Update Box';
             submitBtn.className = 'edit-mode';
             cancelBtn.style.display = 'block';
+            shiftSection.style.display = 'block';
             
             // Highlight the box being edited
             highlightBox(boxId);
@@ -1366,14 +1232,18 @@
             // Reset form
             document.getElementById('boxForm').reset();
             document.getElementById('boxColor').value = '#40a4df';
+            document.getElementById('shiftX').value = 0;
+            document.getElementById('shiftY').value = 0;
             
             // Update UI
             const submitBtn = document.getElementById('submitBtn');
             const cancelBtn = document.getElementById('cancelBtn');
+            const shiftSection = document.getElementById('shiftSection');
             
             submitBtn.textContent = 'Add Box';
             submitBtn.className = '';
             cancelBtn.style.display = 'none';
+            shiftSection.style.display = 'none';
             
             // Remove highlights
             document.querySelectorAll('.box').forEach(box => {
@@ -1523,6 +1393,444 @@
             showAutoSaveIndicator('Project saved successfully!');
         }
 
+        function loadStandardLayout() {
+            // Confirm before loading
+            if (boxes.length > 0) {
+                if (!confirm('This will replace your current layout. Continue?')) {
+                    return;
+                }
+            }
+            
+            // Standard layout data
+            const standardLayout = {
+                "version": "1.0",
+                "created": "2025-08-15T16:04:07.970Z",
+                "siteInfo": {
+                    "width": 150,
+                    "height": 250
+                },
+                "boxes": [
+                    {
+                        "id": 1,
+                        "name": "LC27",
+                        "width": 8,
+                        "height": 20,
+                        "horizontalDistance": 10,
+                        "verticalDistance": 40,
+                        "measureFromEast": false,
+                        "measureFromSouth": false,
+                        "measureFromRight": false,
+                        "measureFromBottom": false,
+                        "color": "#ff0000",
+                        "notes": "20 A\nKylie/Rachel 8/15\nKatie 8/20"
+                    },
+                    {
+                        "id": 2,
+                        "name": "LC03",
+                        "width": 8,
+                        "height": 20,
+                        "horizontalDistance": 27,
+                        "verticalDistance": 40,
+                        "measureFromEast": false,
+                        "measureFromSouth": false,
+                        "measureFromRight": false,
+                        "measureFromBottom": false,
+                        "color": "#ff0000",
+                        "notes": "20A\nKaren 8/18\nLisa R 8/20"
+                    },
+                    {
+                        "id": 3,
+                        "name": "L8173",
+                        "width": 8,
+                        "height": 10,
+                        "horizontalDistance": 27,
+                        "verticalDistance": 25,
+                        "measureFromEast": false,
+                        "measureFromSouth": false,
+                        "measureFromRight": false,
+                        "measureFromBottom": false,
+                        "color": "#ff0000",
+                        "notes": "20A"
+                    },
+                    {
+                        "id": 4,
+                        "name": "10x8",
+                        "width": 8,
+                        "height": 10,
+                        "horizontalDistance": 37,
+                        "verticalDistance": 25,
+                        "measureFromEast": false,
+                        "measureFromSouth": false,
+                        "measureFromRight": false,
+                        "measureFromBottom": false,
+                        "color": "#ff0000",
+                        "notes": "20A"
+                    },
+                    {
+                        "id": 5,
+                        "name": "SC91",
+                        "width": 8,
+                        "height": 20,
+                        "horizontalDistance": 75,
+                        "verticalDistance": 40,
+                        "measureFromEast": false,
+                        "measureFromSouth": false,
+                        "measureFromRight": true,
+                        "measureFromBottom": false,
+                        "color": "#ff0000",
+                        "notes": "20A"
+                    },
+                    {
+                        "id": 6,
+                        "name": "Lounge 1",
+                        "width": 20,
+                        "height": 40,
+                        "horizontalDistance": 75,
+                        "verticalDistance": 60,
+                        "measureFromEast": false,
+                        "measureFromSouth": false,
+                        "measureFromRight": true,
+                        "measureFromBottom": false,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 7,
+                        "name": "Lounge 2",
+                        "width": 20,
+                        "height": 30,
+                        "horizontalDistance": 75,
+                        "verticalDistance": 60,
+                        "measureFromEast": false,
+                        "measureFromSouth": false,
+                        "measureFromRight": false,
+                        "measureFromBottom": false,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 8,
+                        "name": "Hammock",
+                        "width": 20,
+                        "height": 10,
+                        "horizontalDistance": 75,
+                        "verticalDistance": 90,
+                        "measureFromEast": false,
+                        "measureFromSouth": false,
+                        "measureFromRight": false,
+                        "measureFromBottom": false,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 10,
+                        "name": "shade 1",
+                        "width": 20,
+                        "height": 20,
+                        "horizontalDistance": 15,
+                        "verticalDistance": 119,
+                        "measureFromEast": false,
+                        "measureFromSouth": true,
+                        "measureFromRight": false,
+                        "measureFromBottom": true,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 11,
+                        "name": "shade 2",
+                        "width": 20,
+                        "height": 20,
+                        "horizontalDistance": 35,
+                        "verticalDistance": 119,
+                        "measureFromEast": false,
+                        "measureFromSouth": true,
+                        "measureFromRight": false,
+                        "measureFromBottom": true,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 12,
+                        "name": "shade 3",
+                        "width": 20,
+                        "height": 20,
+                        "horizontalDistance": 55,
+                        "verticalDistance": 119,
+                        "measureFromEast": false,
+                        "measureFromSouth": true,
+                        "measureFromRight": false,
+                        "measureFromBottom": true,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 13,
+                        "name": "shade 4",
+                        "width": 20,
+                        "height": 20,
+                        "horizontalDistance": 75,
+                        "verticalDistance": 119,
+                        "measureFromEast": false,
+                        "measureFromSouth": true,
+                        "measureFromRight": false,
+                        "measureFromBottom": true,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 14,
+                        "name": "shade 5",
+                        "width": 20,
+                        "height": 20,
+                        "horizontalDistance": 15,
+                        "verticalDistance": 99,
+                        "measureFromEast": false,
+                        "measureFromSouth": true,
+                        "measureFromRight": false,
+                        "measureFromBottom": true,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 15,
+                        "name": "shade 6",
+                        "width": 20,
+                        "height": 20,
+                        "horizontalDistance": 35,
+                        "verticalDistance": 99,
+                        "measureFromEast": false,
+                        "measureFromSouth": true,
+                        "measureFromRight": false,
+                        "measureFromBottom": true,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 16,
+                        "name": "shade 7",
+                        "width": 20,
+                        "height": 20,
+                        "horizontalDistance": 55,
+                        "verticalDistance": 99,
+                        "measureFromEast": false,
+                        "measureFromSouth": true,
+                        "measureFromRight": false,
+                        "measureFromBottom": true,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 17,
+                        "name": "shade 8",
+                        "width": 20,
+                        "height": 20,
+                        "horizontalDistance": 75,
+                        "verticalDistance": 99,
+                        "measureFromEast": false,
+                        "measureFromSouth": true,
+                        "measureFromRight": false,
+                        "measureFromBottom": true,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 18,
+                        "name": "shade 9",
+                        "width": 20,
+                        "height": 24,
+                        "horizontalDistance": 15,
+                        "verticalDistance": 75,
+                        "measureFromEast": false,
+                        "measureFromSouth": true,
+                        "measureFromRight": false,
+                        "measureFromBottom": true,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 19,
+                        "name": "shade 10",
+                        "width": 20,
+                        "height": 24,
+                        "horizontalDistance": 35,
+                        "verticalDistance": 75,
+                        "measureFromEast": false,
+                        "measureFromSouth": true,
+                        "measureFromRight": false,
+                        "measureFromBottom": true,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 20,
+                        "name": "shade 11",
+                        "width": 20,
+                        "height": 24,
+                        "horizontalDistance": 55,
+                        "verticalDistance": 75,
+                        "measureFromEast": false,
+                        "measureFromSouth": true,
+                        "measureFromRight": false,
+                        "measureFromBottom": true,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 21,
+                        "name": "shade 12",
+                        "width": 20,
+                        "height": 24,
+                        "horizontalDistance": 75,
+                        "verticalDistance": 75,
+                        "measureFromEast": false,
+                        "measureFromSouth": true,
+                        "measureFromRight": false,
+                        "measureFromBottom": true,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 22,
+                        "name": "Shade 13",
+                        "width": 20,
+                        "height": 30,
+                        "horizontalDistance": 15,
+                        "verticalDistance": 45,
+                        "measureFromEast": false,
+                        "measureFromSouth": true,
+                        "measureFromRight": false,
+                        "measureFromBottom": true,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 23,
+                        "name": "shade 14",
+                        "width": 20,
+                        "height": 30,
+                        "horizontalDistance": 35,
+                        "verticalDistance": 45,
+                        "measureFromEast": false,
+                        "measureFromSouth": true,
+                        "measureFromRight": false,
+                        "measureFromBottom": true,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 24,
+                        "name": "shade 15",
+                        "width": 20,
+                        "height": 30,
+                        "horizontalDistance": 55,
+                        "verticalDistance": 45,
+                        "measureFromEast": false,
+                        "measureFromSouth": true,
+                        "measureFromRight": false,
+                        "measureFromBottom": true,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 25,
+                        "name": "shade 16",
+                        "width": 20,
+                        "height": 30,
+                        "horizontalDistance": 75,
+                        "verticalDistance": 45,
+                        "measureFromEast": false,
+                        "measureFromSouth": true,
+                        "measureFromRight": false,
+                        "measureFromBottom": true,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 26,
+                        "name": "Kitchen",
+                        "width": 8,
+                        "height": 28,
+                        "horizontalDistance": 0,
+                        "verticalDistance": 125,
+                        "measureFromEast": true,
+                        "measureFromSouth": false,
+                        "measureFromRight": true,
+                        "measureFromBottom": false,
+                        "color": "#ff0000",
+                        "notes": "2x30A"
+                    },
+                    {
+                        "id": 27,
+                        "name": "Power Crew",
+                        "width": 30,
+                        "height": 20,
+                        "horizontalDistance": 0,
+                        "verticalDistance": 0,
+                        "measureFromEast": true,
+                        "measureFromSouth": false,
+                        "measureFromRight": true,
+                        "measureFromBottom": false,
+                        "color": "#c4f415",
+                        "notes": ""
+                    },
+                    {
+                        "id": 28,
+                        "name": "tattoo",
+                        "width": 20,
+                        "height": 10,
+                        "horizontalDistance": 0,
+                        "verticalDistance": 0,
+                        "measureFromEast": true,
+                        "measureFromSouth": true,
+                        "measureFromRight": true,
+                        "measureFromBottom": true,
+                        "color": "#aef514",
+                        "notes": ""
+                    },
+                    {
+                        "id": 29,
+                        "name": "eco loo",
+                        "width": 20,
+                        "height": 30,
+                        "horizontalDistance": 0,
+                        "verticalDistance": 10,
+                        "measureFromEast": true,
+                        "measureFromSouth": true,
+                        "measureFromRight": true,
+                        "measureFromBottom": true,
+                        "color": "#c4fa00",
+                        "notes": ""
+                    }
+                ],
+                "boxCounter": 29
+            };
+            
+            try {
+                // Clear current project
+                clearProject();
+
+                // Load the standard layout data
+                boxes = standardLayout.boxes;
+                boxCounter = standardLayout.boxCounter || 29;
+
+                // Render all boxes
+                boxes.forEach(box => {
+                    renderBox(box);
+                });
+
+                // Update UI
+                updateBoxList();
+                generateInstructions();
+                drawAlignmentGuides();
+                
+                showAutoSaveIndicator('Standard layout loaded successfully!');
+                
+            } catch (error) {
+                alert('Error loading standard layout: ' + error.message);
+            }
+        }
+
         function loadProject(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1552,6 +1860,9 @@
                     // Update UI
                     updateBoxList();
                     generateInstructions();
+                    
+                    // Update alignment guides
+                    drawAlignmentGuides();
                     
                     showAutoSaveIndicator('Project loaded successfully!');
                     
@@ -1586,6 +1897,10 @@
 
             // Update UI
             updateBoxList();
+            
+            // Clear alignment guides
+            const existingGuides = document.querySelectorAll('.alignment-guide');
+            existingGuides.forEach(guide => guide.remove());
             
             // Auto-save after any changes
             autoSave();
@@ -1667,6 +1982,10 @@
             }
             
             updateBoxList();
+            generateInstructions();
+            
+            // Update alignment guides
+            drawAlignmentGuides();
             
             // Auto-save after deletion
             autoSave();
@@ -1678,17 +1997,53 @@
             const name = document.getElementById('boxName').value;
             const width = parseFloat(document.getElementById('boxWidth').value);
             const height = parseFloat(document.getElementById('boxHeight').value);
-            const westDistance = parseFloat(document.getElementById('westDistance').value);
-            const northDistance = parseFloat(document.getElementById('northDistance').value);
+            const horizontalDistance = parseFloat(document.getElementById('horizontalDistance').value);
+            const verticalDistance = parseFloat(document.getElementById('verticalDistance').value);
+            const measureFromEast = document.getElementById('measureFromEast').checked;
+            const measureFromSouth = document.getElementById('measureFromSouth').checked;
             const measureFromRight = document.getElementById('measureFromRight').checked;
             const measureFromBottom = document.getElementById('measureFromBottom').checked;
             const color = document.getElementById('boxColor').value;
             const notes = document.getElementById('boxNotes').value;
             
-            // Validation
-            if (westDistance < 0 || westDistance > siteWidth ||
-                northDistance < 0 || northDistance > siteHeight) {
-                alert('Box position is outside site boundaries!');
+            // Get shift values if in edit mode
+            let shiftX = 0;
+            let shiftY = 0;
+            if (isEditMode) {
+                shiftX = parseFloat(document.getElementById('shiftX').value) || 0;
+                shiftY = parseFloat(document.getElementById('shiftY').value) || 0;
+            }
+            
+            // Apply shifts to the distances
+            let finalHorizontalDistance = horizontalDistance + shiftX;
+            let finalVerticalDistance = verticalDistance + shiftY;
+            
+            // Convert to westDistance and northDistance for validation
+            let westDistance = finalHorizontalDistance;
+            let northDistance = finalVerticalDistance;
+            
+            if (measureFromEast) {
+                westDistance = siteWidth - finalHorizontalDistance;
+            }
+            if (measureFromSouth) {
+                northDistance = siteHeight - finalVerticalDistance;
+            }
+            
+            // Adjust for measurement point
+            let actualWest = westDistance;
+            let actualNorth = northDistance;
+            
+            if (measureFromRight) {
+                actualWest = westDistance - width;
+            }
+            if (measureFromBottom) {
+                actualNorth = northDistance - height;
+            }
+            
+            // Validation - check if box fits within site boundaries
+            if (actualWest < 0 || actualWest + width > siteWidth ||
+                actualNorth < 0 || actualNorth + height > siteHeight) {
+                alert('Box position would be outside site boundaries! Please adjust the position or shift values.');
                 return;
             }
             
@@ -1701,8 +2056,10 @@
                         name,
                         width,
                         height,
-                        westDistance,
-                        northDistance,
+                        horizontalDistance: finalHorizontalDistance,
+                        verticalDistance: finalVerticalDistance,
+                        measureFromEast,
+                        measureFromSouth,
                         measureFromRight,
                         measureFromBottom,
                         color,
@@ -1728,8 +2085,10 @@
                     name,
                     width,
                     height,
-                    westDistance,
-                    northDistance,
+                    horizontalDistance: finalHorizontalDistance,
+                    verticalDistance: finalVerticalDistance,
+                    measureFromEast,
+                    measureFromSouth,
                     measureFromRight,
                     measureFromBottom,
                     color,
@@ -1746,6 +2105,12 @@
             
             updateBoxList();
             generateInstructions();
+            
+            // Update alignment guides
+            drawAlignmentGuides();
+            
+            // Auto-save after changes
+            autoSave();
         });
 
         // Handle window resize to update box positions
@@ -1754,10 +2119,12 @@
                 const boxElement = document.getElementById(`box-${box.id}`);
                 if (boxElement) {
                     const coords = getPixelCoordinates(
-                        box.westDistance, 
-                        box.northDistance, 
+                        box.horizontalDistance, 
+                        box.verticalDistance, 
                         box.width, 
                         box.height, 
+                        box.measureFromEast,
+                        box.measureFromSouth,
                         box.measureFromRight, 
                         box.measureFromBottom
                     );
@@ -1769,6 +2136,11 @@
                     boxElement.style.height = coords.height + 'px';
                 }
             });
+            
+            // Update alignment guides after resize
+            setTimeout(() => {
+                drawAlignmentGuides();
+            }, 100);
         });
 
         // Close mobile details on window resize to desktop
@@ -1776,26 +2148,6 @@
             if (!isMobile() && selectedMobileBoxId) {
                 closeMobileBoxDetails();
             }
-            
-            boxes.forEach(box => {
-                const boxElement = document.getElementById(`box-${box.id}`);
-                if (boxElement) {
-                    const coords = getPixelCoordinates(
-                        box.westDistance, 
-                        box.northDistance, 
-                        box.width, 
-                        box.height, 
-                        box.measureFromRight, 
-                        box.measureFromBottom
-                    );
-                    
-                    box.position = coords;
-                    boxElement.style.left = coords.x + 'px';
-                    boxElement.style.top = coords.y + 'px';
-                    boxElement.style.width = coords.width + 'px';
-                    boxElement.style.height = coords.height + 'px';
-                }
-            });
         });
 
         // Cancel edit button handler
@@ -1810,11 +2162,6 @@
                 !e.target.classList.contains('box')) {
                 closeMobileBoxDetails();
             }
-        });
-
-        // Initialize the tool with preloaded data when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeWithPreloadedData();
         });
 
         // Toggle box measurements in sidebar
