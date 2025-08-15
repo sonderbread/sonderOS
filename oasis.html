@@ -1,0 +1,2023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Layout Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a2332 50%, #2d4a5c 100%);
+            color: #e0f4ff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+            min-height: calc(100vh - 40px);
+        }
+
+        .sidebar {
+            background: rgba(0, 32, 63, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(64, 164, 223, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            height: fit-content;
+        }
+
+        .main-area {
+            background: rgba(0, 32, 63, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(64, 164, 223, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: #40a4df;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 300;
+            font-size: 28px;
+            text-shadow: 0 0 20px rgba(64, 164, 223, 0.5);
+        }
+
+        h2 {
+            color: #5fb3e8;
+            margin-bottom: 15px;
+            font-weight: 400;
+            font-size: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b8e6ff;
+            font-weight: 500;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(64, 164, 223, 0.3);
+            border-radius: 8px;
+            background: rgba(0, 20, 40, 0.6);
+            color: #e0f4ff;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #40a4df;
+            box-shadow: 0 0 0 2px rgba(64, 164, 223, 0.2);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle input[type="checkbox"] {
+            width: auto;
+            transform: scale(1.2);
+        }
+
+        button {
+            background: linear-gradient(135deg, #40a4df 0%, #2080b8 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #5fb3e8 0%, #40a4df 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(64, 164, 223, 0.4);
+        }
+
+        .print-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20692e 100%);
+            margin-top: 20px;
+        }
+
+        .print-btn:hover {
+            background: linear-gradient(135deg, #34ce57 0%, #28a745 100%);
+        }
+
+        .edit-mode {
+            background: linear-gradient(135deg, #ffc107 0%, #d39e00 100%);
+        }
+
+        .edit-mode:hover {
+            background: linear-gradient(135deg, #ffcd3c 0%, #ffc107 100%);
+        }
+
+        .cancel-btn {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            margin-top: 10px;
+        }
+
+        .cancel-btn:hover {
+            background: linear-gradient(135deg, #868e96 0%, #6c757d 100%);
+        }
+
+        .save-load-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 20, 40, 0.6);
+            border-radius: 10px;
+            border: 1px solid rgba(64, 164, 223, 0.2);
+        }
+
+        .save-load-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        }
+
+        .save-btn:hover {
+            background: linear-gradient(135deg, #1fc8db 0%, #17a2b8 100%);
+        }
+
+        .load-btn {
+            background: linear-gradient(135deg, #6f42c1 0%, #59359a 100%);
+        }
+
+        .load-btn:hover {
+            background: linear-gradient(135deg, #8e5cd6 0%, #6f42c1 100%);
+        }
+
+        .file-input {
+            margin-bottom: 15px;
+        }
+
+        .file-input input[type="file"] {
+            padding: 8px;
+            font-size: 13px;
+        }
+
+        .auto-save-indicator {
+            text-align: center;
+            font-size: 12px;
+            color: #5fb3e8;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .auto-save-indicator.show {
+            opacity: 1;
+        }
+
+        .site-container {
+            background: rgba(0, 15, 30, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid rgba(64, 164, 223, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .site-grid {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 150/250;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(64, 164, 223, 0.1) 0px,
+                rgba(64, 164, 223, 0.1) 1px,
+                transparent 1px,
+                transparent 20px
+            ), repeating-linear-gradient(
+                90deg,
+                rgba(64, 164, 223, 0.1) 0px,
+                rgba(64, 164, 223, 0.1) 1px,
+                transparent 1px,
+                transparent 33.33px
+            );
+            border: 2px solid #40a4df;
+            border-radius: 5px;
+        }
+
+        .box {
+            position: absolute;
+            border: 2px solid;
+            border-radius: 3px;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+            font-size: 12px;
+        }
+
+        .box:hover {
+            opacity: 1;
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(64, 164, 223, 0.6);
+        }
+
+        .box-list {
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .box-item {
+            background: rgba(0, 20, 40, 0.6);
+            border: 1px solid rgba(64, 164, 223, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .box-item:hover {
+            border-color: #40a4df;
+            background: rgba(0, 30, 60, 0.8);
+        }
+
+        .box-item h4 {
+            color: #40a4df;
+            margin-bottom: 5px;
+        }
+
+        .corner-instruction {
+            background: rgba(64, 164, 223, 0.1);
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 5px;
+            border-left: 3px solid #40a4df;
+        }
+
+        .site-info {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #b8e6ff;
+            font-size: 14px;
+        }
+
+        .grid-labels {
+            position: absolute;
+            top: -25px;
+            left: -25px;
+            right: -25px;
+            bottom: -25px;
+            pointer-events: none;
+            color: #40a4df;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);
+            padding: 6px 12px;
+            font-size: 12px;
+            margin-top: 10px;
+            width: auto;
+            display: inline-block;
+        }
+
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #e74c3c 0%, #dc3545 100%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 20, 40, 0.3);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(64, 164, 223, 0.5);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(64, 164, 223, 0.7);
+        }
+
+        /* Mobile Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 15px;
+            }
+
+            .sidebar {
+                order: 2;
+                max-height: none;
+            }
+
+            .main-area {
+                order: 1;
+                padding: 20px;
+            }
+
+            .site-grid {
+                min-height: 300px;
+                max-height: 400px;
+            }
+
+            /* Larger touch targets */
+            button {
+                padding: 15px 20px;
+                font-size: 16px;
+                min-height: 48px;
+            }
+
+            input, select, textarea {
+                padding: 15px;
+                font-size: 16px;
+                min-height: 48px;
+            }
+
+            .toggle input[type="checkbox"] {
+                transform: scale(1.5);
+                margin-right: 10px;
+            }
+
+            .toggle label {
+                font-size: 14px;
+            }
+
+            .box-list {
+                max-height: 300px;
+            }
+
+            .box-item {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+
+            .delete-btn {
+                padding: 12px 20px;
+                font-size: 14px;
+                min-height: 44px;
+            }
+
+            /* Collapsible sections for mobile */
+            .mobile-section {
+                margin-bottom: 20px;
+            }
+
+            .mobile-section-header {
+                background: rgba(64, 164, 223, 0.2);
+                padding: 15px;
+                border-radius: 8px;
+                cursor: pointer;
+                user-select: none;
+                border: 1px solid rgba(64, 164, 223, 0.3);
+                margin-bottom: 10px;
+            }
+
+            .mobile-section-content {
+                display: none;
+            }
+
+            .mobile-section-content.active {
+                display: block;
+            }
+
+            .mobile-section-header:after {
+                content: ' ▼';
+                float: right;
+                transition: transform 0.3s ease;
+            }
+
+            .mobile-section-header.active:after {
+                transform: rotate(180deg);
+            }
+
+            h1 {
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+
+            h2 {
+                font-size: 18px;
+            }
+
+            .row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+
+        /* Landscape mobile optimization */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .container {
+                grid-template-columns: 350px 1fr;
+                gap: 15px;
+            }
+
+            .sidebar {
+                order: 1;
+                max-height: calc(100vh - 30px);
+                overflow-y: auto;
+            }
+
+            .main-area {
+                order: 2;
+                padding: 15px;
+            }
+
+            .site-grid {
+                min-height: 250px;
+                max-height: calc(100vh - 200px);
+            }
+
+            .box-list {
+                max-height: 200px;
+            }
+
+            .mobile-section-content {
+                display: block;
+            }
+
+            .mobile-section-header {
+                display: none;
+            }
+
+            body {
+                padding: 10px;
+            }
+
+            .row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Very small screens */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .sidebar, .main-area {
+                padding: 15px;
+                border-radius: 10px;
+            }
+
+            .site-info {
+                font-size: 12px;
+            }
+
+            .box {
+                font-size: 10px;
+                min-width: 20px;
+                min-height: 20px;
+            }
+
+            .instructions {
+                padding: 15px;
+            }
+
+            .save-load-buttons {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+
+        .mobile-box-details {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 32, 63, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 2px solid #40a4df;
+            padding: 20px;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .mobile-box-details.show {
+            transform: translateY(0);
+        }
+
+        .mobile-box-details h3 {
+            color: #40a4df;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-details {
+            background: none;
+            border: none;
+            color: #e0f4ff;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            width: auto;
+            min-height: auto;
+        }
+
+        .mobile-box-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .box-measurements-toggle {
+            background: rgba(64, 164, 223, 0.2);
+            border: 1px solid rgba(64, 164, 223, 0.3);
+            color: #5fb3e8;
+            padding: 8px 12px;
+            margin: 10px 0 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            user-select: none;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .box-measurements-toggle:hover {
+            background: rgba(64, 164, 223, 0.3);
+            border-color: rgba(64, 164, 223, 0.5);
+        }
+
+        .box-measurements-toggle:after {
+            content: '▼';
+            font-size: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .box-measurements-toggle.active:after {
+            transform: rotate(180deg);
+        }
+
+        .box-measurements-content {
+            display: none;
+            margin-top: 5px;
+        }
+
+        .box-measurements-content.active {
+            display: block;
+        }
+
+        /* Touch improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .box:hover {
+                transform: none;
+                opacity: 0.8;
+            }
+
+            .box:active {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+
+            button:hover {
+                transform: none;
+            }
+
+            button:active {
+                transform: translateY(1px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="mobile-section">
+                <div class="mobile-section-header" onclick="toggleMobileSection(this)">
+                    Add New Box
+                </div>
+                <div class="mobile-section-content active">
+                    <h2 style="display: none;">Add New Box</h2>
+                    <form id="boxForm">
+                        <div class="form-group">
+                            <label for="boxName">Box Name:</label>
+                            <input type="text" id="boxName" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="boxWidth">Width (ft):</label>
+                                <input type="number" id="boxWidth" step="0.1" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="boxHeight">Height (ft):</label>
+                                <input type="number" id="boxHeight" step="0.1" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group">
+                                <label for="horizontalDistance">Distance from West (ft):</label>
+                                <input type="number" id="horizontalDistance" step="0.1" required>
+                                <div class="toggle" style="margin-top: 5px;">
+                                    <input type="checkbox" id="measureFromEast">
+                                    <label for="measureFromEast" style="margin-bottom: 0;">From East (instead of West)</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="verticalDistance">Distance from North (ft):</label>
+                                <input type="number" id="verticalDistance" step="0.1" required>
+                                <div class="toggle" style="margin-top: 5px;">
+                                    <input type="checkbox" id="measureFromSouth">
+                                    <label for="measureFromSouth" style="margin-bottom: 0;">From South (instead of North)</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="toggle-group">
+                            <div class="toggle">
+                                <input type="checkbox" id="measureFromRight">
+                                <label for="measureFromRight">Measure from right side of box</label>
+                            </div>
+                            <div class="toggle">
+                                <input type="checkbox" id="measureFromBottom">
+                                <label for="measureFromBottom">Measure from bottom of box</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="boxColor">Box Color:</label>
+                            <input type="color" id="boxColor" value="#40a4df">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="boxNotes">Notes:</label>
+                            <textarea id="boxNotes" rows="3"></textarea>
+                        </div>
+
+                        <button type="submit" id="submitBtn">Add Box</button>
+                        <button type="button" id="cancelBtn" class="cancel-btn" style="display: none;">Cancel Edit</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="mobile-section">
+                <div class="mobile-section-header" onclick="toggleMobileSection(this)">
+                    Placed Boxes
+                </div>
+                <div class="mobile-section-content active">
+                    <div class="box-list" id="boxList">
+                        <h3 style="display: none;">Placed Boxes</h3>
+                    </div>
+                    <button class="print-btn" onclick="printDirections()" style="margin-top: 20px;">Print All Directions</button>
+                </div>
+            </div>
+
+            <div class="mobile-section">
+                <div class="mobile-section-header" onclick="toggleMobileSection(this)">
+                    Save & Load
+                </div>
+                <div class="mobile-section-content">
+                    <div class="save-load-section">
+                        <h3 style="display: none;">Save & Load</h3>
+                        <div class="save-load-buttons">
+                            <button class="save-btn" onclick="saveProject()">Save Project</button>
+                            <button class="load-btn" onclick="document.getElementById('loadFile').click()">Load Project</button>
+                        </div>
+                        <div class="file-input">
+                            <input type="file" id="loadFile" accept=".json" style="display: none;" onchange="loadProject(event)">
+                            <small>Save your layout to share with others or load a previous project</small>
+                        </div>
+                        <div class="auto-save-indicator" id="autoSaveIndicator">✓ Auto-saved</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-area">
+            <h1>Site Layout Tool</h1>
+            <div class="site-info">
+                Site Dimensions: 150' × 250' | Grid: 50' × 50'
+            </div>
+            
+            <div class="site-container">
+                <div class="grid-labels">
+                    <div style="position: absolute; top: 0; left: 0; transform: translate(-100%, -100%);">0'</div>
+                    <div style="position: absolute; top: 0; right: 0; transform: translate(100%, -100%);">150'</div>
+                    <div style="position: absolute; bottom: 0; left: 0; transform: translate(-100%, 100%);">250'</div>
+                </div>
+                <div class="site-grid" id="siteGrid"></div>
+            </div>
+
+            <div class="instructions" id="instructions">
+                <h3>Measurement Instructions</h3>
+                <button class="print-btn" onclick="printDirections()">Print Directions</button>
+                <p>Instructions will appear here when boxes are placed.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Box Details Popup -->
+    <div class="mobile-box-details" id="mobileBoxDetails">
+        <h3>
+            <span id="mobileBoxTitle">Box Details</span>
+            <button class="close-details" onclick="closeMobileBoxDetails()">×</button>
+        </h3>
+        <div id="mobileBoxContent"></div>
+        <div class="mobile-box-actions">
+            <button onclick="editMobileBox()" class="edit-mode">Edit Box</button>
+            <button onclick="deleteMobileBox()" class="delete-btn">Delete Box</button>
+        </div>
+    </div>
+
+    <script>
+        let boxes = [];
+        let boxCounter = 0;
+        let editingBoxId = null;
+        let isEditMode = false;
+        let selectedMobileBoxId = null;
+
+        const siteWidth = 150; // feet
+        const siteHeight = 250; // feet
+
+        // Check if device is mobile
+        function isMobile() {
+            return window.innerWidth <= 768;
+        }
+
+        // Preloaded data
+        const preloadedData = {
+            "version": "1.0",
+            "created": "2025-08-15T00:50:28.386Z",
+            "siteInfo": {
+                "width": 150,
+                "height": 250
+            },
+            "boxes": [
+                {
+                    "id": 1,
+                    "name": "LC27",
+                    "width": 8,
+                    "height": 20,
+                    "horizontalDistance": 10,
+                    "verticalDistance": 40,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 10,
+                    "northDistance": 40,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#ff0000",
+                    "notes": "20 A\nKylie/Rachel 8/15\nKatie 8/20"
+                },
+                {
+                    "id": 2,
+                    "name": "LC03",
+                    "width": 8,
+                    "height": 20,
+                    "horizontalDistance": 27,
+                    "verticalDistance": 40,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 27,
+                    "northDistance": 40,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#ff0000",
+                    "notes": "20A\nKaren 8/18\nLisa R 8/20"
+                },
+                {
+                    "id": 3,
+                    "name": "L8173",
+                    "width": 8,
+                    "height": 10,
+                    "horizontalDistance": 27,
+                    "verticalDistance": 25,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 27,
+                    "northDistance": 25,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#ff0000",
+                    "notes": "20A"
+                },
+                {
+                    "id": 4,
+                    "name": "10x8",
+                    "width": 8,
+                    "height": 10,
+                    "horizontalDistance": 37,
+                    "verticalDistance": 25,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 37,
+                    "northDistance": 25,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#ff0000",
+                    "notes": "20A"
+                },
+                {
+                    "id": 5,
+                    "name": "SC91",
+                    "width": 8,
+                    "height": 20,
+                    "horizontalDistance": 75,
+                    "verticalDistance": 40,
+                    "measureFromEast": true,
+                    "measureFromSouth": false,
+                    "westDistance": 67,
+                    "northDistance": 40,
+                    "measureFromRight": true,
+                    "measureFromBottom": false,
+                    "color": "#ff0000",
+                    "notes": "20A"
+                },
+                {
+                    "id": 6,
+                    "name": "Lounge 1",
+                    "width": 20,
+                    "height": 40,
+                    "horizontalDistance": 75,
+                    "verticalDistance": 60,
+                    "measureFromEast": true,
+                    "measureFromSouth": false,
+                    "westDistance": 55,
+                    "northDistance": 60,
+                    "measureFromRight": true,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 7,
+                    "name": "Lounge 2",
+                    "width": 20,
+                    "height": 30,
+                    "horizontalDistance": 75,
+                    "verticalDistance": 60,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 75,
+                    "northDistance": 60,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 8,
+                    "name": "Hammock",
+                    "width": 20,
+                    "height": 10,
+                    "horizontalDistance": 75,
+                    "verticalDistance": 90,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 75,
+                    "northDistance": 90,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 9,
+                    "name": "shade 1",
+                    "width": 20,
+                    "height": 20,
+                    "horizontalDistance": 15,
+                    "verticalDistance": 116,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 15,
+                    "northDistance": 116,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 10,
+                    "name": "shade 2",
+                    "width": 20,
+                    "height": 20,
+                    "horizontalDistance": 35,
+                    "verticalDistance": 116,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 35,
+                    "northDistance": 116,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 11,
+                    "name": "shade 3",
+                    "width": 20,
+                    "height": 20,
+                    "horizontalDistance": 55,
+                    "verticalDistance": 116,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 55,
+                    "northDistance": 116,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 12,
+                    "name": "shade 4",
+                    "width": 20,
+                    "height": 20,
+                    "horizontalDistance": 75,
+                    "verticalDistance": 116,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 75,
+                    "northDistance": 116,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 13,
+                    "name": "shade 5",
+                    "width": 20,
+                    "height": 20,
+                    "horizontalDistance": 15,
+                    "verticalDistance": 136,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 15,
+                    "northDistance": 136,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 14,
+                    "name": "shade 6",
+                    "width": 20,
+                    "height": 20,
+                    "horizontalDistance": 35,
+                    "verticalDistance": 136,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 35,
+                    "northDistance": 136,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 15,
+                    "name": "shade 7",
+                    "width": 20,
+                    "height": 20,
+                    "horizontalDistance": 55,
+                    "verticalDistance": 136,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 55,
+                    "northDistance": 136,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 16,
+                    "name": "shade 7",
+                    "width": 20,
+                    "height": 20,
+                    "horizontalDistance": 55,
+                    "verticalDistance": 136,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 55,
+                    "northDistance": 136,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 17,
+                    "name": "shade 8",
+                    "width": 20,
+                    "height": 20,
+                    "horizontalDistance": 75,
+                    "verticalDistance": 136,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 75,
+                    "northDistance": 136,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 18,
+                    "name": "shade 9",
+                    "width": 20,
+                    "height": 24,
+                    "horizontalDistance": 15,
+                    "verticalDistance": 156,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 15,
+                    "northDistance": 156,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 19,
+                    "name": "shade 10",
+                    "width": 20,
+                    "height": 24,
+                    "horizontalDistance": 35,
+                    "verticalDistance": 156,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 35,
+                    "northDistance": 156,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 20,
+                    "name": "shade 11",
+                    "width": 20,
+                    "height": 24,
+                    "horizontalDistance": 55,
+                    "verticalDistance": 156,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 55,
+                    "northDistance": 156,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 21,
+                    "name": "shade 12",
+                    "width": 20,
+                    "height": 24,
+                    "horizontalDistance": 75,
+                    "verticalDistance": 156,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 75,
+                    "northDistance": 156,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 22,
+                    "name": "Shade 13",
+                    "width": 20,
+                    "height": 30,
+                    "horizontalDistance": 15,
+                    "verticalDistance": 180,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 15,
+                    "northDistance": 180,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 23,
+                    "name": "shade 14",
+                    "width": 20,
+                    "height": 30,
+                    "horizontalDistance": 35,
+                    "verticalDistance": 180,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 35,
+                    "northDistance": 180,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 24,
+                    "name": "shade 15",
+                    "width": 20,
+                    "height": 30,
+                    "horizontalDistance": 55,
+                    "verticalDistance": 180,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 55,
+                    "northDistance": 180,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 25,
+                    "name": "shade 16",
+                    "width": 20,
+                    "height": 30,
+                    "horizontalDistance": 75,
+                    "verticalDistance": 180,
+                    "measureFromEast": false,
+                    "measureFromSouth": false,
+                    "westDistance": 75,
+                    "northDistance": 180,
+                    "measureFromRight": false,
+                    "measureFromBottom": false,
+                    "color": "#40a4df",
+                    "notes": ""
+                },
+                {
+                    "id": 26,
+                    "name": "Kitchen",
+                    "width": 8,
+                    "height": 28,
+                    "horizontalDistance": 150,
+                    "verticalDistance": 125,
+                    "measureFromEast": true,
+                    "measureFromSouth": false,
+                    "westDistance": 142,
+                    "northDistance": 125,
+                    "measureFromRight": true,
+                    "measureFromBottom": false,
+                    "color": "#ff0000",
+                    "notes": "2x30A"
+                },
+                {
+                    "id": 27,
+                    "name": "Power Crew",
+                    "width": 30,
+                    "height": 20,
+                    "horizontalDistance": 150,
+                    "verticalDistance": 0,
+                    "measureFromEast": true,
+                    "measureFromSouth": false,
+                    "westDistance": 120,
+                    "northDistance": 0,
+                    "measureFromRight": true,
+                    "measureFromBottom": false,
+                    "color": "#c4f415",
+                    "notes": ""
+                }
+            ],
+            "boxCounter": 27
+        };
+
+        // Initialize with preloaded data
+        function initializeWithPreloadedData() {
+            boxes = preloadedData.boxes;
+            boxCounter = preloadedData.boxCounter;
+            
+            // Render all preloaded boxes
+            boxes.forEach(box => {
+                renderBox(box);
+            });
+            
+            // Update UI
+            updateBoxList();
+        }
+
+        function feetToFeetInches(decimalFeet) {
+            const feet = Math.floor(decimalFeet);
+            const totalInches = (decimalFeet - feet) * 12;
+            
+            // Round to nearest 1/4 inch
+            const roundedQuarterInches = Math.round(totalInches * 4) / 4;
+            const inches = Math.floor(roundedQuarterInches);
+            const fraction = roundedQuarterInches - inches;
+            
+            let result = feet + "'";
+            
+            if (inches > 0 || fraction > 0) {
+                result += " " + inches;
+                if (fraction >= 0.75) {
+                    result += " 3/4";
+                } else if (fraction >= 0.5) {
+                    result += " 1/2";
+                } else if (fraction >= 0.25) {
+                    result += " 1/4";
+                }
+                result += '"';
+            }
+            
+            return result;
+        }
+
+        function getPixelCoordinates(westDistance, northDistance, boxWidth, boxHeight, measureFromRight, measureFromBottom) {
+            const grid = document.getElementById('siteGrid');
+            const gridWidth = grid.offsetWidth;
+            const gridHeight = grid.offsetHeight;
+            
+            // Calculate actual box position based on measurement point
+            let actualWest = westDistance;
+            let actualNorth = northDistance;
+            
+            if (measureFromRight) {
+                actualWest = westDistance - boxWidth;
+            }
+            if (measureFromBottom) {
+                actualNorth = northDistance - boxHeight;
+            }
+            
+            const pixelX = (actualWest / siteWidth) * gridWidth;
+            const pixelY = (actualNorth / siteHeight) * gridHeight;
+            const pixelWidth = (boxWidth / siteWidth) * gridWidth;
+            const pixelHeight = (boxHeight / siteHeight) * gridHeight;
+            
+            return { x: pixelX, y: pixelY, width: pixelWidth, height: pixelHeight, actualWest, actualNorth };
+        }
+
+        function getCornerCoordinates(box) {
+            const { actualWest, actualNorth } = box.position;
+            const { width, height } = box;
+            
+            return {
+                nw: { x: actualWest, y: actualNorth },
+                ne: { x: actualWest + width, y: actualNorth },
+                sw: { x: actualWest, y: actualNorth + height },
+                se: { x: actualWest + width, y: actualNorth + height }
+            };
+        }
+
+        function getClosestSiteCorner(x, y) {
+            const corners = [
+                { name: 'NW', x: 0, y: 0 },
+                { name: 'NE', x: siteWidth, y: 0 },
+                { name: 'SW', x: 0, y: siteHeight },
+                { name: 'SE', x: siteWidth, y: siteHeight }
+            ];
+            
+            let closest = corners[0];
+            let minDistance = Math.sqrt(Math.pow(x - corners[0].x, 2) + Math.pow(y - corners[0].y, 2));
+            
+            corners.forEach(corner => {
+                const distance = Math.sqrt(Math.pow(x - corner.x, 2) + Math.pow(y - corner.y, 2));
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closest = corner;
+                }
+            });
+            
+            return { corner: closest, distance: minDistance };
+        }
+
+        function getNearestSide(x, y) {
+            const sides = [
+                { name: 'North', distance: y },
+                { name: 'South', distance: siteHeight - y },
+                { name: 'West', distance: x },
+                { name: 'East', distance: siteWidth - x }
+            ];
+            
+            return sides.reduce((nearest, side) => 
+                side.distance < nearest.distance ? side : nearest
+            );
+        }
+
+        function generateInstructions() {
+            const instructionsDiv = document.getElementById('instructions');
+            
+            if (boxes.length === 0) {
+                instructionsDiv.innerHTML = '<h3>Measurement Instructions</h3><p>Instructions will appear here when boxes are placed.</p>';
+                return;
+            }
+
+            let html = '<h3>Surveyor Measurement Instructions</h3>';
+            
+            boxes.forEach(box => {
+                const corners = getCornerCoordinates(box);
+                html += `<h4 style="color: #40a4df; margin-top: 20px;">Box: ${box.name}</h4>`;
+                html += `<p style="margin-bottom: 10px;"><strong>Dimensions:</strong> ${box.width}' × ${box.height}'</p>`;
+                if (box.notes) {
+                    html += `<p style="margin-bottom: 10px;"><strong>Notes:</strong> ${box.notes}</p>`;
+                }
+                
+                Object.entries(corners).forEach(([cornerName, coords]) => {
+                    const closestCorner = getClosestSiteCorner(coords.x, coords.y);
+                    const nearestSide = getNearestSide(coords.x, coords.y);
+                    
+                    html += `<div class="corner-instruction">
+                        <strong>${cornerName.toUpperCase()} Corner:</strong><br>
+                        • From ${closestCorner.corner.name} site corner: ${closestCorner.distance.toFixed(1)}'<br>
+                        • From ${nearestSide.name} side: ${nearestSide.distance.toFixed(1)}'<br>
+                        • Coordinates: ${coords.x.toFixed(1)}' from West, ${coords.y.toFixed(1)}' from North
+                    </div>`;
+                });
+            });
+            
+            instructionsDiv.innerHTML = html;
+        }
+
+        function renderBox(box) {
+            const grid = document.getElementById('siteGrid');
+            const boxElement = document.createElement('div');
+            boxElement.className = 'box';
+            boxElement.id = `box-${box.id}`;
+            
+            const coords = getPixelCoordinates(
+                box.westDistance, 
+                box.northDistance, 
+                box.width, 
+                box.height, 
+                box.measureFromRight, 
+                box.measureFromBottom
+            );
+            
+            box.position = coords;
+            
+            boxElement.style.left = coords.x + 'px';
+            boxElement.style.top = coords.y + 'px';
+            boxElement.style.width = coords.width + 'px';
+            boxElement.style.height = coords.height + 'px';
+            boxElement.style.backgroundColor = box.color;
+            boxElement.style.borderColor = box.color;
+            boxElement.textContent = box.name;
+            
+            boxElement.addEventListener('click', () => {
+                if (isMobile()) {
+                    showMobileBoxDetails(box.id);
+                } else {
+                    editBox(box.id);
+                }
+            });
+            
+            grid.appendChild(boxElement);
+        }
+
+        function editBox(boxId) {
+            const box = boxes.find(b => b.id === boxId);
+            if (!box) return;
+            
+            // Populate form fields
+            document.getElementById('boxName').value = box.name;
+            document.getElementById('boxWidth').value = box.width;
+            document.getElementById('boxHeight').value = box.height;
+            document.getElementById('horizontalDistance').value = box.horizontalDistance;
+            document.getElementById('verticalDistance').value = box.verticalDistance;
+            document.getElementById('measureFromEast').checked = box.measureFromEast;
+            document.getElementById('measureFromSouth').checked = box.measureFromSouth;
+            document.getElementById('measureFromRight').checked = box.measureFromRight;
+            document.getElementById('measureFromBottom').checked = box.measureFromBottom;
+            document.getElementById('boxColor').value = box.color;
+            document.getElementById('boxNotes').value = box.notes;
+            
+            // Enter edit mode
+            isEditMode = true;
+            editingBoxId = boxId;
+            
+            // Update UI
+            const submitBtn = document.getElementById('submitBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            
+            submitBtn.textContent = 'Update Box';
+            submitBtn.className = 'edit-mode';
+            cancelBtn.style.display = 'block';
+            
+            // Highlight the box being edited
+            highlightBox(boxId);
+        }
+
+        function cancelEdit() {
+            isEditMode = false;
+            editingBoxId = null;
+            
+            // Reset form
+            document.getElementById('boxForm').reset();
+            document.getElementById('boxColor').value = '#40a4df';
+            
+            // Update UI
+            const submitBtn = document.getElementById('submitBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            
+            submitBtn.textContent = 'Add Box';
+            submitBtn.className = '';
+            cancelBtn.style.display = 'none';
+            
+            // Remove highlights
+            document.querySelectorAll('.box').forEach(box => {
+                box.style.filter = 'none';
+            });
+        }
+
+        function highlightBox(boxId) {
+            // Remove previous highlights
+            document.querySelectorAll('.box').forEach(box => {
+                box.style.filter = 'none';
+            });
+            
+            // Highlight selected box
+            const box = document.getElementById(`box-${boxId}`);
+            if (box) {
+                box.style.filter = 'brightness(1.3) drop-shadow(0 0 10px rgba(64, 164, 223, 0.8))';
+            }
+        }
+
+        function printDirections() {
+            if (boxes.length === 0) {
+                alert('No boxes placed yet!');
+                return;
+            }
+
+            // Create print window
+            const printWindow = window.open('', '_blank', 'width=800,height=600');
+            const printContent = generatePrintableInstructions();
+            
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Site Layout Measurement Instructions</title>
+                    <style>
+                        body { 
+                            font-family: Arial, sans-serif; 
+                            margin: 20px; 
+                            line-height: 1.6;
+                            color: #333;
+                        }
+                        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+                        h2 { color: #34495e; margin-top: 30px; }
+                        h3 { color: #2980b9; margin-top: 20px; }
+                        .box-info { 
+                            background: #f8f9fa; 
+                            padding: 10px; 
+                            border-left: 4px solid #3498db; 
+                            margin: 10px 0;
+                        }
+                        .corner { 
+                            background: #e8f4f8; 
+                            padding: 5px 8px; 
+                            margin: 3px 0; 
+                            border-radius: 3px;
+                            border-left: 2px solid #2980b9;
+                            font-size: 14px;
+                        }
+                        .site-info {
+                            background: #fff3cd;
+                            border: 1px solid #ffeaa7;
+                            border-radius: 4px;
+                            padding: 10px;
+                            margin: 15px 0;
+                            font-size: 14px;
+                        }
+                        @media print {
+                            .no-print { display: none; }
+                            body { margin: 0; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${printContent}
+                    <div class="no-print" style="margin-top: 30px; text-align: center;">
+                        <button onclick="window.print()" style="padding: 10px 20px; font-size: 16px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">Print</button>
+                        <button onclick="window.close()" style="padding: 10px 20px; font-size: 16px; background: #95a5a6; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px;">Close</button>
+                    </div>
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+        }
+
+        function generatePrintableInstructions() {
+            let html = `
+                <h1>Site Layout Measurement Instructions</h1>
+                <div class="site-info">
+                    <strong>Site:</strong> 150' × 250' | <strong>Grid:</strong> 50' × 50' | <strong>Boxes:</strong> ${boxes.length} | <strong>Date:</strong> ${new Date().toLocaleDateString()}
+                </div>
+            `;
+            
+            boxes.forEach((box, index) => {
+                const corners = getCornerCoordinates(box);
+                const horizontalRef = box.measureFromEast ? 'East' : 'West';
+                const verticalRef = box.measureFromSouth ? 'South' : 'North';
+                
+                html += `
+                    <div class="box-info">
+                        <h2>${index + 1}. ${box.name} (${box.width}' × ${box.height}')</h2>
+                        <p><strong>Position:</strong> ${box.horizontalDistance}' from ${horizontalRef}, ${box.verticalDistance}' from ${verticalRef}</p>
+                        ${box.notes ? `<p><strong>Notes:</strong> ${box.notes}</p>` : ''}
+                    </div>
+                `;
+                
+                Object.entries(corners).forEach(([cornerName, coords]) => {
+                    const closestCorner = getClosestSiteCorner(coords.x, coords.y);
+                    const nearestSide = getNearestSide(coords.x, coords.y);
+                    
+                    html += `
+                        <div class="corner">
+                            <strong>${cornerName.toUpperCase()}:</strong> 
+                            ${feetToFeetInches(closestCorner.distance)} from ${closestCorner.corner.name} corner, 
+                            ${feetToFeetInches(nearestSide.distance)} from ${nearestSide.name} side
+                        </div>
+                    `;
+                });
+            });
+            
+            return html;
+        }
+
+        function saveProject() {
+            const projectData = {
+                version: "1.0",
+                created: new Date().toISOString(),
+                siteInfo: {
+                    width: siteWidth,
+                    height: siteHeight
+                },
+                boxes: boxes,
+                boxCounter: boxCounter
+            };
+
+            const dataStr = JSON.stringify(projectData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `site-layout-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showAutoSaveIndicator('Project saved successfully!');
+        }
+
+        function loadProject(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const projectData = JSON.parse(e.target.result);
+                    
+                    // Validate the file format
+                    if (!projectData.boxes || !Array.isArray(projectData.boxes)) {
+                        throw new Error('Invalid file format');
+                    }
+
+                    // Clear current project
+                    clearProject();
+
+                    // Load the data
+                    boxes = projectData.boxes;
+                    boxCounter = projectData.boxCounter || 0;
+
+                    // Render all boxes
+                    boxes.forEach(box => {
+                        renderBox(box);
+                    });
+
+                    // Update UI
+                    updateBoxList();
+                    generateInstructions();
+                    
+                    showAutoSaveIndicator('Project loaded successfully!');
+                    
+                } catch (error) {
+                    alert('Error loading file: ' + error.message);
+                }
+            };
+            
+            reader.readAsText(file);
+            
+            // Reset the file input
+            event.target.value = '';
+        }
+
+        function clearProject() {
+            // Clear all boxes from the grid
+            boxes.forEach(box => {
+                const boxElement = document.getElementById(`box-${box.id}`);
+                if (boxElement) {
+                    boxElement.remove();
+                }
+            });
+
+            // Reset data
+            boxes = [];
+            boxCounter = 0;
+
+            // Cancel any edit mode
+            if (isEditMode) {
+                cancelEdit();
+            }
+
+            // Update UI
+            updateBoxList();
+            
+            // Auto-save after any changes
+            autoSave();
+        }
+
+        function autoSave() {
+            if (boxes.length > 0) {
+                // Create auto-save data
+                const projectData = {
+                    version: "1.0",
+                    created: new Date().toISOString(),
+                    siteInfo: {
+                        width: siteWidth,
+                        height: siteHeight
+                    },
+                    boxes: boxes,
+                    boxCounter: boxCounter
+                };
+
+                // You could potentially store this in memory or trigger a save
+                // For now, we'll just show the indicator
+                showAutoSaveIndicator();
+            }
+        }
+
+        function showAutoSaveIndicator(customMessage = '✓ Auto-saved') {
+            const indicator = document.getElementById('autoSaveIndicator');
+            indicator.textContent = customMessage;
+            indicator.classList.add('show');
+            
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 2000);
+        }
+
+        function updateBoxList() {
+            const boxListDiv = document.getElementById('boxList');
+            let html = '<h3 style="display: none;">Placed Boxes</h3>';
+            
+            boxes.forEach(box => {
+                const corners = getCornerCoordinates(box);
+                const horizontalRef = box.measureFromEast ? 'East' : 'West';
+                const verticalRef = box.measureFromSouth ? 'South' : 'North';
+                
+                html += `<div class="box-item">
+                    <h4>${box.name}</h4>
+                    <p><strong>Size:</strong> ${box.width}' × ${box.height}'</p>
+                    <p><strong>Position:</strong> ${box.horizontalDistance}' from ${horizontalRef}, ${box.verticalDistance}' from ${verticalRef}</p>
+                    ${box.notes ? `<p><strong>Notes:</strong> ${box.notes}</p>` : ''}
+                    
+                    <div class="box-measurements-toggle" onclick="toggleBoxMeasurements(this)">
+                        <span>Corner Measurements</span>
+                    </div>
+                    <div class="box-measurements-content">`;
+                
+                Object.entries(corners).forEach(([cornerName, coords]) => {
+                    const closestCorner = getClosestSiteCorner(coords.x, coords.y);
+                    const nearestSide = getNearestSide(coords.x, coords.y);
+                    
+                    html += `<div style="background: rgba(64, 164, 223, 0.1); padding: 5px 8px; margin: 3px 0; border-radius: 3px; font-size: 12px;">
+                        <strong>${cornerName.toUpperCase()}:</strong> ${feetToFeetInches(closestCorner.distance)} from ${closestCorner.corner.name}, ${feetToFeetInches(nearestSide.distance)} from ${nearestSide.name}
+                    </div>`;
+                });
+                
+                html += `</div>
+                    <button class="delete-btn" onclick="deleteBox(${box.id})">Delete</button>
+                </div>`;
+            });
+            
+            boxListDiv.innerHTML = html;
+        }
+
+        function deleteBox(boxId) {
+            boxes = boxes.filter(box => box.id !== boxId);
+            
+            const boxElement = document.getElementById(`box-${boxId}`);
+            if (boxElement) {
+                boxElement.remove();
+            }
+            
+            updateBoxList();
+            
+            // Auto-save after deletion
+            autoSave();
+        }
+
+        document.getElementById('boxForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('boxName').value;
+            const width = parseFloat(document.getElementById('boxWidth').value);
+            const height = parseFloat(document.getElementById('boxHeight').value);
+            const westDistance = parseFloat(document.getElementById('westDistance').value);
+            const northDistance = parseFloat(document.getElementById('northDistance').value);
+            const measureFromRight = document.getElementById('measureFromRight').checked;
+            const measureFromBottom = document.getElementById('measureFromBottom').checked;
+            const color = document.getElementById('boxColor').value;
+            const notes = document.getElementById('boxNotes').value;
+            
+            // Validation
+            if (westDistance < 0 || westDistance > siteWidth ||
+                northDistance < 0 || northDistance > siteHeight) {
+                alert('Box position is outside site boundaries!');
+                return;
+            }
+            
+            if (isEditMode) {
+                // Update existing box
+                const boxIndex = boxes.findIndex(b => b.id === editingBoxId);
+                if (boxIndex !== -1) {
+                    boxes[boxIndex] = {
+                        ...boxes[boxIndex],
+                        name,
+                        width,
+                        height,
+                        westDistance,
+                        northDistance,
+                        measureFromRight,
+                        measureFromBottom,
+                        color,
+                        notes
+                    };
+                    
+                    // Remove old visual element
+                    const oldElement = document.getElementById(`box-${editingBoxId}`);
+                    if (oldElement) {
+                        oldElement.remove();
+                    }
+                    
+                    // Render updated box
+                    renderBox(boxes[boxIndex]);
+                }
+                
+                // Exit edit mode
+                cancelEdit();
+            } else {
+                // Add new box
+                const box = {
+                    id: ++boxCounter,
+                    name,
+                    width,
+                    height,
+                    westDistance,
+                    northDistance,
+                    measureFromRight,
+                    measureFromBottom,
+                    color,
+                    notes
+                };
+                
+                boxes.push(box);
+                renderBox(box);
+                
+                // Reset form
+                this.reset();
+                document.getElementById('boxColor').value = '#40a4df';
+            }
+            
+            updateBoxList();
+            generateInstructions();
+        });
+
+        // Handle window resize to update box positions
+        window.addEventListener('resize', function() {
+            boxes.forEach(box => {
+                const boxElement = document.getElementById(`box-${box.id}`);
+                if (boxElement) {
+                    const coords = getPixelCoordinates(
+                        box.westDistance, 
+                        box.northDistance, 
+                        box.width, 
+                        box.height, 
+                        box.measureFromRight, 
+                        box.measureFromBottom
+                    );
+                    
+                    box.position = coords;
+                    boxElement.style.left = coords.x + 'px';
+                    boxElement.style.top = coords.y + 'px';
+                    boxElement.style.width = coords.width + 'px';
+                    boxElement.style.height = coords.height + 'px';
+                }
+            });
+        });
+
+        // Close mobile details on window resize to desktop
+        window.addEventListener('resize', function() {
+            if (!isMobile() && selectedMobileBoxId) {
+                closeMobileBoxDetails();
+            }
+            
+            boxes.forEach(box => {
+                const boxElement = document.getElementById(`box-${box.id}`);
+                if (boxElement) {
+                    const coords = getPixelCoordinates(
+                        box.westDistance, 
+                        box.northDistance, 
+                        box.width, 
+                        box.height, 
+                        box.measureFromRight, 
+                        box.measureFromBottom
+                    );
+                    
+                    box.position = coords;
+                    boxElement.style.left = coords.x + 'px';
+                    boxElement.style.top = coords.y + 'px';
+                    boxElement.style.width = coords.width + 'px';
+                    boxElement.style.height = coords.height + 'px';
+                }
+            });
+        });
+
+        // Cancel edit button handler
+        document.getElementById('cancelBtn').addEventListener('click', cancelEdit);
+
+        // Close mobile details when clicking outside
+        document.addEventListener('click', function(e) {
+            const mobileDetails = document.getElementById('mobileBoxDetails');
+            if (selectedMobileBoxId && 
+                mobileDetails.classList.contains('show') && 
+                !mobileDetails.contains(e.target) && 
+                !e.target.classList.contains('box')) {
+                closeMobileBoxDetails();
+            }
+        });
+
+        // Initialize the tool with preloaded data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeWithPreloadedData();
+        });
+
+        // Toggle box measurements in sidebar
+        function toggleBoxMeasurements(toggle) {
+            const content = toggle.nextElementSibling;
+            const isActive = content.classList.contains('active');
+            
+            if (isActive) {
+                content.classList.remove('active');
+                toggle.classList.remove('active');
+            } else {
+                content.classList.add('active');
+                toggle.classList.add('active');
+            }
+        }
+
+        // Mobile section toggle function
+        function toggleMobileSection(header) {
+            const content = header.nextElementSibling;
+            const isActive = content.classList.contains('active');
+            
+            if (isActive) {
+                content.classList.remove('active');
+                header.classList.remove('active');
+            } else {
+                content.classList.add('active');
+                header.classList.add('active');
+            }
+        }
+
+        // Mobile box details functions
+        function showMobileBoxDetails(boxId) {
+            const box = boxes.find(b => b.id === boxId);
+            if (!box) return;
+
+            selectedMobileBoxId = boxId;
+            const corners = getCornerCoordinates(box);
+            const horizontalRef = box.measureFromEast ? 'East' : 'West';
+            const verticalRef = box.measureFromSouth ? 'South' : 'North';
+
+            // Update popup content
+            document.getElementById('mobileBoxTitle').textContent = box.name;
+            
+            let content = `
+                <p><strong>Size:</strong> ${box.width}' × ${box.height}'</p>
+                <p><strong>Position:</strong> ${box.horizontalDistance}' from ${horizontalRef}, ${box.verticalDistance}' from ${verticalRef}</p>
+                ${box.notes ? `<p><strong>Notes:</strong> ${box.notes}</p>` : ''}
+                
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(64, 164, 223, 0.2);">
+                    <h4 style="color: #5fb3e8; margin-bottom: 10px;">Corner Measurements:</h4>
+            `;
+
+            Object.entries(corners).forEach(([cornerName, coords]) => {
+                const closestCorner = getClosestSiteCorner(coords.x, coords.y);
+                const nearestSide = getNearestSide(coords.x, coords.y);
+                
+                content += `<div style="background: rgba(64, 164, 223, 0.1); padding: 8px 12px; margin: 5px 0; border-radius: 5px;">
+                    <strong>${cornerName.toUpperCase()}:</strong> ${feetToFeetInches(closestCorner.distance)} from ${closestCorner.corner.name}, ${feetToFeetInches(nearestSide.distance)} from ${nearestSide.name}
+                </div>`;
+            });
+
+            content += '</div>';
+            
+            document.getElementById('mobileBoxContent').innerHTML = content;
+            document.getElementById('mobileBoxDetails').classList.add('show');
+            
+            // Highlight the selected box
+            highlightBox(boxId);
+        }
+
+        function closeMobileBoxDetails() {
+            document.getElementById('mobileBoxDetails').classList.remove('show');
+            selectedMobileBoxId = null;
+            
+            // Remove highlights
+            document.querySelectorAll('.box').forEach(box => {
+                box.style.filter = 'none';
+            });
+        }
+
+        function editMobileBox() {
+            if (selectedMobileBoxId) {
+                closeMobileBoxDetails();
+                editBox(selectedMobileBoxId);
+                
+                // Scroll to top to show the form
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Expand the Add New Box section if collapsed
+                const addBoxHeader = document.querySelector('.mobile-section-header');
+                const addBoxContent = addBoxHeader.nextElementSibling;
+                if (!addBoxContent.classList.contains('active')) {
+                    toggleMobileSection(addBoxHeader);
+                }
+            }
+        }
+
+        function deleteMobileBox() {
+            if (selectedMobileBoxId) {
+                if (confirm('Are you sure you want to delete this box?')) {
+                    deleteBox(selectedMobileBoxId);
+                    closeMobileBoxDetails();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
