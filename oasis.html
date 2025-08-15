@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site Layout Tool</title>
+    <title>Oasis Layout Tool</title>
     <style>
         * {
             margin: 0;
@@ -751,7 +751,7 @@
 
                         <!-- Shift Section (only shown in edit mode) -->
                         <div class="shift-section" id="shiftSection" style="display: none;">
-                            <h4>🔄 Move Box Position</h4>
+                            <h4>📐 Move Box Position</h4>
                             <div class="row">
                                 <div class="form-group">
                                     <label for="shiftX">Shift East (+) / West (-) (ft):</label>
@@ -807,9 +807,10 @@
                             <button class="load-btn" onclick="document.getElementById('loadFile').click()">Load Project</button>
                         </div>
                         <button class="load-btn" onclick="loadStandardLayout()" style="margin-bottom: 15px; background: linear-gradient(135deg, #28a745 0%, #20692e 100%);">Load Standard Layout</button>
+                        <button class="save-btn" onclick="saveAsStandardLayout()" style="margin-bottom: 15px; background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);">Save as Standard Layout</button>
                         <div class="file-input">
                             <input type="file" id="loadFile" accept=".json" style="display: none;" onchange="loadProject(event)">
-                            <small>Save your layout to share with others or load a previous project</small>
+                            <small>Save your layout to share with others, load a previous project, or use the standard layout template. Admin can save new standard layouts with password.</small>
                         </div>
                         <div class="auto-save-indicator" id="autoSaveIndicator">✓ Auto-saved</div>
                     </div>
@@ -818,7 +819,7 @@
         </div>
 
         <div class="main-area">
-            <h1>Site Layout Tool</h1>
+            <h1>Oasis Layout Tool</h1>
             <div class="site-info">
                 Site Dimensions: 150' × 250' | Grid: 50' × 50'
             </div>
@@ -833,7 +834,7 @@
             </div>
 
             <div class="instructions" id="instructions">
-                <h3>Measurement Instructions</h3>
+                <h3>Oasis Measurement Instructions</h3>
                 <button class="print-btn" onclick="printDirections()">Print Directions</button>
                 <p>Instructions will appear here when boxes are placed.</p>
             </div>
@@ -981,11 +982,11 @@
             const instructionsDiv = document.getElementById('instructions');
             
             if (boxes.length === 0) {
-                instructionsDiv.innerHTML = '<h3>Measurement Instructions</h3><p>Instructions will appear here when boxes are placed.</p>';
+                instructionsDiv.innerHTML = '<h3>Oasis Measurement Instructions</h3><p>Instructions will appear here when boxes are placed.</p>';
                 return;
             }
 
-            let html = '<h3>Surveyor Measurement Instructions</h3>';
+            let html = '<h3>Oasis Measurement Instructions</h3>';
             
             boxes.forEach(box => {
                 const corners = getCornerCoordinates(box);
@@ -1278,7 +1279,7 @@
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Site Layout Measurement Instructions</title>
+                    <title>Oasis Layout Measurement Instructions</title>
                     <style>
                         body { 
                             font-family: Arial, sans-serif; 
@@ -1332,7 +1333,7 @@
 
         function generatePrintableInstructions() {
             let html = `
-                <h1>Site Layout Measurement Instructions</h1>
+                <h1>Oasis Layout Measurement Instructions</h1>
                 <div class="site-info">
                     <strong>Site:</strong> 150' × 250' | <strong>Grid:</strong> 50' × 50' | <strong>Boxes:</strong> ${boxes.length} | <strong>Date:</strong> ${new Date().toLocaleDateString()}
                 </div>
@@ -1385,12 +1386,125 @@
             
             const link = document.createElement('a');
             link.href = URL.createObjectURL(dataBlob);
-            link.download = `site-layout-${new Date().toISOString().split('T')[0]}.json`;
+            link.download = `oasis-layout-${new Date().toISOString().split('T')[0]}.json`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
             showAutoSaveIndicator('Project saved successfully!');
+        }
+
+        // Simple hash function for basic password protection (NOT secure against determined users)
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32-bit integer
+            }
+            return hash.toString(36);
+        }
+
+        
+        const adminHash = "b1qkk"; 
+
+        function verifyAdminPassword() {
+            const password = prompt("Enter admin password to save as standard layout:");
+            if (!password) return false;
+            
+            const inputHash = simpleHash(password);
+            if (inputHash === adminHash) {
+                return true;
+            } else {
+                alert("Incorrect password!");
+                return false;
+            }
+        }
+
+        function saveAsStandardLayout() {
+            if (!verifyAdminPassword()) {
+                return;
+            }
+            
+            if (boxes.length === 0) {
+                alert('No layout to save as standard!');
+                return;
+            }
+
+            // Create the new standard layout data
+            const newStandardLayout = {
+                version: "1.0",
+                created: new Date().toISOString(),
+                siteInfo: {
+                    width: siteWidth,
+                    height: siteHeight
+                },
+                boxes: boxes.map(box => ({
+                    id: box.id,
+                    name: box.name,
+                    width: box.width,
+                    height: box.height,
+                    horizontalDistance: box.horizontalDistance,
+                    verticalDistance: box.verticalDistance,
+                    measureFromEast: box.measureFromEast,
+                    measureFromSouth: box.measureFromSouth,
+                    measureFromRight: box.measureFromRight,
+                    measureFromBottom: box.measureFromBottom,
+                    color: box.color,
+                    notes: box.notes
+                })),
+                boxCounter: boxCounter
+            };
+
+            // Generate the new function code
+            const newFunctionCode = `
+        function loadStandardLayout() {
+            // Confirm before loading
+            if (boxes.length > 0) {
+                if (!confirm('This will replace your current layout. Continue?')) {
+                    return;
+                }
+            }
+            
+            // Standard layout data
+            const standardLayout = ${JSON.stringify(newStandardLayout, null, 20)};
+            
+            try {
+                // Clear current project
+                clearProject();
+
+                // Load the standard layout data
+                boxes = standardLayout.boxes;
+                boxCounter = standardLayout.boxCounter || ${boxCounter};
+
+                // Render all boxes
+                boxes.forEach(box => {
+                    renderBox(box);
+                });
+
+                // Update UI
+                updateBoxList();
+                generateInstructions();
+                drawAlignmentGuides();
+                
+                showAutoSaveIndicator('Standard layout loaded successfully!');
+                
+            } catch (error) {
+                alert('Error loading standard layout: ' + error.message);
+            }
+        }`;
+
+            // Create downloadable file with new standard layout
+            const blob = new Blob([`// New Standard Layout Function - Replace in HTML\n${newFunctionCode}`], 
+                                {type: 'text/plain'});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `new-standard-layout-${new Date().toISOString().split('T')[0]}.js`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert('New standard layout code saved! You\'ll need to manually update the HTML file with this code.');
         }
 
         function loadStandardLayout() {
@@ -1404,7 +1518,7 @@
             // Standard layout data
             const standardLayout = {
                 "version": "1.0",
-                "created": "2025-08-15T16:04:07.970Z",
+                "created": "2025-08-15T21:32:43.328Z",
                 "siteInfo": {
                     "width": 150,
                     "height": 250
@@ -1490,20 +1604,6 @@
                         "measureFromEast": false,
                         "measureFromSouth": false,
                         "measureFromRight": true,
-                        "measureFromBottom": false,
-                        "color": "#40a4df",
-                        "notes": ""
-                    },
-                    {
-                        "id": 7,
-                        "name": "Lounge 2",
-                        "width": 20,
-                        "height": 30,
-                        "horizontalDistance": 75,
-                        "verticalDistance": 60,
-                        "measureFromEast": false,
-                        "measureFromSouth": false,
-                        "measureFromRight": false,
                         "measureFromBottom": false,
                         "color": "#40a4df",
                         "notes": ""
@@ -1801,9 +1901,149 @@
                         "measureFromBottom": true,
                         "color": "#c4fa00",
                         "notes": ""
+                    },
+                    {
+                        "id": 30,
+                        "name": "lounge 2a",
+                        "width": 20,
+                        "height": 10,
+                        "horizontalDistance": 75,
+                        "verticalDistance": 60,
+                        "measureFromEast": false,
+                        "measureFromSouth": false,
+                        "measureFromRight": false,
+                        "measureFromBottom": false,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 31,
+                        "name": "lounge 2b",
+                        "width": 20,
+                        "height": 10,
+                        "horizontalDistance": 75,
+                        "verticalDistance": 70,
+                        "measureFromEast": false,
+                        "measureFromSouth": false,
+                        "measureFromRight": false,
+                        "measureFromBottom": false,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 32,
+                        "name": "lounge 2c",
+                        "width": 20,
+                        "height": 10,
+                        "horizontalDistance": 75,
+                        "verticalDistance": 80,
+                        "measureFromEast": false,
+                        "measureFromSouth": false,
+                        "measureFromRight": false,
+                        "measureFromBottom": false,
+                        "color": "#40a4df",
+                        "notes": ""
+                    },
+                    {
+                        "id": 33,
+                        "name": "Early Tenting/Bikes",
+                        "width": 40,
+                        "height": 50,
+                        "horizontalDistance": 10,
+                        "verticalDistance": 60,
+                        "measureFromEast": false,
+                        "measureFromSouth": false,
+                        "measureFromRight": false,
+                        "measureFromBottom": false,
+                        "color": "#00ff7b",
+                        "notes": ""
+                    },
+                    {
+                        "id": 34,
+                        "name": "Serving Tents",
+                        "width": 20,
+                        "height": 40,
+                        "horizontalDistance": 13,
+                        "verticalDistance": 125,
+                        "measureFromEast": true,
+                        "measureFromSouth": false,
+                        "measureFromRight": true,
+                        "measureFromBottom": false,
+                        "color": "#ffffff",
+                        "notes": ""
+                    },
+                    {
+                        "id": 35,
+                        "name": "Car Park 1",
+                        "width": 10,
+                        "height": 250,
+                        "horizontalDistance": 0,
+                        "verticalDistance": 0,
+                        "measureFromEast": false,
+                        "measureFromSouth": false,
+                        "measureFromRight": false,
+                        "measureFromBottom": false,
+                        "color": "#f7f7f7",
+                        "notes": ""
+                    },
+                    {
+                        "id": 36,
+                        "name": "car park 2",
+                        "width": 120,
+                        "height": 10,
+                        "horizontalDistance": 10,
+                        "verticalDistance": 0,
+                        "measureFromEast": false,
+                        "measureFromSouth": true,
+                        "measureFromRight": false,
+                        "measureFromBottom": true,
+                        "color": "#ffffff",
+                        "notes": ""
+                    },
+                    {
+                        "id": 37,
+                        "name": "Golf Cart Parking",
+                        "width": 50,
+                        "height": 20,
+                        "horizontalDistance": 0,
+                        "verticalDistance": 35,
+                        "measureFromEast": true,
+                        "measureFromSouth": false,
+                        "measureFromRight": true,
+                        "measureFromBottom": false,
+                        "color": "#e79f23",
+                        "notes": ""
+                    },
+                    {
+                        "id": 38,
+                        "name": "Car Park 3",
+                        "width": 30,
+                        "height": 15,
+                        "horizontalDistance": 0,
+                        "verticalDistance": 20,
+                        "measureFromEast": true,
+                        "measureFromSouth": false,
+                        "measureFromRight": true,
+                        "measureFromBottom": false,
+                        "color": "#ffffff",
+                        "notes": ""
+                    },
+                    {
+                        "id": 39,
+                        "name": "staff car parking",
+                        "width": 25,
+                        "height": 8,
+                        "horizontalDistance": 3,
+                        "verticalDistance": 105,
+                        "measureFromEast": true,
+                        "measureFromSouth": false,
+                        "measureFromRight": true,
+                        "measureFromBottom": false,
+                        "color": "#f59d05",
+                        "notes": ""
                     }
                 ],
-                "boxCounter": 29
+                "boxCounter": 39
             };
             
             try {
@@ -1812,7 +2052,7 @@
 
                 // Load the standard layout data
                 boxes = standardLayout.boxes;
-                boxCounter = standardLayout.boxCounter || 29;
+                boxCounter = standardLayout.boxCounter || 39;
 
                 // Render all boxes
                 boxes.forEach(box => {
