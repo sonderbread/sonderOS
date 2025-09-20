@@ -1,1 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SonderFarm: Space Engineers Crop Efficiency Calculator</title>
+    <style>
+        :root {
+            --primary-color: #00d4ff;
+            --secondary-color: #ff6b35;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border-color: #333;
+            --input-bg: #1e1e1e;
+            --hover-bg: #333;
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 2px solid var(--primary-color);
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.95;
+            font-size: 1.1em;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            background: var(--bg-tertiary);
+        }
+
+        .control-group {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .control-group:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            border-color: var(--primary-color);
+        }
+
+        .control-group h3 {
+            margin: 0 0 1rem 0;
+            color: var(--primary-color);
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            font-size: 1.2em;
+        }
+
+        .control-group .icon {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .input-row label {
+            font-weight: 500;
+            color: var(--text-secondary);
+            min-width: 100px;
+        }
+
+        .input-row input[type="number"] {
+            padding: 0.75rem 1rem;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            width: 80px;
+            transition: all 0.3s ease;
+        }
+
+        .input-row input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+        }
+
+        .input-row input[type="range"] {
+            flex: 1;
+            margin: 0 10px;
+            accent-color: var(--primary-color);
+            -webkit-appearance: none;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .input-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .input-row .value-display {
+            font-weight: bold;
+            color: var(--primary-color);
+            min-width: 50px;
+        }
+
+        small {
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+        
+        .results {
+            padding: 2rem;
+            background: var(--bg-secondary);
+        }
+
+        .results h2 {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+            font-weight: 400;
+        }
+        
+        .strategy-list {
+            display: grid;
+            gap: 20px;
+        }
+
+        .strategy {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .strategy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+            border-color: var(--primary-color);
+        }
+
+        .strategy.best {
+            border-color: var(--warning-color);
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, rgba(255, 152, 0, 0.1) 100%);
+            box-shadow: 0 4px 16px rgba(255, 152, 0, 0.2);
+        }
+
+        .strategy.second {
+            border-color: var(--text-secondary);
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+        }
+        
+        .strategy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .strategy-rank {
+            background: var(--primary-color);
+            color: var(--bg-primary);
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
+        }
+
+        .strategy.best .strategy-rank {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .strategy.second .strategy-rank {
+            background: var(--text-secondary);
+            color: var(--bg-primary);
+        }
+        
+        .efficiency-score {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .strategy.best .efficiency-score {
+            color: var(--warning-color);
+        }
+        
+        .allocation {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .allocation h4 {
+            margin: 0 0 10px 0;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .recipe-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .recipe-card {
+            background: var(--bg-secondary);
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 4px solid var(--primary-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .recipe-card h5 {
+            margin: 0 0 8px 0;
+            color: var(--primary-color);
+        }
+
+        .recipe-card .recipe-stats {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 12px;
+            background: var(--bg-primary);
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        .warning {
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid var(--warning-color);
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            color: var(--warning-color);
+        }
+
+        .warning .icon {
+            margin-right: 8px;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .no-results .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+
+            .control-group {
+                padding: 1rem;
+            }
+
+            .input-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .input-row label {
+                min-width: auto;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 SonderFarm</h1>
+            <p>Space Engineers Crop Efficiency Calculator</p>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <h3><span class="icon">🛏️</span>Ship Configuration</h3>
+                <div class="input-row">
+                    <label>Beds:</label>
+                    <input type="number" id="beds" min="0" max="50" value="10">
+                    <span class="value-display" id="bedsDisplay">10</span>
+                </div>
+                <div class="input-row">
+                    <label>Algae Farms:</label>
+                    <input type="number" id="algaeFarms" min="0" max="100" value="0">
+                    <span class="value-display" id="algaeDisplay">0</span>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3><span class="icon">☀️</span>Environment</h3>
+                <div class="input-row">
+                    <label>Sunlight:</label>
+                    <input type="range" id="sunlight" min="0" max="100" value="100">
+                    <span class="value-display" id="sunlightDisplay">100%</span>
+                </div>
+                <small style="color: #6c757d; font-style: italic;">
+                    100% = Space, 50% = Planet surface, 0% = Underground/Dark
+                </small>
+            </div>
+            
+            <div class="control-group">
+                <h3><span class="icon">💧</span>Water Priority</h3>
+                <div class="input-row">
+                    <label>Conservation:</label>
+                    <input type="range" id="waterPriority" min="0" max="100" value="20">
+                    <span class="value-display" id="waterDisplay">20%</span>
+                </div>
+                <small style="color: #6c757d; font-style: italic;">
+                    Higher values prioritize water-efficient recipes
+                </small>
+            </div>
+        </div>
+        
+        <div class="results">
+            <h2>📊 Optimal Strategies</h2>
+            <div id="strategyResults">
+                <!-- Results will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Crop data
+        const crops = {
+            grain: { time: 30, waterTotal: 480, avgYield: 2.5 },
+            veg: { time: 20, waterTotal: 300, avgYield: 2.5 },
+            mushroom: { time: 12, waterTotal: 96, avgYield: 2.5 },
+            fruit: { time: 35, waterTotal: 700, avgYield: 2.5 },
+            algae: { time: 3, waterTotal: 0, avgYield: 1 }
+        };
+
+        // Recipe data with actual game names
+        const recipes = [
+            { name: "Kelp Crisp", grain: 0, veg: 0, mushroom: 0, fruit: 0, algae: 4, calories: 12 },
+            { name: "Fruit Bar", grain: 1, veg: 0, mushroom: 0, fruit: 1, algae: 0, calories: 18 },
+            { name: "Garden Slaw", grain: 0, veg: 2, mushroom: 0, fruit: 1, algae: 0, calories: 22 },
+            { name: "Red Pellets", grain: 0, veg: 1, mushroom: 0, fruit: 2, algae: 0, calories: 23 },
+            { name: "Chili", grain: 0, veg: 3, mushroom: 0, fruit: 1, algae: 0, calories: 30 },
+            { name: "Flatbread", grain: 1, veg: 1, mushroom: 0, fruit: 1, algae: 0, calories: 34 },
+            { name: "Ramen", grain: 1, veg: 1, mushroom: 0, fruit: 0, algae: 2, calories: 36 },
+            { name: "Fruit Pastry", grain: 2, veg: 0, mushroom: 0, fruit: 2, algae: 0, calories: 40 },
+            { name: "Veggie Burger", grain: 1, veg: 2, mushroom: 1, fruit: 0, algae: 0, calories: 46 },
+            { name: "Curry", grain: 1, veg: 1, mushroom: 0, fruit: 2, algae: 0, calories: 48 },
+            { name: "Dumplings", grain: 2, veg: 1, mushroom: 1, fruit: 0, algae: 0, calories: 51 },
+            { name: "Spaghetti", grain: 3, veg: 1, mushroom: 1, fruit: 0, algae: 0, calories: 71 }
+        ];
+
+        function calculateProductionRates(grainBeds, vegBeds, mushroomBeds, fruitBeds, algaeFarms, sunlightPercent) {
+            const sunlightMultiplier = sunlightPercent / 100;
+            
+            return {
+                grain: grainBeds * crops.grain.avgYield / crops.grain.time,
+                veg: vegBeds * crops.veg.avgYield / crops.veg.time,
+                mushroom: mushroomBeds * crops.mushroom.avgYield / crops.mushroom.time,
+                fruit: fruitBeds * crops.fruit.avgYield / crops.fruit.time,
+                algae: algaeFarms * crops.algae.avgYield / crops.algae.time * sunlightMultiplier
+            };
+        }
+
+        function calculateWaterUsage(grainBeds, vegBeds, mushroomBeds, fruitBeds) {
+            return grainBeds * crops.grain.waterTotal + 
+                   vegBeds * crops.veg.waterTotal + 
+                   mushroomBeds * crops.mushroom.waterTotal + 
+                   fruitBeds * crops.fruit.waterTotal;
+        }
+
+        function analyzeStrategy(allocation, rates, waterPriority) {
+            const { grainBeds, vegBeds, mushroomBeds, fruitBeds, algaeFarms } = allocation;
+            
+            let bestRecipes = [];
+            
+            // Test each recipe
+            recipes.forEach(recipe => {
+                let canMake = true;
+                let limitingRate = Infinity;
+                
+                if (recipe.grain > 0) {
+                    if (rates.grain <= 0) canMake = false;
+                    else limitingRate = Math.min(limitingRate, rates.grain / recipe.grain);
+                }
+                if (recipe.veg > 0) {
+                    if (rates.veg <= 0) canMake = false;
+                    else limitingRate = Math.min(limitingRate, rates.veg / recipe.veg);
+                }
+                if (recipe.mushroom > 0) {
+                    if (rates.mushroom <= 0) canMake = false;
+                    else limitingRate = Math.min(limitingRate, rates.mushroom / recipe.mushroom);
+                }
+                if (recipe.fruit > 0) {
+                    if (rates.fruit <= 0) canMake = false;
+                    else limitingRate = Math.min(limitingRate, rates.fruit / recipe.fruit);
+                }
+                if (recipe.algae > 0) {
+                    if (rates.algae <= 0) canMake = false;
+                    else limitingRate = Math.min(limitingRate, rates.algae / recipe.algae);
+                }
+                
+                if (canMake && limitingRate > 0) {
+                    const calPerMin = recipe.calories * limitingRate;
+                    const waterUsage = calculateWaterUsage(grainBeds, vegBeds, mushroomBeds, fruitBeds);
+                    const waterEfficiency = waterUsage > 0 ? calPerMin / waterUsage : 1;
+                    
+                    // Combined score: efficiency + water consideration
+                    const score = calPerMin * (1 + waterEfficiency * waterPriority / 100);
+                    
+                    bestRecipes.push({
+                        recipe,
+                        recipeRate: limitingRate,
+                        calPerMin,
+                        waterEfficiency,
+                        score
+                    });
+                }
+            });
+            
+            bestRecipes.sort((a, b) => b.score - a.score);
+            
+            const totalWater = calculateWaterUsage(grainBeds, vegBeds, mushroomBeds, fruitBeds);
+            const totalBeds = grainBeds + vegBeds + mushroomBeds + fruitBeds;
+            
+            return {
+                allocation,
+                bestRecipe: bestRecipes[0] || null,
+                alternativeRecipes: bestRecipes.slice(1, 3),
+                totalWater,
+                totalBeds,
+                rates
+            };
+        }
+
+        function generateStrategies(beds, algaeFarms, sunlightPercent, waterPriority) {
+            const strategies = [];
+            
+            if (beds === 0 && algaeFarms === 0) {
+                return strategies;
+            }
+            
+            // Generate different bed allocations
+            for (let grainBeds = 0; grainBeds <= beds; grainBeds++) {
+                for (let vegBeds = 0; vegBeds <= beds - grainBeds; vegBeds++) {
+                    for (let mushroomBeds = 0; mushroomBeds <= beds - grainBeds - vegBeds; mushroomBeds++) {
+                        const fruitBeds = beds - grainBeds - vegBeds - mushroomBeds;
+                        
+                        // Skip strategies with no production
+                        if (grainBeds === 0 && vegBeds === 0 && mushroomBeds === 0 && fruitBeds === 0 && algaeFarms === 0) {
+                            continue;
+                        }
+                        
+                        const allocation = { grainBeds, vegBeds, mushroomBeds, fruitBeds, algaeFarms };
+                        const rates = calculateProductionRates(grainBeds, vegBeds, mushroomBeds, fruitBeds, algaeFarms, sunlightPercent);
+                        
+                        const analysis = analyzeStrategy(allocation, rates, waterPriority);
+                        
+                        if (analysis.bestRecipe) {
+                            strategies.push(analysis);
+                        }
+                    }
+                }
+            }
+            
+            // Sort by efficiency and return top strategies
+            strategies.sort((a, b) => b.bestRecipe.calPerMin - a.bestRecipe.calPerMin);
+            return strategies.slice(0, 5);
+        }
+
+        function formatAllocation(allocation) {
+            const parts = [];
+            if (allocation.grainBeds > 0) parts.push(`${allocation.grainBeds}G`);
+            if (allocation.vegBeds > 0) parts.push(`${allocation.vegBeds}V`);
+            if (allocation.mushroomBeds > 0) parts.push(`${allocation.mushroomBeds}M`);
+            if (allocation.fruitBeds > 0) parts.push(`${allocation.fruitBeds}F`);
+            if (allocation.algaeFarms > 0) parts.push(`${allocation.algaeFarms}A`);
+            return parts.join(' + ') || 'No production';
+        }
+
+        function updateResults() {
+            const beds = parseInt(document.getElementById('beds').value);
+            const algaeFarms = parseInt(document.getElementById('algaeFarms').value);
+            const sunlightPercent = parseInt(document.getElementById('sunlight').value);
+            const waterPriority = parseInt(document.getElementById('waterPriority').value);
+            
+            const strategies = generateStrategies(beds, algaeFarms, sunlightPercent, waterPriority);
+            const resultsContainer = document.getElementById('strategyResults');
+            
+            if (strategies.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="no-results">
+                        <div class="icon">🤷‍♂️</div>
+                        <h3>No viable strategies found</h3>
+                        <p>Try adding more beds or algae farms to enable food production.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            
+            strategies.forEach((strategy, index) => {
+                const rankClass = index === 0 ? 'best' : index === 1 ? 'second' : '';
+                const rankText = index === 0 ? '🏆 OPTIMAL' : index === 1 ? '🥈 RUNNER-UP' : `#${index + 1}`;
+                
+                let warnings = [];
+                if (strategy.totalBeds === 0 && algaeFarms > 0) {
+                    warnings.push('⚠️ Pure algae strategy - consider adding some beds for recipe variety');
+                }
+                if (sunlightPercent < 100 && strategy.allocation.algaeFarms > 0) {
+                    warnings.push(`☀️ Reduced algae efficiency due to ${sunlightPercent}% sunlight`);
+                }
+                if (strategy.totalWater > 1000) {
+                    warnings.push('💧 High water usage - consider algae supplementation');
+                }
+                
+                html += `
+                    <div class="strategy ${rankClass}">
+                        <div class="strategy-header">
+                            <div class="strategy-rank">${rankText}</div>
+                            <div class="efficiency-score">${strategy.bestRecipe.calPerMin.toFixed(2)} cal/min</div>
+                        </div>
+                        
+                        <div class="allocation">
+                            <h4>🌱 Crop Allocation:</h4>
+                            ${formatAllocation(strategy.allocation)}
+                        </div>
+                        
+                        <div class="recipe-info">
+                            <div class="recipe-card">
+                                <h5>🍽️ Primary Recipe: ${strategy.bestRecipe.recipe.name}</h5>
+                                <div class="recipe-stats">
+                                    ${strategy.bestRecipe.recipe.calories} calories, 
+                                    ${strategy.bestRecipe.recipeRate.toFixed(3)} recipes/min
+                                </div>
+                            </div>
+                            
+                            ${strategy.alternativeRecipes.length > 0 ? `
+                                <div class="recipe-card" style="background: #2c1810; border-left-color: #d4a574;">
+                                    <h5 style="color: #d4a574;">🔄 Alternative: ${strategy.alternativeRecipes[0].recipe.name}</h5>
+                                    <div class="recipe-stats">
+                                        ${strategy.alternativeRecipes[0].calPerMin.toFixed(2)} cal/min potential
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="stats-grid">
+                            <div class="stat">
+                                <div class="stat-value">${strategy.totalBeds}</div>
+                                <div class="stat-label">Beds Used</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${strategy.totalWater}</div>
+                                <div class="stat-label">Water/Cycle</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${strategy.totalBeds > 0 ? (strategy.bestRecipe.calPerMin / strategy.totalBeds).toFixed(2) : '∞'}</div>
+                                <div class="stat-label">Cal/Bed/Min</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${strategy.totalWater > 0 ? (strategy.bestRecipe.calPerMin / strategy.totalWater * 1000).toFixed(2) : '∞'}</div>
+                                <div class="stat-label">Cal/L Water</div>
+                            </div>
+                        </div>
+                        
+                        ${warnings.length > 0 ? `
+                            <div class="warning">
+                                ${warnings.map(w => `<div><span class="icon">⚠️</span>${w}</div>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            resultsContainer.innerHTML = html;
+        }
+
+        // Event listeners
+        document.getElementById('beds').addEventListener('input', function() {
+            document.getElementById('bedsDisplay').textContent = this.value;
+            updateResults();
+        });
+
+        document.getElementById('algaeFarms').addEventListener('input', function() {
+            document.getElementById('algaeDisplay').textContent = this.value;
+            updateResults();
+        });
+
+        document.getElementById('sunlight').addEventListener('input', function() {
+            document.getElementById('sunlightDisplay').textContent = this.value + '%';
+            updateResults();
+        });
+
+        document.getElementById('waterPriority').addEventListener('input', function() {
+            document.getElementById('waterDisplay').textContent = this.value + '%';
+            updateResults();
+        });
+
+        // Initial calculation
+        updateResults();
+    </script>
+</body>
+</html>
