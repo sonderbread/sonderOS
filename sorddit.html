@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorddit: A Multi-Dimensional Reddit Comment Explorer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #007bff;
+        }
+        .explorer {
+            display: none;
+            margin-top: 20px;
+        }
+        .tab-container {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 14px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .tab.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .filters {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .filter-group {
+            margin-bottom: 15px;
+        }
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        input, select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+        }
+        .results-container {
+            max-height: 600px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+        }
+        .comment-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+        .comment-item:hover {
+            background-color: #f8f9fa;
+        }
+        .comment-meta {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .comment-text {
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        .comment-links {
+            font-size: 11px;
+        }
+        .comment-links a {
+            color: #007bff;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 20px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .subreddit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .subreddit-card {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 4px solid #2196f3;
+        }
+        .subreddit-card:hover {
+            background: #bbdefb;
+            transform: translateY(-2px);
+        }
+        .subreddit-name {
+            font-weight: bold;
+            color: #1565c0;
+        }
+        .subreddit-stats {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        .word-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        .word-tag {
+            background: #e3f2fd;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .word-tag:hover {
+            background: #2196f3;
+            color: white;
+        }
+        .word-tag.large { font-size: 16px; background: #2196f3; color: white; }
+        .word-tag.medium { font-size: 14px; background: #1976d2; color: white; }
+        .progress {
+            width: 100%;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #007bff;
+            border-radius: 5px;
+            transition: width 0.3s;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 12px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        .pattern-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .pattern-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+        .pattern-item:hover {
+            background: #f8f9fa;
+        }
+        .clickable-number {
+            background: #e3f2fd;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid #2196f3;
+            min-width: 40px;
+            display: inline-block;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+        .clickable-number:hover {
+            background: #bbdefb;
+        }
+        .number-input {
+            width: 60px;
+            padding: 4px;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .export-section {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .export-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        .gilded {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #000;
+        }
+        .reply-indicator {
+            background: #e1f5fe;
+            color: #0277bd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+        }
+        .date-filter {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .comparison-view {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .comparison-panel {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Sorddit: A Multi-Dimensional Reddit Comment Explorer</h1>
+        <p>Upload your CSV file to explore comments across subreddits, time, engagement, and linguistic patterns. Perfect for finding philosophical gems, advice patterns, and community-specific insights.</p>
+        
+        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+            <p>📁 Click here to select your CSV file</p>
+            <p style="font-size: 12px; color: #666;">Supports: id, permalink, date, ip, subreddit, gildings, link, parent, body, media columns</p>
+            <input type="file" id="fileInput" accept=".csv" style="display: none;">
+        </div>
+        
+        <div class="progress" id="progressContainer" style="display: none;">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div id="explorer" class="explorer">
+            <div class="tab-container">
+                <button class="tab active" onclick="showTab('overview')">📊 Overview</button>
+                <button class="tab" onclick="showTab('subreddits')">🏘️ Communities</button>
+                <button class="tab" onclick="showTab('search')">🔍 Search & Filter</button>
+                <button class="tab" onclick="showTab('engagement')">⭐ High Value</button>
+                <button class="tab" onclick="showTab('patterns')">🧩 Patterns</button>
+                <button class="tab" onclick="showTab('timeline')">⏰ Timeline</button>
+                <button class="tab" onclick="showTab('compare')">🔄 Compare</button>
+            </div>
+
+            <!-- Overview Tab -->
+            <div id="overview" class="tab-content active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalComments">0</div>
+                        <div>Total Comments</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="uniqueSubreddits">0</div>
+                        <div>Communities</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="avgLength">0</div>
+                        <div>Avg Length</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="gildedCount">0</div>
+                        <div>Awarded Comments</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="replyCount">0</div>
+                        <div>Replies</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="dateRange">-</div>
+                        <div>Time Span</div>
+                    </div>
+                </div>
+                
+                <h3>🏘️ Your Communities</h3>
+                <div class="filter-row">
+                    <button class="btn btn-secondary" onclick="showAllCommunities()">Show All Communities</button>
+                    <button class="btn btn-secondary" onclick="showTopCommunities()">Show Top 12</button>
+                </div>
+                <div class="subreddit-grid" id="topSubreddits"></div>
+                
+                <h3>🔥 Word Usage</h3>
+                <div class="filter-row">
+                    <button class="btn btn-secondary" onclick="showAllWords()">Show All Words</button>
+                    <button class="btn btn-secondary" onclick="showTopWords()">Show Top 40</button>
+                </div>
+                <div class="word-cloud" id="globalWords"></div>
+            </div>
+
+            <!-- Subreddits Tab -->
+            <div id="subreddits" class="tab-content">
+                <h3>📊 Community Analysis</h3>
+                <div class="filter-row">
+                    <select id="subredditSelect">
+                        <option value="">All Subreddits</option>
+                    </select>
+                    <button class="btn" onclick="analyzeSubreddit()">Analyze Selected</button>
+                    <button class="btn btn-secondary" onclick="showAllSubreddits()">Show All Communities</button>
+                </div>
+                
+                <div id="subredditAnalysis"></div>
+            </div>
+
+            <!-- Search & Filter Tab -->
+            <div id="search" class="tab-content">
+                <div class="filters">
+                    <div class="filter-group">
+                        <label>🔍 Search in Comments:</label>
+                        <div class="filter-row">
+                            <input type="text" class="search-input" id="searchInput" placeholder="Search for words, phrases, or patterns...">
+                            <select id="searchType">
+                                <option value="contains">Contains</option>
+                                <option value="starts">Starts with</option>
+                                <option value="ends">Ends with</option>
+                                <option value="exact">Exact match</option>
+                                <option value="regex">Regex</option>
+                            </select>
+                            <button class="btn" onclick="performSearch()">Search</button>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>🏘️ Community Filter:</label>
+                        <div class="filter-row">
+                            <select id="filterSubreddit">
+                                <option value="">All Communities</option>
+                            </select>
+                            <input type="checkbox" id="excludeSubreddit"> <span>Exclude selected</span>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>📏 Length Filter:</label>
+                        <div class="filter-row">
+                            <input type="range" id="minLength" min="0" max="1000" value="0">
+                            <span id="minLengthValue" class="clickable-number" onclick="editNumber('minLengthValue', 'minLength')">0</span>
+                            <span>to</span>
+                            <input type="range" id="maxLength" min="0" max="1000" value="1000">
+                            <span id="maxLengthValue" class="clickable-number" onclick="editNumber('maxLengthValue', 'maxLength')">1000</span>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <label>📅 Date Range:</label>
+                        <div class="date-filter">
+                            <input type="date" id="startDate">
+                            <span>to</span>
+                            <input type="date" id="endDate">
+                            <button class="btn btn-secondary" onclick="applyFilters()">Apply All Filters</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="searchResults">
+                    <p>Use the search and filters above to explore your comments.</p>
+                </div>
+            </div>
+
+            <!-- High Value Tab -->
+            <div id="engagement" class="tab-content">
+                <h3>⭐ High-Value Content Analysis</h3>
+                
+                <div class="filter-row" id="engagementButtons">
+                    <button class="btn" onclick="showGildedComments()">🏆 Awarded Comments</button>
+                    <button class="btn" onclick="showAllCommentsByLength()">📏 All Comments by Length</button>
+                </div>
+                
+                <div id="engagementResults"></div>
+            </div>
+
+            <!-- Patterns Tab -->
+            <div id="patterns" class="tab-content">
+                <h3>🧩 Discover Patterns</h3>
+                
+                <div class="filter-row">
+                    <button class="btn" onclick="findPatterns('I think')">💭 "I think" statements</button>
+                    <button class="btn" onclick="findPatterns('like a')">🌊 Metaphors ("like a...")</button>
+                    <button class="btn" onclick="findPatterns('?')">❓ Questions</button>
+                    <button class="btn" onclick="findPhilosophicalTerms()">🧘 Philosophical terms</button>
+                    <button class="btn" onclick="findAdvicePatterns()">💡 Advice patterns</button>
+                </div>
+                
+                <h4>📋 Common Sentence Starters by Community</h4>
+                <div class="pattern-list" id="communityStarters"></div>
+                
+                <h4>🔗 Common Phrases</h4>
+                <div class="pattern-list" id="commonPhrases"></div>
+            </div>
+
+            <!-- Timeline Tab -->
+            <div id="timeline" class="tab-content">
+                <h3>⏰ Temporal Analysis</h3>
+                
+                <div class="filter-row">
+                    <button class="btn" onclick="showTimelineOverview()">📊 Activity Over Time</button>
+                    <button class="btn" onclick="showEvolutionAnalysis()">🧠 Thought Evolution</button>
+                    <button class="btn" onclick="showCommunityTimeline()">🏘️ Community Timeline</button>
+                </div>
+                
+                <div id="timelineResults"></div>
+            </div>
+
+            <!-- Compare Tab -->
+            <div id="compare" class="tab-content">
+                <h3>🔄 Community Comparison</h3>
+                
+                <div class="filter-row">
+                    <select id="compareSubreddit1">
+                        <option value="">Select first community</option>
+                    </select>
+                    <span>vs</span>
+                    <select id="compareSubreddit2">
+                        <option value="">Select second community</option>
+                    </select>
+                    <button class="btn" onclick="performComparison()">Compare</button>
+                </div>
+                
+                <div id="comparisonResults"></div>
+            </div>
+
+            <!-- Export Section -->
+            <div class="export-section">
+                <h3>💾 Export Current Results</h3>
+                <div class="export-row">
+                    <button class="btn" onclick="exportCurrentResults()">📄 Export All Results</button>
+                    <button class="btn btn-secondary" onclick="exportRowNumbers()">🔢 Export Row Numbers</button>
+                    <button class="btn btn-secondary" onclick="exportAnalytics()">📊 Export Analytics</button>
+                </div>
+                <div class="export-row">
+                    <span>Export top</span>
+                    <input type="number" id="exportCount" class="number-input" value="500" min="1" placeholder="500">
+                    <span>results</span>
+                    <button class="btn" onclick="exportCustomCount()">📄 Export Custom Amount</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script>
+        let allComments = [];
+        let currentResults = [];
+        let subredditData = {};
+        let analytics = {};
+
+        function formatRedditLink(permalink) {
+            if (!permalink) return '';
+            
+            // If permalink already starts with http/https, use it as-is
+            if (permalink.startsWith('http')) {
+                return permalink;
+            }
+            
+            // If it's just a path (starts with /), add full reddit URL
+            if (permalink.startsWith('/')) {
+                return `https://reddit.com${permalink}`;
+            }
+            
+            // Otherwise, assume it needs full reddit URL prefix
+            return `https://reddit.com/${permalink}`;
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function updateProgress(percent) {
+            document.getElementById('progressBar').style.width = percent + '%';
+        }
+
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
+            // Handle various date formats
+            const date = new Date(dateStr);
+            return isNaN(date.getTime()) ? null : date;
+        }
+
+        function analyzeComments(comments) {
+            const analysis = {
+                totalComments: comments.length,
+                subreddits: {},
+                wordCounts: {},
+                sentenceStarters: {},
+                commonPhrases: {},
+                gildedComments: 0,
+                replies: 0,
+                dates: [],
+                lengths: [],
+                scores: []
+            };
+
+            let totalLength = 0;
+
+            comments.forEach((comment, index) => {
+                const text = comment.body || '';
+                const subreddit = comment.subreddit || 'unknown';
+                const gildings = parseInt(comment.gildings) || 0;
+                const hasParent = comment.parent && comment.parent.trim();
+                const score = parseFloat(comment.ip) || 0;
+                const date = parseDate(comment.date);
+
+                totalLength += text.length;
+                analysis.lengths.push(text.length);
+                analysis.scores.push(score);
+
+                if (gildings > 0) analysis.gildedComments++;
+                if (hasParent) analysis.replies++;
+                if (date) analysis.dates.push(date);
+
+                // Subreddit analysis
+                if (!analysis.subreddits[subreddit]) {
+                    analysis.subreddits[subreddit] = {
+                        count: 0,
+                        totalLength: 0,
+                        gilded: 0,
+                        avgScore: 0,
+                        words: {},
+                        phrases: {}
+                    };
+                }
+                analysis.subreddits[subreddit].count++;
+                analysis.subreddits[subreddit].totalLength += text.length;
+                if (gildings > 0) analysis.subreddits[subreddit].gilded++;
+
+                // Word analysis
+                const words = text.toLowerCase().match(/\b\w+\b/g) || [];
+                words.forEach(word => {
+                    if (word.length > 2) {
+                        analysis.wordCounts[word] = (analysis.wordCounts[word] || 0) + 1;
+                        analysis.subreddits[subreddit].words[word] = (analysis.subreddits[subreddit].words[word] || 0) + 1;
+                    }
+                });
+
+                // Phrase analysis
+                for (let i = 0; i < words.length - 1; i++) {
+                    const phrase = words.slice(i, i + 2).join(' ');
+                    if (phrase.length > 4) {
+                        analysis.commonPhrases[phrase] = (analysis.commonPhrases[phrase] || 0) + 1;
+                    }
+                }
+
+                // Sentence starters
+                const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+                if (sentences.length > 0) {
+                    const firstWords = sentences[0].trim().split(' ').slice(0, 2).join(' ').toLowerCase();
+                    if (firstWords) {
+                        analysis.sentenceStarters[firstWords] = (analysis.sentenceStarters[firstWords] || 0) + 1;
+                    }
+                }
+
+                if (index % 100 === 0) {
+                    updateProgress(30 + (index / comments.length) * 50);
+                }
+            });
+
+            analysis.avgLength = Math.round(totalLength / comments.length);
+            analysis.uniqueSubreddits = Object.keys(analysis.subreddits).length;
+
+            // Calculate average scores for subreddits
+            Object.keys(analysis.subreddits).forEach(sub => {
+                const subComments = comments.filter(c => c.subreddit === sub);
+                const scores = subComments.map(c => parseFloat(c.ip) || 0);
+                analysis.subreddits[sub].avgScore = scores.length > 0 ? 
+                    Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 100) / 100 : 0;
+            });
+
+            return analysis;
+        }
+
+        function displayOverview(analysis) {
+            document.getElementById('totalComments').textContent = analysis.totalComments.toLocaleString();
+            document.getElementById('uniqueSubreddits').textContent = analysis.uniqueSubreddits;
+            document.getElementById('avgLength').textContent = analysis.avgLength;
+            document.getElementById('gildedCount').textContent = analysis.gildedComments;
+            document.getElementById('replyCount').textContent = analysis.replies;
+
+            // Date range
+            if (analysis.dates.length > 0) {
+                const sortedDates = analysis.dates.sort((a, b) => a - b);
+                const start = sortedDates[0].getFullYear();
+                const end = sortedDates[sortedDates.length - 1].getFullYear();
+                document.getElementById('dateRange').textContent = start === end ? start : `${start}-${end}`;
+            }
+
+            // Store analysis globally for other functions
+            window.globalAnalysis = analysis;
+
+            // Show top communities initially
+            showTopCommunities();
+            
+            // Show top words initially
+            showTopWords();
+
+            // Populate select dropdowns
+            populateSubredditSelects(Object.keys(analysis.subreddits));
+        }
+
+        function showTopCommunities() {
+            if (!window.globalAnalysis) return;
+            
+            const topSubs = Object.entries(window.globalAnalysis.subreddits)
+                .sort((a, b) => b[1].count - a[1].count)
+                .slice(0, 12);
+            
+            displayCommunities(topSubs);
+        }
+
+        function showAllCommunities() {
+            if (!window.globalAnalysis) return;
+            
+            const allSubs = Object.entries(window.globalAnalysis.subreddits)
+                .sort((a, b) => b[1].count - a[1].count);
+            
+            displayCommunities(allSubs);
+        }
+
+        function displayCommunities(subs) {
+            const subredditGrid = document.getElementById('topSubreddits');
+            subredditGrid.innerHTML = '';
+            subs.forEach(([sub, data]) => {
+                const div = document.createElement('div');
+                div.className = 'subreddit-card';
+                div.innerHTML = `
+                    <div class="subreddit-name">r/${sub}</div>
+                    <div class="subreddit-stats">
+                        ${data.count} comments | ${Math.round(data.totalLength/data.count)} avg chars
+                        ${data.gilded > 0 ? ` | ${data.gilded} awarded` : ''}
+                    </div>
+                `;
+                div.onclick = () => filterBySubreddit(sub);
+                subredditGrid.appendChild(div);
+            });
+        }
+
+        function showTopWords() {
+            if (!window.globalAnalysis) return;
+            
+            const topWords = Object.entries(window.globalAnalysis.wordCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 40);
+            
+            displayWords(topWords);
+        }
+
+        function showAllWords() {
+            if (!window.globalAnalysis) return;
+            
+            const allWords = Object.entries(window.globalAnalysis.wordCounts)
+                .sort((a, b) => b[1] - a[1]);
+            
+            displayWords(allWords);
+        }
+
+        function displayWords(words) {
+            const wordCloud = document.getElementById('globalWords');
+            wordCloud.innerHTML = '';
+            words.forEach(([word, count]) => {
+                const span = document.createElement('span');
+                span.className = 'word-tag';
+                if (count > 100) span.className += ' large';
+                else if (count > 50) span.className += ' medium';
+                span.textContent = `${word} (${count})`;
+                span.onclick = () => findPatterns(word);
+                wordCloud.appendChild(span);
+            });
+        }
+
+        function populateSubredditSelects(subreddits) {
+            const selects = ['subredditSelect', 'filterSubreddit', 'compareSubreddit1', 'compareSubreddit2'];
+            
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                // Clear existing options except first
+                while (select.children.length > 1) {
+                    select.removeChild(select.lastChild);
+                }
+                
+                subreddits.sort().forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub;
+                    option.textContent = `r/${sub}`;
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        function performSearch() {
+            const query = document.getElementById('searchInput').value;
+            const searchType = document.getElementById('searchType').value;
+            const subredditFilter = document.getElementById('filterSubreddit').value;
+            const excludeSubreddit = document.getElementById('excludeSubreddit').checked;
+            
+            if (!query) return;
+
+            let results = allComments.filter(comment => {
+                // Subreddit filter
+                if (subredditFilter) {
+                    const matches = comment.subreddit === subredditFilter;
+                    if (excludeSubreddit ? matches : !matches) return false;
+                }
+                
+                // Text search
+                const text = comment.body.toLowerCase();
+                const queryLower = query.toLowerCase();
+                
+                switch (searchType) {
+                    case 'contains':
+                        return text.includes(queryLower);
+                    case 'starts':
+                        return text.startsWith(queryLower);
+                    case 'ends':
+                        return text.endsWith(queryLower);
+                    case 'exact':
+                        return text === queryLower;
+                    case 'regex':
+                        try {
+                            return new RegExp(query, 'i').test(text);
+                        } catch (e) {
+                            return false;
+                        }
+                    default:
+                        return false;
+                }
+            });
+
+            displayResults(results, `Search results for "${query}"`);
+        }
+
+        function findPatterns(pattern) {
+            const results = allComments.filter(comment => 
+                comment.body.toLowerCase().includes(pattern.toLowerCase())
+            );
+            displayResults(results, `Comments containing "${pattern}"`, 'searchResults');
+            showTab('search');
+        }
+
+        function filterBySubreddit(subreddit) {
+            const results = allComments.filter(comment => comment.subreddit === subreddit);
+            displayResults(results, `Comments from r/${subreddit}`, 'searchResults');
+            showTab('search');
+        }
+
+        function showGildedComments() {
+            const results = allComments.filter(comment => 
+                parseInt(comment.gildings) > 0
+            );
+            displayResults(results, `Awarded Comments (${results.length} found)`, 'engagementResults');
+        }
+
+        function showAllCommentsByLength() {
+            // Show all comments, pre-sorted by length (longest first)
+            const results = [...allComments].sort((a, b) => b.body.length - a.body.length);
+            displayResults(results, `All Comments Sorted by Length`, 'engagementResults');
+            // Set the sort dropdown to reflect current sorting
+            setTimeout(() => {
+                const sortDropdown = document.getElementById('sortBy');
+                if (sortDropdown) {
+                    sortDropdown.value = 'length_desc';
+                }
+            }, 100);
+        }
+
+        function showHighScoreComments() {
+            const scores = allComments.map(c => parseFloat(c.ip) || 0);
+            const validScores = scores.filter(s => s > 0);
+            
+            if (validScores.length === 0) {
+                document.getElementById('engagementResults').innerHTML = '<p>No score data available in this dataset.</p>';
+                return;
+            }
+            
+            const avgScore = validScores.reduce((a, b) => a + b, 0) / validScores.length;
+            const threshold = avgScore * 1.5;
+            const results = allComments.filter(comment => 
+                (parseFloat(comment.ip) || 0) > threshold
+            );
+            displayResults(results, `High Score Comments (above ${Math.round(threshold * 100)/100})`, 'engagementResults');
+        }
+
+        function findPhilosophicalTerms() {
+            const philosophicalTerms = ['meaning', 'existence', 'consciousness', 'reality', 'truth', 'wisdom', 'enlighten', 'spiritual', 'universe', 'soul', 'purpose'];
+            const results = allComments.filter(comment => 
+                philosophicalTerms.some(term => comment.body.toLowerCase().includes(term))
+            );
+            displayResults(results, `Comments with philosophical terms`, 'searchResults');
+            showTab('search');
+        }
+
+        function findAdvicePatterns() {
+            const advicePatterns = ['you should', 'i recommend', 'try this', 'my advice', 'what helped me', 'in my experience', 'i suggest', 'here\'s what', 'from my experience'];
+            const results = allComments.filter(comment => 
+                advicePatterns.some(pattern => comment.body.toLowerCase().includes(pattern))
+            );
+            displayResults(results, `Comments with advice patterns (${advicePatterns.join(', ')})`, 'searchResults');
+            showTab('search');
+        }
+
+        function showTimelineOverview() {
+            if (!allComments.length) return;
+            
+            // Group comments by year and month
+            const timeline = {};
+            const validDates = allComments.filter(c => c.date).map(c => {
+                const date = parseDate(c.date);
+                if (date) {
+                    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                    timeline[key] = (timeline[key] || 0) + 1;
+                }
+                return date;
+            }).filter(d => d);
+
+            if (validDates.length === 0) {
+                document.getElementById('timelineResults').innerHTML = '<p>No date information available in your comments.</p>';
+                return;
+            }
+
+            const sortedTimeline = Object.entries(timeline).sort();
+            
+            let html = `<h4>📅 Comment Activity Over Time</h4>`;
+            html += `<div class="pattern-list">`;
+            sortedTimeline.forEach(([month, count]) => {
+                html += `<div class="pattern-item"><span>${month}</span><span>${count} comments</span></div>`;
+            });
+            html += `</div>`;
+            
+            document.getElementById('timelineResults').innerHTML = html;
+        }
+
+        function showEvolutionAnalysis() {
+            if (!allComments.length) return;
+            
+            const results = allComments.filter(c => c.date && c.body.length > 200)
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            displayResults(results, `Your Thoughtful Comments Over Time (200+ chars, chronological order)`, 'timelineResults');
+        }
+
+        function showCommunityTimeline() {
+            if (!allComments.length) return;
+            
+            const communityTimeline = {};
+            allComments.forEach(comment => {
+                if (comment.date && comment.subreddit) {
+                    const year = new Date(comment.date).getFullYear();
+                    if (!communityTimeline[year]) communityTimeline[year] = {};
+                    communityTimeline[year][comment.subreddit] = (communityTimeline[year][comment.subreddit] || 0) + 1;
+                }
+            });
+
+            let html = `<h4>🏘️ Community Activity by Year</h4>`;
+            Object.keys(communityTimeline).sort().forEach(year => {
+                const yearData = communityTimeline[year];
+                const topCommunities = Object.entries(yearData)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 5);
+                
+                html += `<div class="pattern-item">
+                    <span><strong>${year}</strong>: ${topCommunities.map(([sub, count]) => `r/${sub} (${count})`).join(', ')}</span>
+                </div>`;
+            });
+            
+            document.getElementById('timelineResults').innerHTML = html;
+        }
+
+        function getSortingOptions() {
+            // Check if we have meaningful score data
+            const validScores = allComments.filter(c => parseFloat(c.ip) > 0).length;
+            const hasScores = validScores > allComments.length * 0.1; // At least 10% have scores
+            
+            let options = `
+                <option value="relevance">Relevance (original order)</option>
+                <option value="date_desc">Date (newest first)</option>
+                <option value="date_asc">Date (oldest first)</option>
+            `;
+            
+            if (hasScores) {
+                options += `
+                    <option value="score_desc">Score (highest first)</option>
+                    <option value="score_asc">Score (lowest first)</option>
+                `;
+            }
+            
+            options += `
+                <option value="awards_desc">Awards (most first)</option>
+                <option value="awards_asc">Awards (least first)</option>
+                <option value="length_desc">Length (longest first)</option>
+                <option value="length_asc">Length (shortest first)</option>
+                <option value="subreddit_asc">Subreddit (A-Z)</option>
+                <option value="subreddit_desc">Subreddit (Z-A)</option>
+            `;
+            
+            return options;
+        }
+
+        function displayResults(results, title, targetContainer = null) {
+            currentResults = results;
+            
+            // Determine target container
+            let container;
+            if (targetContainer) {
+                container = document.getElementById(targetContainer);
+            } else {
+                container = document.getElementById('searchResults') || 
+                           document.getElementById('engagementResults') || 
+                           document.getElementById('timelineResults');
+            }
+            
+            if (!container) {
+                console.error('No container found for displaying results');
+                return;
+            }
+            
+            container.innerHTML = `<h3>${title} (${results.length} found)</h3>`;
+            
+            if (results.length === 0) {
+                container.innerHTML += '<p>No results found.</p>';
+                return;
+            }
+
+            // Add sorting controls
+            const sortControls = document.createElement('div');
+            sortControls.className = 'filter-row';
+            sortControls.style.marginBottom = '15px';
+            sortControls.innerHTML = `
+                <label><strong>Sort by:</strong></label>
+                <select id="sortBy" onchange="sortCurrentResults()">
+                    ${getSortingOptions()}
+                </select>
+            `;
+            container.appendChild(sortControls);
+
+            renderResultsList(results, container);
+        }
+
+        function renderResultsList(results, container) {
+            // Remove existing results container if it exists
+            const existingResults = container.querySelector('.results-container');
+            if (existingResults) {
+                existingResults.remove();
+            }
+
+            // Check if we have meaningful score data
+            const validScores = allComments.filter(c => parseFloat(c.ip) > 0).length;
+            const hasScores = validScores > allComments.length * 0.1;
+
+            const resultsDiv = document.createElement('div');
+            resultsDiv.className = 'results-container';
+            
+            // Store current page in the results div for pagination
+            if (!resultsDiv.currentPage) resultsDiv.currentPage = 1;
+            const itemsPerPage = 100;
+            const startIndex = 0; // Always start with first page
+            const endIndex = Math.min(itemsPerPage, results.length);
+            const currentResults = results.slice(startIndex, endIndex);
+            
+            currentResults.forEach(comment => {
+                const div = document.createElement('div');
+                div.className = 'comment-item';
+                
+                const gildings = parseInt(comment.gildings) || 0;
+                const hasParent = comment.parent && comment.parent.trim();
+                const score = parseFloat(comment.ip) || 0;
+                
+                div.innerHTML = `
+                    <div class="comment-meta">
+                        <span>Row ${comment.row}</span>
+                        <span>r/${comment.subreddit}</span>
+                        <span>${comment.body.length} chars</span>
+                        ${comment.date ? `<span>${new Date(comment.date).toLocaleDateString()}</span>` : ''}
+                        ${hasScores && score > 0 ? `<span>Score: ${score}</span>` : ''}
+                        ${gildings > 0 ? `<span class="gilded">🏆 ${gildings} award${gildings > 1 ? 's' : ''}</span>` : ''}
+                        ${hasParent ? `<span class="reply-indicator">Reply</span>` : ''}
+                    </div>
+                    <div class="comment-text">${comment.body}</div>
+                    ${comment.permalink ? `<div class="comment-links"><a href="${formatRedditLink(comment.permalink)}" target="_blank">View on Reddit</a></div>` : ''}
+                `;
+                resultsDiv.appendChild(div);
+            });
+            
+            // Add pagination controls if there are more results
+            if (results.length > itemsPerPage) {
+                const paginationDiv = document.createElement('div');
+                paginationDiv.style.cssText = 'padding: 20px; text-align: center; border-top: 1px solid #eee; background: #f8f9fa;';
+                
+                const totalPages = Math.ceil(results.length / itemsPerPage);
+                const currentPage = 1;
+                
+                paginationDiv.innerHTML = `
+                    <div style="margin-bottom: 10px; color: #666;">
+                        Showing ${currentResults.length} of ${results.length} results (Page ${currentPage} of ${totalPages})
+                    </div>
+                    <div class="pagination-controls">
+                        <button class="btn" onclick="loadMoreResults()" id="loadMoreBtn">
+                            Load Next ${Math.min(itemsPerPage, results.length - itemsPerPage)} Results
+                        </button>
+                        <button class="btn btn-secondary" onclick="loadAllResults()" style="margin-left: 10px;">
+                            Load All ${results.length} Results
+                        </button>
+                    </div>
+                `;
+                
+                resultsDiv.appendChild(paginationDiv);
+                
+                // Store full results for pagination
+                window.currentFullResults = results;
+                window.currentResultsContainer = container;
+                window.currentPage = 1;
+            }
+            
+            container.appendChild(resultsDiv);
+        }
+
+        function loadMoreResults() {
+            if (!window.currentFullResults) return;
+            
+            const itemsPerPage = 100;
+            const currentPage = window.currentPage || 1;
+            const nextPage = currentPage + 1;
+            const startIndex = currentPage * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, window.currentFullResults.length);
+            
+            if (startIndex >= window.currentFullResults.length) return;
+            
+            const container = window.currentResultsContainer;
+            const resultsDiv = container.querySelector('.results-container');
+            const paginationDiv = resultsDiv.querySelector('.pagination-controls').parentElement;
+            
+            // Check if we have meaningful score data
+            const validScores = allComments.filter(c => parseFloat(c.ip) > 0).length;
+            const hasScores = validScores > allComments.length * 0.1;
+            
+            // Add new results before pagination
+            const newResults = window.currentFullResults.slice(startIndex, endIndex);
+            newResults.forEach(comment => {
+                const div = document.createElement('div');
+                div.className = 'comment-item';
+                
+                const gildings = parseInt(comment.gildings) || 0;
+                const hasParent = comment.parent && comment.parent.trim();
+                const score = parseFloat(comment.ip) || 0;
+                
+                div.innerHTML = `
+                    <div class="comment-meta">
+                        <span>Row ${comment.row}</span>
+                        <span>r/${comment.subreddit}</span>
+                        <span>${comment.body.length} chars</span>
+                        ${comment.date ? `<span>${new Date(comment.date).toLocaleDateString()}</span>` : ''}
+                        ${hasScores && score > 0 ? `<span>Score: ${score}</span>` : ''}
+                        ${gildings > 0 ? `<span class="gilded">🏆 ${gildings} award${gildings > 1 ? 's' : ''}</span>` : ''}
+                        ${hasParent ? `<span class="reply-indicator">Reply</span>` : ''}
+                    </div>
+                    <div class="comment-text">${comment.body}</div>
+                    ${comment.permalink ? `<div class="comment-links"><a href="${formatRedditLink(comment.permalink)}" target="_blank">View on Reddit</a></div>` : ''}
+                `;
+                resultsDiv.insertBefore(div, paginationDiv);
+            });
+            
+            // Update pagination info
+            window.currentPage = nextPage;
+            const totalPages = Math.ceil(window.currentFullResults.length / itemsPerPage);
+            const totalShown = nextPage * itemsPerPage;
+            const remaining = window.currentFullResults.length - totalShown;
+            
+            paginationDiv.innerHTML = `
+                <div style="margin-bottom: 10px; color: #666;">
+                    Showing ${Math.min(totalShown, window.currentFullResults.length)} of ${window.currentFullResults.length} results (Page ${nextPage} of ${totalPages})
+                </div>
+                <div class="pagination-controls">
+                    ${remaining > 0 ? `
+                        <button class="btn" onclick="loadMoreResults()" id="loadMoreBtn">
+                            Load Next ${Math.min(itemsPerPage, remaining)} Results
+                        </button>
+                    ` : '<span style="color: #666;">All results loaded</span>'}
+                    ${remaining > itemsPerPage ? `
+                        <button class="btn btn-secondary" onclick="loadAllResults()" style="margin-left: 10px;">
+                            Load All Remaining ${remaining} Results
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function loadAllResults() {
+            if (!window.currentFullResults) return;
+            
+            const container = window.currentResultsContainer;
+            const resultsDiv = container.querySelector('.results-container');
+            const paginationDiv = resultsDiv.querySelector('.pagination-controls').parentElement;
+            
+            // Check if we have meaningful score data
+            const validScores = allComments.filter(c => parseFloat(c.ip) > 0).length;
+            const hasScores = validScores > allComments.length * 0.1;
+            
+            const itemsPerPage = 100;
+            const currentPage = window.currentPage || 1;
+            const startIndex = currentPage * itemsPerPage;
+            
+            // Add all remaining results
+            const remainingResults = window.currentFullResults.slice(startIndex);
+            remainingResults.forEach(comment => {
+                const div = document.createElement('div');
+                div.className = 'comment-item';
+                
+                const gildings = parseInt(comment.gildings) || 0;
+                const hasParent = comment.parent && comment.parent.trim();
+                const score = parseFloat(comment.ip) || 0;
+                
+                div.innerHTML = `
+                    <div class="comment-meta">
+                        <span>Row ${comment.row}</span>
+                        <span>r/${comment.subreddit}</span>
+                        <span>${comment.body.length} chars</span>
+                        ${comment.date ? `<span>${new Date(comment.date).toLocaleDateString()}</span>` : ''}
+                        ${hasScores && score > 0 ? `<span>Score: ${score}</span>` : ''}
+                        ${gildings > 0 ? `<span class="gilded">🏆 ${gildings} award${gildings > 1 ? 's' : ''}</span>` : ''}
+                        ${hasParent ? `<span class="reply-indicator">Reply</span>` : ''}
+                    </div>
+                    <div class="comment-text">${comment.body}</div>
+                    ${comment.permalink ? `<div class="comment-links"><a href="${formatRedditLink(comment.permalink)}" target="_blank">View on Reddit</a></div>` : ''}
+                `;
+                resultsDiv.insertBefore(div, paginationDiv);
+            });
+            
+            // Update pagination to show all loaded
+            paginationDiv.innerHTML = `
+                <div style="margin-bottom: 10px; color: #666;">
+                    Showing all ${window.currentFullResults.length} results
+                </div>
+                <div style="color: #666;">All results loaded</div>
+            `;
+        }
+
+        function sortCurrentResults() {
+            const sortBy = document.getElementById('sortBy').value;
+            if (!currentResults || currentResults.length === 0) return;
+
+            let sortedResults = [...currentResults];
+
+            switch (sortBy) {
+                case 'date_desc':
+                    sortedResults.sort((a, b) => {
+                        const dateA = parseDate(a.date);
+                        const dateB = parseDate(b.date);
+                        if (!dateA && !dateB) return 0;
+                        if (!dateA) return 1;
+                        if (!dateB) return -1;
+                        return dateB - dateA;
+                    });
+                    break;
+                case 'date_asc':
+                    sortedResults.sort((a, b) => {
+                        const dateA = parseDate(a.date);
+                        const dateB = parseDate(b.date);
+                        if (!dateA && !dateB) return 0;
+                        if (!dateA) return 1;
+                        if (!dateB) return -1;
+                        return dateA - dateB;
+                    });
+                    break;
+                case 'score_desc':
+                    sortedResults.sort((a, b) => (parseFloat(b.ip) || 0) - (parseFloat(a.ip) || 0));
+                    break;
+                case 'score_asc':
+                    sortedResults.sort((a, b) => (parseFloat(a.ip) || 0) - (parseFloat(b.ip) || 0));
+                    break;
+                case 'awards_desc':
+                    sortedResults.sort((a, b) => (parseInt(b.gildings) || 0) - (parseInt(a.gildings) || 0));
+                    break;
+                case 'awards_asc':
+                    sortedResults.sort((a, b) => (parseInt(a.gildings) || 0) - (parseInt(b.gildings) || 0));
+                    break;
+                case 'length_desc':
+                    sortedResults.sort((a, b) => b.body.length - a.body.length);
+                    break;
+                case 'length_asc':
+                    sortedResults.sort((a, b) => a.body.length - b.body.length);
+                    break;
+                case 'subreddit_asc':
+                    sortedResults.sort((a, b) => a.subreddit.localeCompare(b.subreddit));
+                    break;
+                case 'subreddit_desc':
+                    sortedResults.sort((a, b) => b.subreddit.localeCompare(a.subreddit));
+                    break;
+                case 'relevance':
+                default:
+                    // Keep original order
+                    break;
+            }
+
+            // Update the global currentResults to reflect the new sort order
+            currentResults = sortedResults;
+            
+            // Also update the pagination storage to use sorted results
+            window.currentFullResults = sortedResults;
+
+            // Find the current container and re-render
+            const containers = ['searchResults', 'engagementResults', 'timelineResults'];
+            for (const containerId of containers) {
+                const container = document.getElementById(containerId);
+                if (container && container.querySelector('.results-container')) {
+                    renderResultsList(sortedResults, container);
+                    break;
+                }
+            }
+        }
+
+        function applyFilters() {
+            const minLen = parseInt(document.getElementById('minLength').value);
+            const maxLen = parseInt(document.getElementById('maxLength').value);
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const subredditFilter = document.getElementById('filterSubreddit').value;
+            
+            let results = allComments.filter(comment => {
+                // Length filter
+                if (comment.body.length < minLen || comment.body.length > maxLen) return false;
+                
+                // Date filter
+                if (startDate || endDate) {
+                    const commentDate = parseDate(comment.date);
+                    if (!commentDate) return false;
+                    
+                    if (startDate && commentDate < new Date(startDate)) return false;
+                    if (endDate && commentDate > new Date(endDate)) return false;
+                }
+                
+                // Subreddit filter
+                if (subredditFilter && comment.subreddit !== subredditFilter) return false;
+                
+                return true;
+            });
+            
+            displayResults(results, `Filtered results`);
+        }
+
+        function exportCurrentResults() {
+            if (currentResults.length === 0) {
+                alert('No results to export');
+                return;
+            }
+            
+            const content = currentResults.map(comment => 
+                `Row ${comment.row} | r/${comment.subreddit} | ${comment.date || 'No date'}\n${comment.body}\n${'='.repeat(80)}\n`
+            ).join('\n');
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'filtered_comments.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportRowNumbers() {
+            if (currentResults.length === 0) {
+                alert('No results to export');
+                return;
+            }
+            
+            const data = {
+                row_numbers: currentResults.map(comment => comment.row),
+                count: currentResults.length,
+                subreddits: [...new Set(currentResults.map(c => c.subreddit))],
+                exported_at: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'row_numbers.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function editNumber(spanId, sliderId) {
+            const span = document.getElementById(spanId);
+            const slider = document.getElementById(sliderId);
+            const currentValue = span.textContent;
+            
+            // Create input field
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.className = 'number-input';
+            input.value = currentValue;
+            input.min = slider.min;
+            input.max = slider.max;
+            input.style.width = '60px';
+            
+            // Replace span with input
+            span.parentNode.replaceChild(input, span);
+            input.focus();
+            input.select();
+            
+            // Handle enter key and blur
+            const finishEdit = () => {
+                const newValue = Math.max(slider.min, Math.min(slider.max, parseInt(input.value) || 0));
+                slider.value = newValue;
+                
+                // Create new span
+                const newSpan = document.createElement('span');
+                newSpan.id = spanId;
+                newSpan.className = 'clickable-number';
+                newSpan.textContent = newValue;
+                newSpan.onclick = () => editNumber(spanId, sliderId);
+                
+                input.parentNode.replaceChild(newSpan, input);
+            };
+            
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    finishEdit();
+                }
+            });
+            
+            input.addEventListener('blur', finishEdit);
+        }
+
+        function exportCustomCount() {
+            const count = parseInt(document.getElementById('exportCount').value) || 500;
+            
+            if (currentResults.length === 0) {
+                alert('No results to export');
+                return;
+            }
+            
+            const resultsToExport = currentResults.slice(0, count);
+            const content = resultsToExport.map(comment => 
+                `Row ${comment.row} | r/${comment.subreddit} | ${comment.date || 'No date'} | ${comment.body.length} chars\n${comment.body}\n${'='.repeat(80)}\n`
+            ).join('\n');
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `top_${count}_comments.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function exportAnalytics() {
+            const blob = new Blob([JSON.stringify(analytics, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'comment_analytics.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function processFile(file) {
+            document.getElementById('progressContainer').style.display = 'block';
+            updateProgress(10);
+            
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    updateProgress(25);
+                    
+                    allComments = results.data.map((row, index) => ({
+                        row: index + 2,
+                        id: row.id || '',
+                        permalink: row.permalink || '',
+                        date: row.date || '',
+                        ip: row.ip || 0,
+                        subreddit: row.subreddit || 'unknown',
+                        gildings: row.gildings || 0,
+                        link: row.link || '',
+                        parent: row.parent || '',
+                        body: row.body || '',
+                        media: row.media || 0
+                    })).filter(comment => comment.body.trim());
+                    
+                    updateProgress(50);
+                    
+                    analytics = analyzeComments(allComments);
+                    displayOverview(analytics);
+                    
+                    // Set dynamic length filter limits based on actual data
+                    const maxLength = Math.max(...allComments.map(c => c.body.length));
+                    const minLengthSlider = document.getElementById('minLength');
+                    const maxLengthSlider = document.getElementById('maxLength');
+                    
+                    if (minLengthSlider && maxLengthSlider) {
+                        minLengthSlider.max = maxLength;
+                        maxLengthSlider.max = maxLength;
+                        maxLengthSlider.value = maxLength;
+                        document.getElementById('maxLengthValue').textContent = maxLength;
+                    }
+                    
+                    // Add high score button if we have score data
+                    const validScores = allComments.filter(c => parseFloat(c.ip) > 0).length;
+                    const hasScores = validScores > allComments.length * 0.1;
+                    if (hasScores) {
+                        const engagementButtons = document.getElementById('engagementButtons');
+                        const scoreButton = document.createElement('button');
+                        scoreButton.className = 'btn';
+                        scoreButton.onclick = showHighScoreComments;
+                        scoreButton.textContent = '📈 High Score Comments';
+                        engagementButtons.appendChild(scoreButton);
+                    }
+                    
+                    updateProgress(100);
+                    document.getElementById('explorer').style.display = 'block';
+                    
+                    setTimeout(() => {
+                        document.getElementById('progressContainer').style.display = 'none';
+                    }, 500);
+                }
+            });
+        }
+
+        // Event listeners
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                processFile(file);
+            }
+        });
+
+        // Setup event listeners when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Update range displays
+            const minLengthSlider = document.getElementById('minLength');
+            const maxLengthSlider = document.getElementById('maxLength');
+            const exportCountInput = document.getElementById('exportCount');
+            
+            if (minLengthSlider) {
+                minLengthSlider.addEventListener('input', function(e) {
+                    document.getElementById('minLengthValue').textContent = e.target.value;
+                });
+            }
+
+            if (maxLengthSlider) {
+                maxLengthSlider.addEventListener('input', function(e) {
+                    document.getElementById('maxLengthValue').textContent = e.target.value;
+                });
+            }
+
+            // Handle enter key for export count
+            if (exportCountInput) {
+                exportCountInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        exportCustomCount();
+                    }
+                });
+            }
+
+            // Search on Enter
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        performSearch();
+                    }
+                });
+            }
+
+            const wordSearchInput = document.getElementById('wordSearch');
+            if (wordSearchInput) {
+                wordSearchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        searchByWord();
+                    }
+                });
+            }
+        }
+
+        // Call setup immediately in case DOM is already ready
+        setupEventListeners();
+    </script>
+</body>
+</html>
