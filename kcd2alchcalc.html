@@ -71,6 +71,7 @@
             background: rgba(40, 25, 10, 0.5);
             border: 1px solid #6b5523;
             border-radius: 4px;
+            position: relative;
         }
 
         .potion-entry:hover {
@@ -80,6 +81,35 @@
         .potion-name {
             color: #e8d4a0;
             font-weight: 500;
+            cursor: help;
+        }
+
+        .potion-tooltip {
+            visibility: hidden;
+            position: absolute;
+            left: 0;
+            top: 100%;
+            margin-top: 5px;
+            background: rgba(20, 15, 10, 0.95);
+            color: #f4e4c1;
+            padding: 10px 12px;
+            border-radius: 5px;
+            border: 1px solid #d4af37;
+            font-size: 0.9em;
+            line-height: 1.4;
+            z-index: 1000;
+            width: 350px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+
+        .potion-tooltip strong {
+            color: #d4af37;
+            display: block;
+            margin-top: 8px;
+        }
+
+        .potion-entry:hover .potion-tooltip {
+            visibility: visible;
         }
 
         .potion-entry input {
@@ -262,7 +292,8 @@
                     "Boil for 2 turns",
                     "Add 1 Belladonna to the mortar, grind, and pour into cauldron",
                     "Prepare phial and distill"
-                ]
+                ],
+                "effect": "Increases Horsemanship and houndmaster by 5 and makes it easier to sneak up on animals for 24 hours. <strong>Strong Quality:</strong> Animals take less notice of you and dogs don't bark at you"
             },
             "Aqua Vitalis": {
                 "ingredients": {
@@ -276,7 +307,8 @@
                     "Add 1 Marigold to the mortar, grind, and pour into the cauldron",
                     "Boil for 2 turns",
                     "Prepare phial and distill"
-                ]
+                ],
+                "effect": "Lose 50% less Health and slows bleeding by 50% for 10 minutes. <strong>Henry Quality:</strong> Lose 60% less Health and bleed 60% slower for 15 minutes"
             },
             "Artemisia": {
                 "ingredients": {
@@ -290,7 +322,8 @@
                     "Add 2 Wormwood to mortar, grind, and pour into cauldron",
                     "Boil for 2 turns",
                     "Prepare phial and distill"
-                ]
+                ],
+                "effect": "Increases Strength by 4 and both attack and defence cost 25% less Stamina for 15 minutes. <strong>Henry Quality:</strong> Increases Strength by 6 and costs 35% less Stamina"
             },
             "Bane Poison": {
                 "ingredients": {
@@ -306,7 +339,8 @@
                     "Boil for 1 turn using bellows",
                     "Add 1 Amanita Muscaria to cauldron",
                     "Prepare phial and distill"
-                ]
+                ],
+                "effect": "Makes running impossible and reduces Health by 110 in 30 seconds (Poison)"
             },
             "Bowman's Brew": {
                 "ingredients": {
@@ -320,7 +354,8 @@
                     "Grind 1 St. John's wort and add to cauldron",
                     "Boil for 1 turn",
                     "Prepare phial and distill"
-                ]
+                ],
+                "effect": "Improves bow accuracy and archery skills"
             },
             "Buck's Blood": {
                 "ingredients": {
@@ -335,7 +370,8 @@
                     "Boil for 1 turn",
                     "Add 1 Dandelion to cauldron and using bellows, boil for 1 turn",
                     "Finally, pour"
-                ]
+                ],
+                "effect": "Increases maximum Stamina for a period of time. <strong>Strong Quality:</strong> Increases stamina by 30% and stamina regeneration by 15% for 40 minutes"
             },
             "Chamomile Decoction": {
                 "ingredients": {
@@ -348,7 +384,8 @@
                     "Boil for 1 turn",
                     "Grind 1 Sage and add to cauldron",
                     "Finally, pour"
-                ]
+                ],
+                "effect": "Cures food poisoning. <strong>Strong Quality:</strong> Energy replenishes faster while sleeping"
             },
             "Cockerel": {
                 "ingredients": {
@@ -362,7 +399,8 @@
                     "Add 1 Valerian",
                     "Boil for 2 turns",
                     "Prepare phial and distill"
-                ]
+                ],
+                "effect": "Increases energy. <strong>Strong Quality:</strong> Slows tiring"
             },
             "Digestive Potion": {
                 "ingredients": {
@@ -378,7 +416,8 @@
                     "Boil for 1 turn",
                     "Grind 1 Charcoal and add to cauldron",
                     "Finally, pour"
-                ]
+                ],
+                "effect": "Reduces feeling of fullness after food and cures food poisoning. <strong>Strong Quality:</strong> Cures any poisoning and boosts vitality"
             },
             "Dollmaker Poison": {
                 "ingredients": {
@@ -392,7 +431,8 @@
                     "Grind 1 Valerian and add to cauldron",
                     "Boil for 1 turn",
                     "Prepare phial and distill"
-                ]
+                ],
+                "effect": "Reduces weapon skills and makes running impossible (Poison)"
             },
             "Embrocation": {
                 "ingredients": {
@@ -409,7 +449,8 @@
                     "Add 1 Boar's Tusk",
                     "Boil for 1 turn",
                     "Finally, pour"
-                ]
+                ],
+                "effect": "Increases agility. <strong>Strong Quality:</strong> Increases agility by 4 and reduces stamina used by sprinting for 15 minutes"
             },
             "Fever Tonic": {
                 "ingredients": {
@@ -425,7 +466,8 @@
                     "Add 2 Ginger",
                     "Boil for 2 turns",
                     "Prepare phial and distill"
-                ]
+                ],
+                "effect": "Cures fever and illness"
             },
             "Fox": {
                 "ingredients": {
@@ -443,7 +485,8 @@
                     "Add 1 Belladonna",
                     "Boil for 1 turn",
                     "Finally, pour"
-                ]
+                ],
+                "effect": "Improves visibility at night and in dark places. <strong>Strong Quality:</strong> +5 Speech, faster reading speed for 1 day. <strong>Henry Quality:</strong> +7 Speech, faster reading speed, +50% Speech XP for 2 days"
             },
             "Hair o' the Dog": {
                 "ingredients": {
@@ -457,7 +500,8 @@
                     "Boil for 3 turns",
                     "Grind 1 Mint and add to cauldron",
                     "Finally, pour"
-                ]
+                ],
+                "effect": "Cures hangover and alcohol effects. <strong>Strong Quality:</strong> Cures hangover immediately"
             },
             "Lead Shot Gunpowder": {
                 "ingredients": {
@@ -471,7 +515,8 @@
                     "Add 1 Saltpetre and 1 Sulphur to mortar",
                     "Grind together",
                     "Pour into mortar and continue grinding until powder forms"
-                ]
+                ],
+                "effect": "Creates gunpowder for firearms (lead shot ammunition)"
             },
             "Lethean Water": {
                 "ingredients": {
@@ -486,7 +531,8 @@
                     "Boil for 3 turns",
                     "Add 1 Henbane",
                     "Prepare phial and distill"
-                ]
+                ],
+                "effect": "Helps forget traumatic memories and reduces stress"
             },
             "Lion Perfume": {
                 "ingredients": {
@@ -499,7 +545,8 @@
                     "Boil for 2 turns",
                     "Grind 2 Mint and add to cauldron",
                     "Finally, pour"
-                ]
+                ],
+                "effect": "Increases Charisma and Speech effectiveness (Perfume)"
             },
             "Lullaby": {
                 "ingredients": {
@@ -515,7 +562,8 @@
                     "Boil for 1 turn",
                     "Grind 1 Herb Paris and add to cauldron",
                     "Finally, pour"
-                ]
+                ],
+                "effect": "Puts target to sleep (used for drugging)"
             },
             "Marigold Decoction": {
                 "ingredients": {
@@ -528,7 +576,8 @@
                     "Boil for 2 turns",
                     "Grind 2 Marigold and add to cauldron",
                     "Finally, pour"
-                ]
+                ],
+                "effect": "Gradually heals part of your health. <strong>Strong Quality:</strong> Heals 40 health over 1 minute and helps against hangover. <strong>Henry Quality:</strong> Heals 60 health"
             },
             "Mintha Perfume": {
                 "ingredients": {
@@ -544,7 +593,8 @@
                     "Add 1 Marigold to cauldron",
                     "Boil for 1 turn using bellows",
                     "Prepare phial and distill"
-                ]
+                ],
+                "effect": "Increases Charisma and attractiveness (Perfume)"
             },
             "Moonshine": {
                 "ingredients": {
@@ -558,7 +608,8 @@
                     "Grind 2 Mint and add to cauldron",
                     "Boil for 1 turn",
                     "Prepare phial and distill"
-                ]
+                ],
+                "effect": "Strong alcoholic beverage that can be sold or consumed"
             },
             "Nighthawk": {
                 "ingredients": {
@@ -573,7 +624,8 @@
                     "Add 1 Belladonna",
                     "Boil for 1 turn",
                     "Prepare phial and distill"
-                ]
+                ],
+                "effect": "You see better in the dark. <strong>Strong Quality:</strong> Energy depletes slower. <strong>Henry Quality:</strong> Energy doesn't deplete at all"
             },
             "Painkiller Brew": {
                 "ingredients": {
@@ -588,7 +640,8 @@
                     "Add 1 Comfrey and 1 Marigold",
                     "Boil for 1 turn using bellows",
                     "Prepare phial and distill"
-                ]
+                ],
+                "effect": "Reduces pain and provides temporary immunity to injury effects"
             },
             "Quickfinger": {
                 "ingredients": {
@@ -603,7 +656,8 @@
                     "Grind 2 Valerian and add to cauldron",
                     "Boil for 1 turn",
                     "Finally, pour"
-                ]
+                ],
+                "effect": "Increases thievery and craftsmanship skills. <strong>Henry Quality:</strong> Increases Craftsmanship and Thievery skills by 8 points for 1 hour"
             },
             "Saviour Schnapps": {
                 "ingredients": {
@@ -617,7 +671,8 @@
                     "Grind 2 Belladonna and add to cauldron",
                     "Boil for 1 turn",
                     "Finally, pour"
-                ]
+                ],
+                "effect": "Allows manual saving of the game. <strong>Strong/Henry Quality:</strong> Also boosts Strength, Vitality, and Agility by 3 for 8 minutes and instantly heals 20 health"
             },
             "Scattershot Powder": {
                 "ingredients": {
@@ -631,7 +686,8 @@
                     "Add 1 Saltpetre and 1 Sulphur to mortar",
                     "Grind together",
                     "Pour into mortar and continue grinding until powder forms"
-                ]
+                ],
+                "effect": "Creates gunpowder for firearms (scattershot ammunition)"
             },
             "Soap": {
                 "ingredients": {
@@ -647,7 +703,8 @@
                     "Add 1 Dandelion",
                     "Boil for 1 turn",
                     "Finally, pour"
-                ]
+                ],
+                "effect": "Improves hygiene and Charisma when used for bathing"
             }
         };
 
@@ -659,11 +716,15 @@
             const sortedPotions = Object.keys(potions).sort();
             
             for (const name of sortedPotions) {
+                const data = potions[name];
                 const entry = document.createElement('div');
                 entry.className = 'potion-entry';
                 
                 entry.innerHTML = `
-                    <span class="potion-name">${name}</span>
+                    <span class="potion-name">
+                        ${name}
+                        <div class="potion-tooltip">${data.effect}</div>
+                    </span>
                     <input type="number" 
                            id="${name.replace(/\s+/g, '_').replace(/'/g, '')}" 
                            min="0" 
