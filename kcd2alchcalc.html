@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kingdom Come: Deliverance 2 - Alchemy Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c1810 0%, #1a0f0a 100%);
+            color: #f4e4c1;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #d4af37;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #b8956a;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: rgba(60, 40, 20, 0.6);
+            border: 2px solid #8b6914;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        h2 {
+            color: #d4af37;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #8b6914;
+            padding-bottom: 10px;
+        }
+
+        .potion-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            background: rgba(40, 25, 10, 0.5);
+            border: 1px solid #6b5523;
+            border-radius: 4px;
+        }
+
+        .potion-entry:hover {
+            background: rgba(50, 30, 15, 0.7);
+        }
+
+        .potion-name {
+            color: #e8d4a0;
+            font-weight: 500;
+        }
+
+        .potion-entry input {
+            width: 70px;
+            padding: 6px 8px;
+            background: rgba(20, 15, 10, 0.7);
+            border: 1px solid #8b6914;
+            border-radius: 3px;
+            color: #f4e4c1;
+            font-size: 0.95em;
+            text-align: center;
+        }
+
+        .potion-entry input:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+
+        .materials-list {
+            list-style: none;
+        }
+
+        .material-item {
+            background: rgba(40, 25, 10, 0.5);
+            border-left: 3px solid #d4af37;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .material-name {
+            color: #e8d4a0;
+            font-weight: bold;
+        }
+
+        .material-quantity {
+            color: #d4af37;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #8b6914;
+            font-style: italic;
+            padding: 40px 20px;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #8b6914 0%, #6b5523 100%);
+            color: #f4e4c1;
+            border: 2px solid #d4af37;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #a67c1a 0%, #8b6914 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .recipes-section {
+            background: rgba(60, 40, 20, 0.6);
+            border: 2px solid #8b6914;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            margin-top: 30px;
+            display: none;
+        }
+
+        .recipes-section.visible {
+            display: block;
+        }
+
+        .recipe-card {
+            background: rgba(40, 25, 10, 0.5);
+            border: 1px solid #6b5523;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .recipe-title {
+            color: #d4af37;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #6b5523;
+            padding-bottom: 5px;
+        }
+
+        .recipe-ingredients {
+            color: #e8d4a0;
+            line-height: 1.6;
+        }
+
+        .recipe-ingredient {
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .recipe-ingredient:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #d4af37;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚗️ Alchemy Calculator</h1>
+        <p class="subtitle">Kingdom Come: Deliverance 2</p>
+
+        <div class="main-content">
+            <div class="section">
+                <h2>Select Potions</h2>
+                <div id="potionsList"></div>
+                <div class="button-container">
+                    <button onclick="calculateMaterials()">Calculate Materials</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Required Materials</h2>
+                <div id="materialsResult">
+                    <p class="empty-message">Enter potion quantities and click "Calculate Materials" to see the shopping list.</p>
+                </div>
+                <div id="showRecipesButton" style="display: none;">
+                    <div class="button-container">
+                        <button onclick="showRecipes()">Show Recipe Reference</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="recipesSection" class="recipes-section">
+            <h2>Recipe Reference (Alphabetical)</h2>
+            <div id="recipesList"></div>
+        </div>
+    </div>
+
+    <script>
+        const potions = {
+            "Aesop": {
+                "ingredients": {
+                    "Spirits": 1,
+                    "Belladonna": 1,
+                    "Boar's Tusk": 1,
+                    "Comfrey": 2
+                },
+                "steps": [
+                    "Add 2 Comfrey to the mortar, grind, and pour into the cauldron",
+                    "Add 1 Boar's Tusk to cauldron",
+                    "Boil for 2 turns",
+                    "Add 1 Belladonna to the mortar, grind, and pour into cauldron",
+                    "Prepare phial and distill"
+                ]
+            },
+            "Aqua Vitalis": {
+                "ingredients": {
+                    "Water": 1,
+                    "Dandelion": 2,
+                    "Marigold": 1
+                },
+                "steps": [
+                    "Add 2 Dandelion to cauldron",
+                    "Boil for 1 turn",
+                    "Add 1 Marigold to the mortar, grind, and pour into the cauldron",
+                    "Boil for 2 turns",
+                    "Prepare phial and distill"
+                ]
+            },
+            "Artemisia": {
+                "ingredients": {
+                    "Spirits": 1,
+                    "Sage": 1,
+                    "Wormwood": 2
+                },
+                "steps": [
+                    "Add 1 Sage to cauldron",
+                    "Boil for 1 turn",
+                    "Add 2 Wormwood to mortar, grind, and pour into cauldron",
+                    "Boil for 2 turns",
+                    "Prepare phial and distill"
+                ]
+            },
+            "Bane Poison": {
+                "ingredients": {
+                    "Wine": 1,
+                    "Amanita Muscaria": 1,
+                    "Belladonna": 2,
+                    "Wormwood": 1
+                },
+                "steps": [
+                    "Add 1 Wormwood to cauldron",
+                    "Boil for 2 turns",
+                    "Add 2 Belladonna to mortar, grind, and pour into cauldron",
+                    "Boil for 1 turn using bellows",
+                    "Add 1 Amanita Muscaria to cauldron",
+                    "Prepare phial and distill"
+                ]
+            },
+            "Bowman's Brew": {
+                "ingredients": {
+                    "Spirits": 1,
+                    "Eyebright": 2,
+                    "St. John's Wort": 1
+                },
+                "steps": [
+                    "Add 2 Eyebright to cauldron",
+                    "Boil for 3 turns",
+                    "Grind 1 St. John's wort and add to cauldron",
+                    "Boil for 1 turn",
+                    "Prepare phial and distill"
+                ]
+            },
+            "Buck's Blood": {
+                "ingredients": {
+                    "Oil": 1,
+                    "Comfrey": 1,
+                    "Dandelion": 1,
+                    "St. John's Wort": 1
+                },
+                "steps": [
+                    "Grind 1 St. John's wort and add to cauldron",
+                    "Add 1 Comfrey to cauldron",
+                    "Boil for 1 turn",
+                    "Add 1 Dandelion to cauldron and using bellows, boil for 1 turn",
+                    "Finally, pour"
+                ]
+            },
+            "Chamomile Decoction": {
+                "ingredients": {
+                    "Wine": 1,
+                    "Chamomile": 2,
+                    "Sage": 1
+                },
+                "steps": [
+                    "Add 2 Chamomile to cauldron",
+                    "Boil for 1 turn",
+                    "Grind 1 Sage and add to cauldron",
+                    "Finally, pour"
+                ]
+            },
+            "Cockerel": {
+                "ingredients": {
+                    "Spirits": 1,
+                    "Mint": 2,
+                    "Valerian": 1
+                },
+                "steps": [
+                    "Grind 2 Mint and add to cauldron",
+                    "Boil for 1 turn",
+                    "Add 1 Valerian",
+                    "Boil for 2 turns",
+                    "Prepare phial and distill"
+                ]
+            },
+            "Digestive Potion": {
+                "ingredients": {
+                    "Water": 1,
+                    "Charcoal": 1,
+                    "Nettle": 1,
+                    "Thisle": 2
+                },
+                "steps": [
+                    "Add 2 Thistle to cauldron",
+                    "Boil for 2 turns",
+                    "Grind 1 Nettle and add to cauldron",
+                    "Boil for 1 turn",
+                    "Grind 1 Charcoal and add to cauldron",
+                    "Finally, pour"
+                ]
+            },
+            "Dollmaker Poison": {
+                "ingredients": {
+                    "Spirits": 1,
+                    "Herb Paris": 2,
+                    "Valerian": 1
+                },
+                "steps": [
+                    "Add 2 Herb Paris to cauldron",
+                    "Boil for 3 turns",
+                    "Grind 1 Valerian and add to cauldron",
+                    "Boil for 1 turn",
+                    "Prepare phial and distill"
+                ]
+            },
+            "Embrocation": {
+                "ingredients": {
+                    "Oil": 1,
+                    "Boar's Tusk": 1,
+                    "Eyebright": 1,
+                    "Poppy": 1,
+                    "Valerian": 1
+                },
+                "steps": [
+                    "Add 1 Poppy and 1 Valerian to cauldron",
+                    "Boil for 2 turns",
+                    "Grind 1 Eyebright and add to cauldron",
+                    "Add 1 Boar's Tusk",
+                    "Boil for 1 turn",
+                    "Finally, pour"
+                ]
+            },
+            "Fever Tonic": {
+                "ingredients": {
+                    "Wine": 1,
+                    "Elderberry Leaves": 1,
+                    "Feverfew": 3,
+                    "Ginger": 2
+                },
+                "steps": [
+                    "Add 3 Feverfew to cauldron",
+                    "Boil for 2 turns",
+                    "Grind 1 Elderberry leaves and add to cauldron",
+                    "Add 2 Ginger",
+                    "Boil for 2 turns",
+                    "Prepare phial and distill"
+                ]
+            },
+            "Fox": {
+                "ingredients": {
+                    "Oil": 1,
+                    "Belladonna": 1,
+                    "Charcoal": 1,
+                    "Nettle": 1,
+                    "St. John's Wort": 1
+                },
+                "steps": [
+                    "Grind 1 St. John's wort and 1 Nettle",
+                    "Add to cauldron",
+                    "Boil for 2 turns",
+                    "Grind 1 Charcoal and add to cauldron",
+                    "Add 1 Belladonna",
+                    "Boil for 1 turn",
+                    "Finally, pour"
+                ]
+            },
+            "Hair o' the Dog": {
+                "ingredients": {
+                    "Water": 1,
+                    "Mint": 1,
+                    "Sage": 1,
+                    "St. John's Wort": 1
+                },
+                "steps": [
+                    "Add 1 Sage and 1 St. John's wort to cauldron",
+                    "Boil for 3 turns",
+                    "Grind 1 Mint and add to cauldron",
+                    "Finally, pour"
+                ]
+            },
+            "Lead Shot Gunpowder": {
+                "ingredients": {
+                    "Water": 1,
+                    "Charcoal": 1,
+                    "Saltpetre": 1,
+                    "Sulphur": 1
+                },
+                "steps": [
+                    "Add 1 Charcoal to mortar and grind",
+                    "Add 1 Saltpetre and 1 Sulphur to mortar",
+                    "Grind together",
+                    "Pour into mortar and continue grinding until powder forms"
+                ]
+            },
+            "Lethean Water": {
+                "ingredients": {
+                    "Spirits": 1,
+                    "Belladonna": 1,
+                    "Henbane": 1,
+                    "Wormwood": 2
+                },
+                "steps": [
+                    "Grind 2 Wormwood and add to cauldron",
+                    "Add 1 Belladonna",
+                    "Boil for 3 turns",
+                    "Add 1 Henbane",
+                    "Prepare phial and distill"
+                ]
+            },
+            "Lion Perfume": {
+                "ingredients": {
+                    "Spirits": 1,
+                    "Mint": 2,
+                    "Sage": 2
+                },
+                "steps": [
+                    "Add 2 Sage to cauldron",
+                    "Boil for 2 turns",
+                    "Grind 2 Mint and add to cauldron",
+                    "Finally, pour"
+                ]
+            },
+            "Lullaby": {
+                "ingredients": {
+                    "Oil": 1,
+                    "Herb Paris": 1,
+                    "Poppy": 1,
+                    "Thisle": 1
+                },
+                "steps": [
+                    "Add 1 Poppy to cauldron",
+                    "Boil for 1 turn",
+                    "Add 1 Thistle",
+                    "Boil for 1 turn",
+                    "Grind 1 Herb Paris and add to cauldron",
+                    "Finally, pour"
+                ]
+            },
+            "Marigold Decoction": {
+                "ingredients": {
+                    "Water": 1,
+                    "Marigold": 2,
+                    "Nettle": 1
+                },
+                "steps": [
+                    "Add 1 Nettle to cauldron",
+                    "Boil for 2 turns",
+                    "Grind 2 Marigold and add to cauldron",
+                    "Finally, pour"
+                ]
+            },
+            "Mintha Perfume": {
+                "ingredients": {
+                    "Wine": 1,
+                    "Dandelion": 3,
+                    "Marigold": 1,
+                    "Mint": 1
+                },
+                "steps": [
+                    "Grind 3 Dandelion and 1 Mint",
+                    "Add to cauldron",
+                    "Boil for 2 turns",
+                    "Add 1 Marigold to cauldron",
+                    "Boil for 1 turn using bellows",
+                    "Prepare phial and distill"
+                ]
+            },
+            "Moonshine": {
+                "ingredients": {
+                    "Spirits": 1,
+                    "Mint": 2,
+                    "Wormwood": 2
+                },
+                "steps": [
+                    "Add 2 Wormwood to cauldron",
+                    "Boil for 2 turns",
+                    "Grind 2 Mint and add to cauldron",
+                    "Boil for 1 turn",
+                    "Prepare phial and distill"
+                ]
+            },
+            "Nighthawk": {
+                "ingredients": {
+                    "Water": 1,
+                    "Belladonna": 1,
+                    "Chamomile": 1,
+                    "Eyebright": 2
+                },
+                "steps": [
+                    "Add 1 Chamomile and 2 Eyebright to cauldron",
+                    "Boil for 2 turns",
+                    "Add 1 Belladonna",
+                    "Boil for 1 turn",
+                    "Prepare phial and distill"
+                ]
+            },
+            "Painkiller Brew": {
+                "ingredients": {
+                    "Spirits": 1,
+                    "Comfrey": 1,
+                    "Marigold": 1,
+                    "Poppy": 3
+                },
+                "steps": [
+                    "Add 3 Poppy to cauldron",
+                    "Boil for 2 turns",
+                    "Add 1 Comfrey and 1 Marigold",
+                    "Boil for 1 turn using bellows",
+                    "Prepare phial and distill"
+                ]
+            },
+            "Quickfinger": {
+                "ingredients": {
+                    "Water": 1,
+                    "Cobweb": 1,
+                    "Eyebright": 2,
+                    "Valerian": 2
+                },
+                "steps": [
+                    "Add 1 Cobweb and 2 Eyebright to cauldron",
+                    "Boil for 3 turns",
+                    "Grind 2 Valerian and add to cauldron",
+                    "Boil for 1 turn",
+                    "Finally, pour"
+                ]
+            },
+            "Saviour Schnapps": {
+                "ingredients": {
+                    "Wine": 1,
+                    "Belladonna": 2,
+                    "Nettle": 1
+                },
+                "steps": [
+                    "Add 1 Nettle to cauldron",
+                    "Boil for 2 turns",
+                    "Grind 2 Belladonna and add to cauldron",
+                    "Boil for 1 turn",
+                    "Finally, pour"
+                ]
+            },
+            "Scattershot Powder": {
+                "ingredients": {
+                    "Water": 1,
+                    "Leached Charcoal": 1,
+                    "Saltpetre": 1,
+                    "Sulphur": 1
+                },
+                "steps": [
+                    "Add 1 Leached Charcoal to mortar and grind",
+                    "Add 1 Saltpetre and 1 Sulphur to mortar",
+                    "Grind together",
+                    "Pour into mortar and continue grinding until powder forms"
+                ]
+            },
+            "Soap": {
+                "ingredients": {
+                    "Oil": 1,
+                    "Charcoal": 1,
+                    "Dandelion": 1,
+                    "Thistle": 2
+                },
+                "steps": [
+                    "Add 2 Thistle to cauldron",
+                    "Boil for 1 turn",
+                    "Grind 1 Charcoal and add to cauldron",
+                    "Add 1 Dandelion",
+                    "Boil for 1 turn",
+                    "Finally, pour"
+                ]
+            }
+        };
+
+        // Initialize the potion list
+        function initializePotionsList() {
+            const container = document.getElementById('potionsList');
+            
+            // Sort potions alphabetically
+            const sortedPotions = Object.keys(potions).sort();
+            
+            for (const name of sortedPotions) {
+                const entry = document.createElement('div');
+                entry.className = 'potion-entry';
+                
+                entry.innerHTML = `
+                    <span class="potion-name">${name}</span>
+                    <input type="number" 
+                           id="${name.replace(/\s+/g, '_').replace(/'/g, '')}" 
+                           min="0" 
+                           value="0"
+                           onchange="calculateMaterials()">
+                `;
+                
+                container.appendChild(entry);
+            }
+        }
+
+        // Calculate total materials needed
+        function calculateMaterials() {
+            const materials = {};
+            let hasAnyPotion = false;
+            
+            // Iterate through all potions
+            for (const [potionName, potionData] of Object.entries(potions)) {
+                const inputId = potionName.replace(/\s+/g, '_').replace(/'/g, '');
+                const quantity = parseInt(document.getElementById(inputId).value) || 0;
+                
+                if (quantity > 0) {
+                    hasAnyPotion = true;
+                    
+                    // Add ingredients for this potion
+                    for (const [ingredient, amount] of Object.entries(potionData.ingredients)) {
+                        if (!materials[ingredient]) {
+                            materials[ingredient] = 0;
+                        }
+                        materials[ingredient] += amount * quantity;
+                    }
+                }
+            }
+            
+            // Display results
+            displayMaterials(materials, hasAnyPotion);
+        }
+
+        // Display the materials list
+        function displayMaterials(materials, hasAnyPotion) {
+            const container = document.getElementById('materialsResult');
+            const showRecipesBtn = document.getElementById('showRecipesButton');
+            
+            if (!hasAnyPotion) {
+                container.innerHTML = '<p class="empty-message">Enter potion quantities and click "Calculate Materials" to see the shopping list.</p>';
+                showRecipesBtn.style.display = 'none';
+                return;
+            }
+            
+            // Sort materials alphabetically
+            const sortedMaterials = Object.entries(materials).sort((a, b) => a[0].localeCompare(b[0]));
+            
+            let html = '<ul class="materials-list">';
+            
+            for (const [material, quantity] of sortedMaterials) {
+                html += `
+                    <li class="material-item">
+                        <span class="material-name">${material}</span>
+                        <span class="material-quantity">×${quantity}</span>
+                    </li>
+                `;
+            }
+            
+            html += '</ul>';
+            container.innerHTML = html;
+            showRecipesBtn.style.display = 'block';
+        }
+
+        // Show recipes for selected potions
+        function showRecipes() {
+            const recipesSection = document.getElementById('recipesSection');
+            const recipesList = document.getElementById('recipesList');
+            
+            // Get selected potions
+            const selectedPotions = [];
+            for (const [potionName] of Object.entries(potions)) {
+                const inputId = potionName.replace(/\s+/g, '_').replace(/'/g, '');
+                const quantity = parseInt(document.getElementById(inputId).value) || 0;
+                
+                if (quantity > 0) {
+                    selectedPotions.push(potionName);
+                }
+            }
+            
+            if (selectedPotions.length === 0) {
+                recipesList.innerHTML = '<p class="empty-message">No potions selected.</p>';
+                recipesSection.classList.add('visible');
+                return;
+            }
+            
+            // Sort alphabetically
+            selectedPotions.sort();
+            
+            let html = '';
+            for (const potionName of selectedPotions) {
+                const potionData = potions[potionName];
+                const ingredients = Object.entries(potionData.ingredients)
+                    .map(([name, qty]) => `<div class="recipe-ingredient">${name} × ${qty}</div>`)
+                    .join('');
+                
+                const steps = potionData.steps
+                    .map((step, index) => `<div class="recipe-ingredient">${index + 1}. ${step}</div>`)
+                    .join('');
+                
+                html += `
+                    <div class="recipe-card">
+                        <div class="recipe-title">${potionName}</div>
+                        <div class="recipe-ingredients">
+                            <strong>Ingredients:</strong>
+                            ${ingredients}
+                            <br><br>
+                            <strong>Steps:</strong>
+                            ${steps}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            recipesList.innerHTML = html;
+            recipesSection.classList.add('visible');
+            
+            // Scroll to recipes section
+            recipesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Initialize on page load
+        initializePotionsList();
+    </script>
+</body>
+</html>
