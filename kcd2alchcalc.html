@@ -848,14 +848,16 @@
             let html = '<ul class="materials-list">';
             
             for (const [material, quantity] of sortedMaterials) {
-                const checkboxId = `checkbox_${material.replace(/\s+/g, '_')}`;
+                // Remove special characters for IDs
+                const safeId = material.replace(/[\s.']/g, '_');
+                const checkboxId = `checkbox_${safeId}`;
                 html += `
-                    <li class="material-item" id="item_${material.replace(/\s+/g, '_')}">
+                    <li class="material-item" id="item_${safeId}">
                         <div class="material-left">
                             <input type="checkbox" 
                                    class="material-checkbox" 
                                    id="${checkboxId}"
-                                   onchange="toggleMaterialCheck('${material.replace(/\s+/g, '_')}')">
+                                   onchange="toggleMaterialCheck('${safeId}')">
                             <span class="material-name">${material}</span>
                         </div>
                         <span class="material-quantity">×${quantity}</span>
