@@ -143,6 +143,24 @@
             align-items: center;
         }
 
+        .material-item.checked {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
+        .material-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .material-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #d4af37;
+        }
+
         .material-name {
             color: #e8d4a0;
             font-weight: bold;
@@ -235,6 +253,53 @@
             position: absolute;
             left: 0;
             color: #d4af37;
+        }
+
+        .potion-tracking {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #6b5523;
+        }
+
+        .tracking-label {
+            color: #d4af37;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .tracking-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tracking-checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(20, 15, 10, 0.5);
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #6b5523;
+        }
+
+        .tracking-checkbox-wrapper.checked {
+            background: rgba(139, 105, 20, 0.3);
+            border-color: #d4af37;
+        }
+
+        .tracking-checkbox-wrapper input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #d4af37;
+        }
+
+        .tracking-checkbox-wrapper label {
+            color: #e8d4a0;
+            cursor: pointer;
+            font-size: 0.95em;
         }
 
         @media (max-width: 768px) {
@@ -355,7 +420,7 @@
                     "Boil for 1 turn",
                     "Prepare phial and distill"
                 ],
-                "effect": "Improves bow accuracy and archery skills"
+                "effect": "Improves bow accuracy and steadiness. Increases bow steadiness and allows aiming for longer periods"
             },
             "Buck's Blood": {
                 "ingredients": {
@@ -486,7 +551,7 @@
                     "Boil for 1 turn",
                     "Finally, pour"
                 ],
-                "effect": "Improves visibility at night and in dark places. <strong>Strong Quality:</strong> +5 Speech, faster reading speed for 1 day. <strong>Henry Quality:</strong> +7 Speech, faster reading speed, +50% Speech XP for 2 days"
+                "effect": "Increases Speech and reading speed. <strong>Strong Quality:</strong> +5 Speech and faster reading for 1 day. <strong>Henry Quality:</strong> +7 Speech, faster reading, and +50% experience gain for 2 days"
             },
             "Hair o' the Dog": {
                 "ingredients": {
@@ -546,7 +611,7 @@
                     "Grind 2 Mint and add to cauldron",
                     "Finally, pour"
                 ],
-                "effect": "Increases Charisma and Speech effectiveness (Perfume)"
+                "effect": "Strong but short-lasting perfume. Substantially increases Charisma for short periods (Perfume). Note: Reduces charisma if combined with another perfume"
             },
             "Lullaby": {
                 "ingredients": {
@@ -594,7 +659,7 @@
                     "Boil for 1 turn using bellows",
                     "Prepare phial and distill"
                 ],
-                "effect": "Increases Charisma and attractiveness (Perfume)"
+                "effect": "Weak but long-lasting perfume. Slightly increases Charisma for a longer period (Perfume). Note: Reduces charisma if combined with another perfume"
             },
             "Moonshine": {
                 "ingredients": {
@@ -625,7 +690,7 @@
                     "Boil for 1 turn",
                     "Prepare phial and distill"
                 ],
-                "effect": "You see better in the dark. <strong>Strong Quality:</strong> Energy depletes slower. <strong>Henry Quality:</strong> Energy doesn't deplete at all"
+                "effect": "Improves visibility at night and in dark places. <strong>Strong Quality:</strong> Energy depletes slower. <strong>Henry Quality:</strong> Energy doesn't deplete at all in darkness"
             },
             "Painkiller Brew": {
                 "ingredients": {
@@ -641,7 +706,7 @@
                     "Boil for 1 turn using bellows",
                     "Prepare phial and distill"
                 ],
-                "effect": "Reduces pain and provides temporary immunity to injury effects"
+                "effect": "Lessens the effects of wounds and reduces the amount by which maximum stamina decreases with health. Helps maintain stamina when injured"
             },
             "Quickfinger": {
                 "ingredients": {
@@ -739,6 +804,7 @@
         // Calculate total materials needed
         function calculateMaterials() {
             const materials = {};
+            const baseIngredients = ['Water', 'Wine', 'Oil', 'Spirits']; // Bases, not ingredients
             let hasAnyPotion = false;
             
             // Iterate through all potions
@@ -749,12 +815,14 @@
                 if (quantity > 0) {
                     hasAnyPotion = true;
                     
-                    // Add ingredients for this potion
+                    // Add ingredients for this potion (excluding bases)
                     for (const [ingredient, amount] of Object.entries(potionData.ingredients)) {
-                        if (!materials[ingredient]) {
-                            materials[ingredient] = 0;
+                        if (!baseIngredients.includes(ingredient)) {
+                            if (!materials[ingredient]) {
+                                materials[ingredient] = 0;
+                            }
+                            materials[ingredient] += amount * quantity;
                         }
-                        materials[ingredient] += amount * quantity;
                     }
                 }
             }
@@ -780,9 +848,16 @@
             let html = '<ul class="materials-list">';
             
             for (const [material, quantity] of sortedMaterials) {
+                const checkboxId = `checkbox_${material.replace(/\s+/g, '_')}`;
                 html += `
-                    <li class="material-item">
-                        <span class="material-name">${material}</span>
+                    <li class="material-item" id="item_${material.replace(/\s+/g, '_')}">
+                        <div class="material-left">
+                            <input type="checkbox" 
+                                   class="material-checkbox" 
+                                   id="${checkboxId}"
+                                   onchange="toggleMaterialCheck('${material.replace(/\s+/g, '_')}')">
+                            <span class="material-name">${material}</span>
+                        </div>
                         <span class="material-quantity">×${quantity}</span>
                     </li>
                 `;
@@ -793,19 +868,31 @@
             showRecipesBtn.style.display = 'block';
         }
 
+        // Toggle checked state for material items
+        function toggleMaterialCheck(materialId) {
+            const item = document.getElementById(`item_${materialId}`);
+            const checkbox = document.getElementById(`checkbox_${materialId}`);
+            
+            if (checkbox.checked) {
+                item.classList.add('checked');
+            } else {
+                item.classList.remove('checked');
+            }
+        }
+
         // Show recipes for selected potions
         function showRecipes() {
             const recipesSection = document.getElementById('recipesSection');
             const recipesList = document.getElementById('recipesList');
             
-            // Get selected potions
+            // Get selected potions with quantities
             const selectedPotions = [];
             for (const [potionName] of Object.entries(potions)) {
                 const inputId = potionName.replace(/\s+/g, '_').replace(/'/g, '');
                 const quantity = parseInt(document.getElementById(inputId).value) || 0;
                 
                 if (quantity > 0) {
-                    selectedPotions.push(potionName);
+                    selectedPotions.push({ name: potionName, quantity: quantity });
                 }
             }
             
@@ -815,12 +902,12 @@
                 return;
             }
             
-            // Sort alphabetically
-            selectedPotions.sort();
+            // Sort alphabetically by name
+            selectedPotions.sort((a, b) => a.name.localeCompare(b.name));
             
             let html = '';
-            for (const potionName of selectedPotions) {
-                const potionData = potions[potionName];
+            for (const potion of selectedPotions) {
+                const potionData = potions[potion.name];
                 const ingredients = Object.entries(potionData.ingredients)
                     .map(([name, qty]) => `<div class="recipe-ingredient">${name} × ${qty}</div>`)
                     .join('');
@@ -829,15 +916,35 @@
                     .map((step, index) => `<div class="recipe-ingredient">${index + 1}. ${step}</div>`)
                     .join('');
                 
+                // Create tracking checkboxes
+                let trackingCheckboxes = '';
+                const safeId = potion.name.replace(/\s+/g, '_').replace(/'/g, '').replace(/:/g, '');
+                for (let i = 1; i <= potion.quantity; i++) {
+                    trackingCheckboxes += `
+                        <div class="tracking-checkbox-wrapper" id="wrapper_${safeId}_${i}">
+                            <input type="checkbox" 
+                                   id="track_${safeId}_${i}" 
+                                   onchange="togglePotionCheck('${safeId}', ${i})">
+                            <label for="track_${safeId}_${i}">#${i}</label>
+                        </div>
+                    `;
+                }
+                
                 html += `
                     <div class="recipe-card">
-                        <div class="recipe-title">${potionName}</div>
+                        <div class="recipe-title">${potion.name} (×${potion.quantity})</div>
                         <div class="recipe-ingredients">
                             <strong>Ingredients:</strong>
                             ${ingredients}
                             <br><br>
                             <strong>Steps:</strong>
                             ${steps}
+                        </div>
+                        <div class="potion-tracking">
+                            <span class="tracking-label">Crafting Progress:</span>
+                            <div class="tracking-checkboxes">
+                                ${trackingCheckboxes}
+                            </div>
                         </div>
                     </div>
                 `;
@@ -848,6 +955,18 @@
             
             // Scroll to recipes section
             recipesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Toggle checked state for potion tracking checkboxes
+        function togglePotionCheck(potionId, num) {
+            const wrapper = document.getElementById(`wrapper_${potionId}_${num}`);
+            const checkbox = document.getElementById(`track_${potionId}_${num}`);
+            
+            if (checkbox.checked) {
+                wrapper.classList.add('checked');
+            } else {
+                wrapper.classList.remove('checked');
+            }
         }
 
         // Initialize on page load
