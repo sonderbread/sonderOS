@@ -233,6 +233,7 @@
                 return saved ? JSON.parse(saved) : true;
             });
             const [sortBy, setSortBy] = useState('name'); // 'name', 'rate-asc', 'rate-desc'
+            const [showWipeConfirm, setShowWipeConfirm] = useState(false);
             const audioRef = useRef(null);
 
             // Load from localStorage on mount
@@ -433,6 +434,17 @@
                 }
             };
 
+            const handleWipeData = () => {
+                setActivities([]);
+                setBalance(0);
+                setLogs([]);
+                setRunningTimers({});
+                setTimerDisplays({});
+                setNewActivity({ name: '', rate: 1, type: 'credit' });
+                setShowSettings(false);
+                setShowWipeConfirm(false);
+            };
+
             const sortActivities = (actsList) => {
                 const sorted = [...actsList];
                 if (sortBy === 'name') {
@@ -589,8 +601,51 @@
                                                     Close
                                                 </button>
                                             </div>
+                                            <div className="mt-6 pt-6 border-t border-gray-300 dark:border-gray-600">
+                                                <button
+                                                    onClick={() => setShowWipeConfirm(true)}
+                                                    className="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-bold transition text-sm"
+                                                >
+                                                    🗑️ Wipe All Data & Start Fresh
+                                                </button>
+                                            </div>
                                         </>
                                     )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Wipe Data Confirmation Modal */}
+                        {showWipeConfirm && (
+                            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                                <div className={`${darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white'} rounded-lg shadow-2xl p-4 md:p-8 max-w-md w-full transition-colors`}>
+                                    <h2 className={`text-xl md:text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Wipe All Data?</h2>
+                                    <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-2 text-sm md:text-base`}>
+                                        This will permanently delete:
+                                    </p>
+                                    <ul className={`list-disc list-inside ${darkMode ? 'text-gray-300' : 'text-gray-600'} mb-6 text-sm md:text-base`}>
+                                        <li>All activities</li>
+                                        <li>Current balance</li>
+                                        <li>All activity logs</li>
+                                        <li>Any running timers</li>
+                                    </ul>
+                                    <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-6 text-xs md:text-sm font-semibold`}>
+                                        This action cannot be undone.
+                                    </p>
+                                    <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
+                                        <button
+                                            onClick={handleWipeData}
+                                            className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-bold transition text-sm md:text-base"
+                                        >
+                                            Yes, Wipe Everything
+                                        </button>
+                                        <button
+                                            onClick={() => setShowWipeConfirm(false)}
+                                            className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-bold transition text-sm md:text-base"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         )}
@@ -661,27 +716,29 @@
                                                         <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>≈ {Math.round(elapsed * activity.rate / 60)} pts</p>
                                                     </div>
                                                 </div>
-                                                <div className="flex flex-col sm:flex-row gap-2 mt-3">
+                                                <div className="flex flex-col gap-2 mt-3">
                                                     <button
                                                         onClick={() => startTimer(parseInt(activityId))}
-                                                        className="flex items-center justify-center gap-1 bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded text-xs md:text-sm font-semibold transition"
+                                                        className="flex items-center justify-center gap-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 md:py-2 rounded text-sm md:text-sm font-semibold transition w-full md:w-auto"
                                                     >
-                                                        {timer.isPaused ? <Play size={14} /> : <Pause size={14} />}
+                                                        {timer.isPaused ? <Play size={16} /> : <Pause size={16} />}
                                                         {timer.isPaused ? 'Resume' : 'Pause'}
                                                     </button>
-                                                    <button
-                                                        onClick={() => resetTimer(parseInt(activityId))}
-                                                        className="flex items-center justify-center gap-1 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded text-xs md:text-sm font-semibold transition"
-                                                    >
-                                                        <RotateCcw size={14} />
-                                                        Reset
-                                                    </button>
-                                                    <button
-                                                        onClick={() => stopTimer(parseInt(activityId))}
-                                                        className="flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded text-xs md:text-sm font-semibold transition"
-                                                    >
-                                                        Stop & Confirm
-                                                    </button>
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            onClick={() => resetTimer(parseInt(activityId))}
+                                                            className="flex-1 flex items-center justify-center gap-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm font-semibold transition"
+                                                        >
+                                                            <RotateCcw size={16} />
+                                                            Reset
+                                                        </button>
+                                                        <button
+                                                            onClick={() => stopTimer(parseInt(activityId))}
+                                                            className="flex-1 flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm font-semibold transition"
+                                                        >
+                                                            Stop & Confirm
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         );
