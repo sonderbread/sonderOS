@@ -226,11 +226,11 @@
             const [showLogs, setShowLogs] = useState(false);
             const [darkMode, setDarkMode] = useState(() => {
                 const saved = localStorage.getItem('memento-darkMode');
-                return saved ? JSON.parse(saved) : false;
+                return saved ? JSON.parse(saved) : true;
             });
             const [hideBalance, setHideBalance] = useState(() => {
                 const saved = localStorage.getItem('memento-hideBalance');
-                return saved ? JSON.parse(saved) : false;
+                return saved ? JSON.parse(saved) : true;
             });
             const [sortBy, setSortBy] = useState('name'); // 'name', 'rate-asc', 'rate-desc'
             const audioRef = useRef(null);
