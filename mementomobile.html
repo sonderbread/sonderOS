@@ -695,46 +695,44 @@
 
                         {/* Active Timers */}
                         {Object.keys(runningTimers).length > 0 && (
-                            <div className={`${darkMode ? 'bg-gray-800 border-2 border-indigo-600' : 'bg-white border-2 border-indigo-500'} rounded-lg shadow-lg p-4 md:p-8 mb-8 transition-colors`}>
-                                <h2 className={`text-xl md:text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4 md:mb-6`}>Active Timers</h2>
-                                <div className="space-y-3 md:space-y-4">
+                            <div className={`${darkMode ? 'bg-gray-800 border-2 border-indigo-600' : 'bg-white border-2 border-indigo-500'} rounded-lg shadow-lg p-4 md:p-8 mb-8 transition-colors w-full`}>
+                                <h2 className={`text-xl md:text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Active Timers</h2>
+                                <div className="space-y-4 w-full">
                                     {Object.entries(runningTimers).map(([activityId, timer]) => {
                                         const activity = activities.find(a => a.id === parseInt(activityId));
                                         const elapsed = timerDisplays[activityId] || 0;
                                         if (!activity) return null;
                                         return (
-                                            <div key={activityId} className={`rounded-lg p-3 md:p-4 border-l-4 border-indigo-500 ${darkMode ? 'bg-gradient-to-r from-indigo-900 to-blue-900' : 'bg-gradient-to-r from-indigo-50 to-blue-50'}`}>
-                                                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                                                    <div className="flex-1 min-w-0">
-                                                        <h3 className={`font-bold text-sm md:text-base truncate ${darkMode ? 'text-white' : 'text-gray-800'}`}>{activity.name}</h3>
-                                                        <p className={`text-xs md:text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{activity.rate} pts/min</p>
-                                                    </div>
-                                                    <div className="text-right flex-shrink-0">
-                                                        <div className={`text-3xl md:text-4xl font-bold font-mono ${darkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
-                                                            {formatTime(elapsed)}
-                                                        </div>
-                                                        <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>≈ {Math.round(elapsed * activity.rate / 60)} pts</p>
-                                                    </div>
+                                            <div key={activityId} className={`rounded-lg p-4 border-l-4 border-indigo-500 w-full ${darkMode ? 'bg-gradient-to-r from-indigo-900 to-blue-900' : 'bg-gradient-to-r from-indigo-50 to-blue-50'}`}>
+                                                <div className="mb-3">
+                                                    <h3 className={`font-bold text-base truncate ${darkMode ? 'text-white' : 'text-gray-800'}`}>{activity.name}</h3>
+                                                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{activity.rate} pts/min</p>
                                                 </div>
-                                                <div className="flex flex-col gap-2 mt-3">
+                                                <div className="text-center mb-4">
+                                                    <div className={`text-5xl font-bold font-mono ${darkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
+                                                        {formatTime(elapsed)}
+                                                    </div>
+                                                    <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>≈ {Math.round(elapsed * activity.rate / 60)} pts</p>
+                                                </div>
+                                                <div className="flex flex-col gap-2 w-full">
                                                     <button
                                                         onClick={() => startTimer(parseInt(activityId))}
-                                                        className="flex items-center justify-center gap-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 md:py-2 rounded text-sm md:text-sm font-semibold transition w-full md:w-auto"
+                                                        className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded text-sm font-semibold transition"
                                                     >
-                                                        {timer.isPaused ? <Play size={16} /> : <Pause size={16} />}
+                                                        {timer.isPaused ? <Play size={18} /> : <Pause size={18} />}
                                                         {timer.isPaused ? 'Resume' : 'Pause'}
                                                     </button>
-                                                    <div className="flex gap-2">
+                                                    <div className="flex gap-2 w-full">
                                                         <button
                                                             onClick={() => resetTimer(parseInt(activityId))}
-                                                            className="flex-1 flex items-center justify-center gap-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm font-semibold transition"
+                                                            className="flex-1 flex items-center justify-center gap-1 bg-gray-500 hover:bg-gray-600 text-white px-3 py-3 rounded text-sm font-semibold transition"
                                                         >
                                                             <RotateCcw size={16} />
                                                             Reset
                                                         </button>
                                                         <button
                                                             onClick={() => stopTimer(parseInt(activityId))}
-                                                            className="flex-1 flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm font-semibold transition"
+                                                            className="flex-1 flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-3 rounded text-sm font-semibold transition"
                                                         >
                                                             Stop & Confirm
                                                         </button>
