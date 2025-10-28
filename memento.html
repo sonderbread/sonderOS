@@ -23,6 +23,18 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
+        const SUGGESTED_ACTIVITIES = [
+            { name: 'Laundry', rate: 0.5, type: 'credit' },
+            { name: 'Cleaning/Dishes', rate: 1, type: 'credit' },
+            { name: 'Grocery Shopping', rate: 1, type: 'credit' },
+            { name: 'Exercise', rate: 2, type: 'credit' },
+            { name: 'House Projects', rate: 2, type: 'credit' },
+            { name: 'Walk the Dog', rate: 1, type: 'credit' },
+            { name: 'Video Games', rate: 1, type: 'debit' },
+            { name: 'Play Music', rate: 0.5, type: 'debit' },
+            { name: 'Nap', rate: 0.5, type: 'debit' },
+        ];
+
         // Icon components (simplified SVG versions)
         const Play = ({ size = 24 }) => (
             <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
@@ -220,6 +232,7 @@
                 const saved = localStorage.getItem('memento-hideBalance');
                 return saved ? JSON.parse(saved) : false;
             });
+            const [sortBy, setSortBy] = useState('name'); // 'name', 'rate-asc', 'rate-desc'
             const audioRef = useRef(null);
 
             // Load from localStorage on mount
@@ -420,8 +433,20 @@
                 }
             };
 
-            const creditActivities = activities.filter(a => a.type === 'credit');
-            const debitActivities = activities.filter(a => a.type === 'debit');
+            const sortActivities = (actsList) => {
+                const sorted = [...actsList];
+                if (sortBy === 'name') {
+                    sorted.sort((a, b) => a.name.localeCompare(b.name));
+                } else if (sortBy === 'rate-asc') {
+                    sorted.sort((a, b) => a.rate - b.rate);
+                } else if (sortBy === 'rate-desc') {
+                    sorted.sort((a, b) => b.rate - a.rate);
+                }
+                return sorted;
+            };
+
+            const creditActivities = sortActivities(activities.filter(a => a.type === 'credit'));
+            const debitActivities = sortActivities(activities.filter(a => a.type === 'debit'));
 
             return (
                 <div className={`min-h-screen transition-colors ${darkMode ? 'bg-gradient-to-br from-gray-900 to-gray-800' : 'bg-gradient-to-br from-blue-50 to-indigo-100'} p-6`}>
@@ -713,6 +738,41 @@
                             </div>
                         )}
 
+                        {showAddForm && (
+                            <div className={`${darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white'} rounded-lg shadow-lg p-6 mb-8 transition-colors`}>
+                                <h4 className={`text-lg font-semibold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Suggested Activities</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {SUGGESTED_ACTIVITIES.map((activity, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => {
+                                                setActivities([...activities, { ...activity, id: Date.now() + Math.random() }]);
+                                                addLog('Activity Added', `${activity.name} - ${activity.rate} pts/min (${activity.type})`);
+                                                setShowAddForm(false);
+                                                setNewActivity({ name: '', rate: 1, type: 'credit' });
+                                            }}
+                                            className={`p-3 rounded-lg border-2 text-left transition ${
+                                                activity.type === 'credit'
+                                                    ? darkMode ? 'bg-green-900 border-green-700 hover:bg-green-800' : 'bg-green-50 border-green-300 hover:bg-green-100'
+                                                    : darkMode ? 'bg-red-900 border-red-700 hover:bg-red-800' : 'bg-red-50 border-red-300 hover:bg-red-100'
+                                            }`}
+                                        >
+                                            <div className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                                                {activity.name}
+                                            </div>
+                                            <div className={`text-sm ${
+                                                activity.type === 'credit'
+                                                    ? darkMode ? 'text-green-300' : 'text-green-700'
+                                                    : darkMode ? 'text-red-300' : 'text-red-700'
+                                            }`}>
+                                                {activity.type === 'credit' ? '+' : '-'}{activity.rate}/min
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         {!showAddForm && (
                             <button
                                 onClick={() => setShowAddForm(true)}
@@ -721,6 +781,22 @@
                                 <Plus size={20} />
                                 Add New Activity
                             </button>
+                        )}
+
+                        {/* Sort Controls */}
+                        {(creditActivities.length > 0 || debitActivities.length > 0) && (
+                            <div className="mb-6 flex items-center gap-3">
+                                <label className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Sort by:</label>
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className={`px-4 py-2 rounded-lg border-2 focus:outline-none focus:border-indigo-500 ${darkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-300'}`}
+                                >
+                                    <option value="name">Alphabetical (A-Z)</option>
+                                    <option value="rate-asc">Time Cost (Low to High)</option>
+                                    <option value="rate-desc">Time Cost (High to Low)</option>
+                                </select>
+                            </div>
                         )}
 
                         {/* Activities Grid - Credit Left, Debit Right */}
