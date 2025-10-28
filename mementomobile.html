@@ -699,7 +699,7 @@
                                 <h2 className={`text-xl md:text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>Active Timers</h2>
                                 <div className="space-y-4 w-full">
                                     {Object.entries(runningTimers).map(([activityId, timer]) => {
-                                        const activity = activities.find(a => a.id === parseInt(activityId));
+                                        const activity = activities.find(a => a.id === Number(activityId));
                                         const elapsed = timerDisplays[activityId] || 0;
                                         if (!activity) return null;
                                         return (
@@ -716,7 +716,7 @@
                                                 </div>
                                                 <div className="flex flex-col gap-2 w-full">
                                                     <button
-                                                        onClick={() => startTimer(parseInt(activityId))}
+                                                        onClick={() => startTimer(Number(activityId))}
                                                         className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded text-sm font-semibold transition"
                                                     >
                                                         {timer.isPaused ? <Play size={18} /> : <Pause size={18} />}
@@ -724,14 +724,14 @@
                                                     </button>
                                                     <div className="flex gap-2 w-full">
                                                         <button
-                                                            onClick={() => resetTimer(parseInt(activityId))}
+                                                            onClick={() => resetTimer(Number(activityId))}
                                                             className="flex-1 flex items-center justify-center gap-1 bg-gray-500 hover:bg-gray-600 text-white px-3 py-3 rounded text-sm font-semibold transition"
                                                         >
                                                             <RotateCcw size={16} />
                                                             Reset
                                                         </button>
                                                         <button
-                                                            onClick={() => stopTimer(parseInt(activityId))}
+                                                            onClick={() => stopTimer(Number(activityId))}
                                                             className="flex-1 flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-3 rounded text-sm font-semibold transition"
                                                         >
                                                             Stop & Confirm
