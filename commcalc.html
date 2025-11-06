@@ -307,7 +307,6 @@
 </head>
 <body>
     <div class="container">
-        <button class="dark-mode-toggle" id="darkModeToggle" title="Toggle dark mode">🌙</button>
         <h1>Commission Split Calculator</h1>
         <p class="subtitle">Calculate Brokerage Split Owed</p>
 
@@ -442,30 +441,9 @@
     </div>
 
     <script>
-        // Dark mode toggle function
-        function toggleDarkMode() {
-            const body = document.body;
-            const toggle = document.getElementById('darkModeToggle');
-
-            body.classList.toggle('dark-mode');
-
-            // Update button emoji and save preference
-            if (body.classList.contains('dark-mode')) {
-                toggle.textContent = '☀️';
-                localStorage.setItem('darkMode', 'true');
-            } else {
-                toggle.textContent = '🌙';
-                localStorage.setItem('darkMode', 'false');
-            }
-        }
-
-        // Load dark mode preference from localStorage
+        // Initialize dark mode as default
         function initDarkMode() {
-            const darkModePreference = localStorage.getItem('darkMode');
-            if (darkModePreference === 'true') {
-                document.body.classList.add('dark-mode');
-                document.getElementById('darkModeToggle').textContent = '☀️';
-            }
+            document.body.classList.add('dark-mode');
         }
 
         // Helper function to format currency
@@ -622,8 +600,6 @@
         }
 
         // Event listeners
-        document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
-
         // Auto-select text in all input fields when focused
         const inputFields = document.querySelectorAll('input[type="number"]:not([readonly]), input[type="text"]:not([readonly])');
         inputFields.forEach(field => {
