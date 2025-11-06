@@ -152,16 +152,18 @@
 
         .input-with-icon {
             position: relative;
+            display: flex;
+            align-items: center;
         }
 
         .input-with-icon::before {
             content: attr(data-currency);
             position: absolute;
             left: 12px;
-            top: 35px;
             color: var(--icon-color);
             font-weight: 600;
             transition: color 0.3s ease;
+            pointer-events: none;
         }
 
         .input-with-icon input {
