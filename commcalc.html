@@ -12,86 +12,109 @@
         }
 
         :root {
-            --bg-primary: #f5f5f5;
+            --bg-primary: #f8f9fa;
             --bg-secondary: #ffffff;
-            --text-primary: #444444;
-            --text-secondary: #666;
-            --border-color: #e0e0e0;
-            --border-light: #f0f0f0;
-            --accent-color: #0693e3;
-            --accent-light: #e8f4f8;
-            --accent-lighter: #f0f7fb;
-            --shadow-color: rgba(68, 68, 68, 0.15);
+            --text-primary: #2c3e50;
+            --text-secondary: #6c757d;
+            --border-color: #dee2e6;
+            --border-light: #f1f3f5;
+            --accent-color: #0066cc;
+            --accent-light: #e3f2fd;
+            --accent-lighter: #f0f7ff;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.1);
             --input-bg: #ffffff;
-            --input-border: #e0e0e0;
-            --button-secondary-bg: #dedede;
-            --button-secondary-hover: #c8c8c8;
+            --input-border: #ced4da;
+            --button-secondary-bg: #e9ecef;
+            --button-secondary-hover: #dae0e5;
             --result-bg: #f8f9fa;
-            --icon-color: #999;
+            --success-color: #28a745;
+            --toggle-active: #0066cc;
+            --toggle-inactive: #e9ecef;
         }
 
         body.dark-mode {
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2d2d2d;
-            --text-primary: #e0e0e0;
-            --text-secondary: #b0b0b0;
-            --border-color: #444444;
-            --border-light: #3a3a3a;
-            --accent-color: #0693e3;
-            --accent-light: #1a3a4a;
-            --accent-lighter: #0f2a3a;
-            --shadow-color: rgba(0, 0, 0, 0.3);
-            --input-bg: #3a3a3a;
-            --input-border: #555555;
-            --button-secondary-bg: #444444;
-            --button-secondary-hover: #555555;
-            --result-bg: #333333;
-            --icon-color: #888;
+            --bg-primary: #0f1419;
+            --bg-secondary: #1a1f2e;
+            --text-primary: #e1e8ed;
+            --text-secondary: #aab8c2;
+            --border-color: #2f3336;
+            --border-light: #252b3a;
+            --accent-color: #1d9bf0;
+            --accent-light: #1a3a52;
+            --accent-lighter: #162d40;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.2);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.3);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.4);
+            --shadow-xl: 0 20px 25px rgba(0,0,0,0.5);
+            --input-bg: #253341;
+            --input-border: #3a444e;
+            --button-secondary-bg: #2f3336;
+            --button-secondary-hover: #3a444e;
+            --result-bg: #253341;
+            --success-color: #00ba7c;
+            --toggle-active: #1d9bf0;
+            --toggle-inactive: #2f3336;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: var(--bg-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
             min-height: 100vh;
             padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .container {
             background: var(--bg-secondary);
-            border-radius: 10px;
-            box-shadow: 0 4px 15px var(--shadow-color);
-            max-width: 600px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-xl);
+            max-width: 700px;
             width: 100%;
-            padding: 40px;
-            border-left: 5px solid var(--accent-color);
-            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            padding: 48px;
             position: relative;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent-color), #00ba7c);
+            border-radius: 20px 20px 0 0;
         }
 
         h1 {
             color: var(--text-primary);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-align: center;
-            font-size: 28px;
+            font-size: 32px;
+            font-weight: 700;
             transition: color 0.3s ease;
         }
 
         .subtitle {
             text-align: center;
             color: var(--text-secondary);
-            margin-bottom: 30px;
-            font-size: 14px;
+            margin-bottom: 36px;
+            font-size: 16px;
+            font-weight: 400;
             transition: color 0.3s ease;
         }
 
         .form-section {
-            margin-bottom: 30px;
-            padding-bottom: 30px;
-            border-bottom: 2px solid var(--border-light);
+            margin-bottom: 32px;
+            padding-bottom: 32px;
+            border-bottom: 1px solid var(--border-light);
             transition: border-color 0.3s ease;
         }
 
@@ -100,24 +123,24 @@
         }
 
         .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--accent-color);
-            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1.2px;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             color: var(--text-primary);
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             transition: color 0.3s ease;
         }
 
@@ -126,28 +149,79 @@
             color: var(--accent-color);
         }
 
+        /* Toggle Switch Styles */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            padding: 20px;
+            background: var(--border-light);
+            border-radius: 12px;
+        }
+
+        .toggle-option {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .toggle-option.active {
+            color: var(--accent-color);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 32px;
+            background: var(--toggle-inactive);
+            border-radius: 34px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: var(--toggle-active);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(28px);
+        }
+
+        /* Input Styles */
         input[type="number"],
         input[type="text"] {
             width: 100%;
-            padding: 10px 12px;
+            padding: 14px 16px;
             border: 2px solid var(--input-border);
-            border-radius: 5px;
-            font-size: 14px;
+            border-radius: 10px;
+            font-size: 15px;
             background-color: var(--input-bg);
             color: var(--text-primary);
-            transition: border-color 0.3s, background-color 0.3s, color 0.3s;
-        }
-
-        input[type="number"]:not([readonly]),
-        input[type="text"]:not([readonly]) {
-            cursor: text;
+            transition: all 0.3s ease;
+            font-weight: 500;
         }
 
         input[type="number"]:focus,
         input[type="text"]:focus {
             outline: none;
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(6, 147, 227, 0.1);
+            box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.1);
+            transform: translateY(-1px);
         }
 
         .input-with-icon {
@@ -159,32 +233,62 @@
         .input-with-icon::before {
             content: attr(data-currency);
             position: absolute;
-            left: 12px;
-            color: var(--icon-color);
+            left: 16px;
+            color: var(--text-secondary);
             font-weight: 600;
+            font-size: 15px;
             transition: color 0.3s ease;
             pointer-events: none;
         }
 
         .input-with-icon input {
-            padding-left: 25px;
+            padding-left: 32px;
         }
 
+        /* Option Cards */
+        .option-card {
+            background: var(--border-light);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .option-card.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Results Section */
         .results-section {
-            background: var(--result-bg);
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 30px;
-            transition: background-color 0.3s ease;
+            background: linear-gradient(135deg, var(--result-bg), var(--bg-secondary));
+            border-radius: 12px;
+            padding: 28px;
+            margin-top: 32px;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
         }
 
         .result-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 12px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border-color);
-            transition: border-color 0.3s ease;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+            transition: all 0.3s ease;
         }
 
         .result-item:last-child {
@@ -195,42 +299,59 @@
         .result-label {
             color: var(--text-secondary);
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             transition: color 0.3s ease;
         }
 
         .result-value {
             color: var(--accent-color);
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 700;
-            font-family: 'Courier New', monospace;
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
         }
 
+        .result-item.highlight {
+            background: var(--accent-lighter);
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-bottom: none;
+        }
+
+        .result-item.highlight .result-value {
+            color: var(--success-color);
+            font-size: 22px;
+        }
+
+        /* Buttons */
         .button-group {
             display: flex;
-            gap: 10px;
-            margin-top: 30px;
+            gap: 12px;
+            margin-top: 32px;
         }
 
         button {
             flex: 1;
-            padding: 12px 20px;
+            padding: 14px 24px;
             border: none;
-            border-radius: 5px;
-            font-size: 14px;
+            border-radius: 10px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .btn-calculate {
-            background: var(--accent-color);
+            background: linear-gradient(135deg, var(--accent-color), #0052a3);
             color: white;
+            box-shadow: var(--shadow-md);
         }
 
         .btn-calculate:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(6, 147, 227, 0.3);
+            box-shadow: var(--shadow-lg);
         }
 
         .btn-calculate:active {
@@ -240,168 +361,275 @@
         .btn-reset {
             background: var(--button-secondary-bg);
             color: var(--text-primary);
-            transition: background-color 0.3s, color 0.3s;
+            transition: all 0.3s ease;
         }
 
         .btn-reset:hover {
             background: var(--button-secondary-hover);
+            transform: translateY(-2px);
         }
 
+        /* Dark Mode Toggle */
         .dark-mode-toggle {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 24px;
+            right: 24px;
             background: var(--accent-color);
             color: white;
             border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            border-radius: 12px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             font-size: 20px;
             transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
         }
 
         .dark-mode-toggle:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(6, 147, 227, 0.3);
+            transform: scale(1.1) rotate(20deg);
+            box-shadow: var(--shadow-lg);
         }
 
-        .info-box {
-            background: var(--accent-light);
-            border-left: 4px solid var(--accent-color);
+        /* Tier Table */
+        .tier-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 14px;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tier-table th {
+            background: var(--accent-color);
+            color: white;
             padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 15px;
+            text-align: left;
+            font-weight: 600;
             font-size: 13px;
-            color: var(--accent-color);
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .highlight {
+        .tier-table td {
+            padding: 12px;
+            color: var(--text-primary);
+            background: var(--input-bg);
+            border-bottom: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .tier-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tier-table tr:hover td {
             background: var(--accent-lighter);
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            border-left: 4px solid var(--accent-color);
-            font-size: 13px;
-            color: var(--accent-color);
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
 
+        /* Tier Breakdown */
+        .tier-breakdown-item {
+            background: var(--border-light);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--accent-color);
+            transition: all 0.3s ease;
+        }
+
+        .tier-breakdown-item:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .tier-breakdown-header {
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .tier-breakdown-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .tier-breakdown-label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tier-breakdown-value {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: linear-gradient(135deg, var(--accent-lighter), var(--accent-light));
+            border-left: 4px solid var(--accent-color);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .info-box strong {
+            color: var(--accent-color);
+            font-weight: 700;
+        }
+
+        /* Responsive Design */
         @media (max-width: 600px) {
             .container {
-                padding: 20px;
+                padding: 32px 20px;
             }
 
             h1 {
-                font-size: 24px;
+                font-size: 26px;
             }
 
             .button-group {
                 flex-direction: column;
             }
+
+            .tier-breakdown-details {
+                grid-template-columns: 1fr;
+            }
+
+            .toggle-container {
+                flex-direction: column;
+                gap: 12px;
+            }
         }
     </style>
 </head>
-<body>
+<body class="dark-mode">
     <div class="container">
-        <h1>Commission Split Calculator</h1>
-        <p class="subtitle">Calculate Brokerage Split Owed</p>
+        <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+            <span id="themeIcon">☀️</span>
+        </button>
 
-        <div class="highlight">
-            <strong>Instructions:</strong> Enter the Broker's Year-to-Date Commissions and the Current Sale Commission in the bold fields to calculate the office split owed.
+        <h1>Commission Split Calculator</h1>
+        <p class="subtitle">Professional Brokerage Split Calculation Tool</p>
+
+        <div class="info-box">
+            <strong>Quick Start:</strong> Select your commission entry method, enter the amounts, and calculate your brokerage split instantly.
         </div>
 
-        <!-- INPUTS SECTION -->
+        <!-- COMMISSION ENTRY METHOD TOGGLE -->
         <div class="form-section">
-            <div class="section-title">Inputs</div>
+            <div class="section-title">Commission Entry Method</div>
 
-            <div class="form-group">
-                <label for="ytdCommissions" class="bold">Broker Year-to-Date Commissions:</label>
-                <div class="input-with-icon" data-currency="$">
-                    <input type="number" id="ytdCommissions" value="0" placeholder="0">
+            <div class="toggle-container">
+                <span class="toggle-option active" id="option1Label">Direct Amount</span>
+                <div class="toggle-switch" id="toggleSwitch" onclick="toggleCommissionMethod()">
+                    <div class="toggle-slider"></div>
                 </div>
+                <span class="toggle-option" id="option2Label">Calculate from Sale</span>
             </div>
 
-            <div class="form-group">
-                <label style="color: var(--text-primary); font-weight: 500;">Enter Commission One of Two Ways:</label>
-            </div>
-
-            <div style="background: var(--border-light); padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+            <!-- Option 1: Direct Commission -->
+            <div class="option-card active" id="option1Card">
                 <div class="form-group">
-                    <label for="currentSaleCommission" class="bold">Option 1 - Direct Commission Amount:</label>
+                    <label for="currentSaleCommission" class="bold">Commission Amount:</label>
                     <div class="input-with-icon" data-currency="$">
-                        <input type="number" id="currentSaleCommission" value="0" placeholder="0" onchange="calculateCommission()" oninput="calculateCommission()">
+                        <input type="number" id="currentSaleCommission" value="0" placeholder="Enter commission amount" onchange="calculateCommission()" oninput="calculateCommission()">
                     </div>
                 </div>
             </div>
 
-            <div style="background: var(--border-light); padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+            <!-- Option 2: Calculate from Sale -->
+            <div class="option-card" id="option2Card">
                 <div class="form-group">
-                    <label for="salesPrice" class="bold">Option 2 - Property Sales Price:</label>
+                    <label for="salesPrice" class="bold">Property Sales Price:</label>
                     <div class="input-with-icon" data-currency="$">
-                        <input type="number" id="salesPrice" value="0" placeholder="0" onchange="calculateCommission()" oninput="calculateCommission()">
+                        <input type="number" id="salesPrice" value="0" placeholder="Enter sales price" onchange="calculateCommission()" oninput="calculateCommission()">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="commissionRate" class="bold">Commission Rate (%):</label>
-                    <input type="number" id="commissionRate" value="0" placeholder="0" step="0.1" onchange="calculateCommission()" oninput="calculateCommission()">
+                    <input type="number" id="commissionRate" value="0" placeholder="Enter commission rate" step="0.1" onchange="calculateCommission()" oninput="calculateCommission()">
                 </div>
 
                 <div class="form-group">
                     <label for="calculatedCommission">Calculated Commission:</label>
                     <div class="input-with-icon" data-currency="$">
-                        <input type="text" id="calculatedCommission" readonly>
+                        <input type="text" id="calculatedCommission" readonly style="background: var(--result-bg);">
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BROKER YTD SECTION -->
+        <div class="form-section">
+            <div class="section-title">Broker Information</div>
+
+            <div class="form-group">
+                <label for="ytdCommissions" class="bold">Broker Year-to-Date Commissions (Before this commission):</label>
+                <div class="input-with-icon" data-currency="$">
+                    <input type="number" id="ytdCommissions" value="0" placeholder="Enter YTD commissions">
                 </div>
             </div>
         </div>
 
         <!-- TIER REFERENCE SECTION -->
         <div class="form-section">
-            <div class="section-title">Tier Reference</div>
-            <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: var(--text-primary);">
-                <tr style="background: var(--border-light);">
-                    <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">YTD Threshold</th>
-                    <th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">Broker Split</th>
-                    <th style="padding: 8px; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">Office Split</th>
-                </tr>
-                <tr>
-                    <td style="padding: 8px; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">$40,000+</td>
-                    <td style="padding: 8px; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">70%</td>
-                    <td style="padding: 8px; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">30%</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">$65,000+</td>
-                    <td style="padding: 8px; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">75%</td>
-                    <td style="padding: 8px; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">25%</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">$95,000+</td>
-                    <td style="padding: 8px; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">80%</td>
-                    <td style="padding: 8px; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">20%</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">$125,000+</td>
-                    <td style="padding: 8px; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">85%</td>
-                    <td style="padding: 8px; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">15%</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">$150,000+</td>
-                    <td style="padding: 8px; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">90%</td>
-                    <td style="padding: 8px; text-align: center; border-bottom: 1px solid var(--border-color); color: var(--text-primary);">10%</td>
-                </tr>
+            <div class="section-title">Commission Tier Structure</div>
+            <table class="tier-table">
+                <thead>
+                    <tr>
+                        <th>YTD Threshold</th>
+                        <th style="text-align: center;">Broker Split</th>
+                        <th style="text-align: center;">Office Split</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>$40,000+</td>
+                        <td style="text-align: center;">70%</td>
+                        <td style="text-align: center;">30%</td>
+                    </tr>
+                    <tr>
+                        <td>$65,000+</td>
+                        <td style="text-align: center;">75%</td>
+                        <td style="text-align: center;">25%</td>
+                    </tr>
+                    <tr>
+                        <td>$95,000+</td>
+                        <td style="text-align: center;">80%</td>
+                        <td style="text-align: center;">20%</td>
+                    </tr>
+                    <tr>
+                        <td>$125,000+</td>
+                        <td style="text-align: center;">85%</td>
+                        <td style="text-align: center;">15%</td>
+                    </tr>
+                    <tr>
+                        <td>$150,000+</td>
+                        <td style="text-align: center;">90%</td>
+                        <td style="text-align: center;">10%</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
 
         <!-- RESULTS SECTION -->
         <div class="results-section">
-            <div class="section-title">Results</div>
+            <div class="section-title">Calculation Results</div>
 
             <div class="result-item">
                 <span class="result-label">Broker's Final Tier After Sale:</span>
@@ -409,43 +637,83 @@
             </div>
 
             <div class="result-item">
-                <span class="result-label">Weighted Average Broker Split %:</span>
+                <span class="result-label">Weighted Average Broker Split:</span>
                 <span class="result-value" id="agentSplitPercent">-</span>
             </div>
 
             <div class="result-item">
-                <span class="result-label">Broker Commission on Current Sale:</span>
+                <span class="result-label">Total Commission Amount:</span>
                 <span class="result-value" id="agentCommission">$0.00</span>
             </div>
 
-            <div class="result-item" style="border-top: 2px solid #667eea; padding-top: 12px; margin-top: 12px;">
-                <span class="result-label" style="font-weight: 700; font-size: 15px;">Broker Commission Pay:</span>
-                <span class="result-value" style="font-size: 18px; color: #28a745;" id="brokerCommissionOwed">$0.00</span>
+            <div class="result-item highlight">
+                <span class="result-label" style="font-weight: 700; font-size: 16px;">Broker Commission Pay:</span>
+                <span class="result-value" id="brokerCommissionOwed">$0.00</span>
             </div>
 
-            <div class="result-item">
-                <span class="result-label" style="font-weight: 700; font-size: 15px;">Brokerage Split:</span>
-                <span class="result-value" style="font-size: 18px; color: #28a745;" id="brokerageSplitOwed">$0.00</span>
+            <div class="result-item highlight">
+                <span class="result-label" style="font-weight: 700; font-size: 16px;">Brokerage Split:</span>
+                <span class="result-value" id="brokerageSplitOwed">$0.00</span>
             </div>
 
-            <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--border-color);">
-                <div class="section-title" style="margin-bottom: 12px;">Commission Breakdown by Tier</div>
-                <div id="tierBreakdown" style="font-size: 13px; line-height: 1.8;">
+            <div style="margin-top: 28px; padding-top: 28px; border-top: 2px solid var(--border-light);">
+                <div class="section-title" style="margin-bottom: 16px;">Commission Breakdown by Tier</div>
+                <div id="tierBreakdown">
                     <!-- Tier breakdown will be inserted here -->
                 </div>
             </div>
         </div>
 
         <div class="button-group">
-            <button class="btn-calculate" onclick="calculateCommission()">Calculate Commission</button>
-            <button class="btn-reset" onclick="resetForm()">Reset</button>
+            <button class="btn-calculate" onclick="calculateCommission()">Calculate Split</button>
+            <button class="btn-reset" onclick="resetForm()">Reset Form</button>
         </div>
     </div>
 
     <script>
-        // Initialize dark mode as default
-        function initDarkMode() {
-            document.body.classList.add('dark-mode');
+        // Initialize dark mode state (dark mode enabled by default)
+        let isDarkMode = true;
+
+        // Toggle dark mode
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode');
+            document.getElementById('themeIcon').textContent = isDarkMode ? '☀️' : '🌙';
+        }
+
+        // Toggle commission entry method
+        function toggleCommissionMethod() {
+            const toggleSwitch = document.getElementById('toggleSwitch');
+            const option1Card = document.getElementById('option1Card');
+            const option2Card = document.getElementById('option2Card');
+            const option1Label = document.getElementById('option1Label');
+            const option2Label = document.getElementById('option2Label');
+
+            toggleSwitch.classList.toggle('active');
+
+            if (toggleSwitch.classList.contains('active')) {
+                // Option 2 is selected
+                option1Card.classList.remove('active');
+                option2Card.classList.add('active');
+                option1Label.classList.remove('active');
+                option2Label.classList.add('active');
+
+                // Clear Option 1 values
+                document.getElementById('currentSaleCommission').value = '0';
+            } else {
+                // Option 1 is selected
+                option1Card.classList.add('active');
+                option2Card.classList.remove('active');
+                option1Label.classList.add('active');
+                option2Label.classList.remove('active');
+
+                // Clear Option 2 values
+                document.getElementById('salesPrice').value = '0';
+                document.getElementById('commissionRate').value = '0';
+                document.getElementById('calculatedCommission').value = '';
+            }
+
+            calculateCommission();
         }
 
         // Helper function to format currency
@@ -469,16 +737,23 @@
             const ytdCommissions = parseCurrency(document.getElementById('ytdCommissions').value);
 
             // Determine which commission input method is being used
-            let currentSaleCommission = parseCurrency(document.getElementById('currentSaleCommission').value);
-            const salesPrice = parseCurrency(document.getElementById('salesPrice').value);
-            const commissionRate = parseCurrency(document.getElementById('commissionRate').value);
+            let currentSaleCommission = 0;
+            const toggleSwitch = document.getElementById('toggleSwitch');
 
-            // If Option 2 (sales price + rate) is being used, calculate the commission
-            if (salesPrice > 0 || commissionRate > 0) {
-                currentSaleCommission = (salesPrice * commissionRate) / 100;
-                document.getElementById('calculatedCommission').value = formatCurrency(currentSaleCommission);
+            if (!toggleSwitch.classList.contains('active')) {
+                // Option 1: Direct commission
+                currentSaleCommission = parseCurrency(document.getElementById('currentSaleCommission').value);
             } else {
-                document.getElementById('calculatedCommission').value = '';
+                // Option 2: Calculate from sale
+                const salesPrice = parseCurrency(document.getElementById('salesPrice').value);
+                const commissionRate = parseCurrency(document.getElementById('commissionRate').value);
+
+                if (salesPrice > 0 && commissionRate > 0) {
+                    currentSaleCommission = (salesPrice * commissionRate) / 100;
+                    document.getElementById('calculatedCommission').value = formatCurrency(currentSaleCommission);
+                } else {
+                    document.getElementById('calculatedCommission').value = '';
+                }
             }
 
             // Define tier thresholds and splits
@@ -561,16 +836,19 @@
             let breakdownHTML = '';
             tierBreakdownData.forEach((data, index) => {
                 breakdownHTML += `
-                    <div style="background: var(--border-light); padding: 10px; border-radius: 4px; margin-bottom: 8px; color: var(--text-primary);">
-                        <div style="font-weight: 600; color: var(--accent-color); margin-bottom: 6px;">${data.tier}</div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div class="tier-breakdown-item">
+                        <div class="tier-breakdown-header">${data.tier} Tier</div>
+                        <div class="tier-breakdown-details">
                             <div>
-                                <div style="color: var(--text-secondary); font-size: 12px;">Commission Amount:</div>
-                                <div style="color: var(--text-primary);">${formatCurrency(data.commission)}</div>
+                                <div class="tier-breakdown-label">Commission Amount</div>
+                                <div class="tier-breakdown-value">${formatCurrency(data.commission)}</div>
                             </div>
                             <div>
-                                <div style="color: var(--text-secondary); font-size: 12px;">Broker Split ${data.brokerSplit}% / Office ${data.officeSplit}%:</div>
-                                <div style="color: var(--text-primary);">Broker: ${formatCurrency(data.brokerAmount)} / Office: ${formatCurrency(data.officeAmount)}</div>
+                                <div class="tier-breakdown-label">Split (${data.brokerSplit}% / ${data.officeSplit}%)</div>
+                                <div class="tier-breakdown-value">
+                                    <span style="color: var(--success-color);">${formatCurrency(data.brokerAmount)}</span> /
+                                    <span style="color: var(--accent-color);">${formatCurrency(data.officeAmount)}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -580,10 +858,10 @@
             // Update display
             document.getElementById('currentTier').textContent = finalTier;
             document.getElementById('agentSplitPercent').textContent = (totalBrokerCommission > 0 ? (totalBrokerCommission / currentSaleCommission * 100).toFixed(1) : 0) + '%';
-            document.getElementById('agentCommission').textContent = formatCurrency(totalBrokerCommission);
+            document.getElementById('agentCommission').textContent = formatCurrency(currentSaleCommission);
             document.getElementById('brokerCommissionOwed').textContent = formatCurrency(totalBrokerCommission);
             document.getElementById('brokerageSplitOwed').textContent = formatCurrency(totalOfficeCommission);
-            document.getElementById('tierBreakdown').innerHTML = breakdownHTML;
+            document.getElementById('tierBreakdown').innerHTML = breakdownHTML || '<p style="color: var(--text-secondary); text-align: center;">No commission breakdown available</p>';
         }
 
         // Reset form function
@@ -598,7 +876,13 @@
             document.getElementById('agentCommission').textContent = '$0.00';
             document.getElementById('brokerCommissionOwed').textContent = '$0.00';
             document.getElementById('brokerageSplitOwed').textContent = '$0.00';
-            document.getElementById('tierBreakdown').innerHTML = '';
+            document.getElementById('tierBreakdown').innerHTML = '<p style="color: var(--text-secondary); text-align: center;">No commission breakdown available</p>';
+
+            // Reset to Option 1
+            const toggleSwitch = document.getElementById('toggleSwitch');
+            if (toggleSwitch.classList.contains('active')) {
+                toggleCommissionMethod();
+            }
         }
 
         // Event listeners
@@ -619,7 +903,6 @@
 
         // Initial setup on page load
         window.addEventListener('load', function() {
-            initDarkMode();
             calculateCommission();
         });
     </script>
