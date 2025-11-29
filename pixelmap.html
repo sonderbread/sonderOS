@@ -212,6 +212,22 @@
             text-transform: uppercase;
         }
 
+        #fileName {
+            font-family: 'VT323', monospace;
+            font-size: 18px;
+            padding: 8px 12px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 2px;
+            width: 140px;
+        }
+
+        #fileName:focus {
+            outline: none;
+            border-color: var(--accent-green);
+        }
+
         .current-color-display {
             height: 30px;
             border: 2px solid var(--border-color);
@@ -444,6 +460,25 @@
             display: none;
         }
 
+        .ref-crosshair {
+            position: absolute;
+            pointer-events: none;
+            display: none;
+            background: rgba(255, 100, 100, 0.7);
+        }
+
+        .ref-crosshair.horizontal {
+            left: 0;
+            right: 0;
+            height: 1px;
+        }
+
+        .ref-crosshair.vertical {
+            top: 0;
+            bottom: 0;
+            width: 1px;
+        }
+
         .ref-buttons {
             display: flex;
             gap: 8px;
@@ -453,6 +488,52 @@
             flex: 1;
             font-size: 14px;
             padding: 6px 8px;
+        }
+
+        .shift-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .shift-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .shift-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 4px;
+        }
+
+        .shift-grid button {
+            padding: 8px;
+            font-size: 16px;
+        }
+
+        .shift-grid button:nth-child(1) {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        .shift-grid button:nth-child(2) {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        .shift-grid button:nth-child(3) {
+            grid-column: 3;
+            grid-row: 2;
+        }
+
+        .shift-grid button:nth-child(4) {
+            grid-column: 2;
+            grid-row: 2;
         }
 
         .ref-info {
@@ -493,6 +574,7 @@
                         <option value="128">128 × 128</option>
                     </select>
                 </div>
+                <input type="text" id="fileName" placeholder="texture_name" value="texture">
                 <button onclick="newTexture()">New</button>
                 <button onclick="document.getElementById('importInput').click()">Import</button>
                 <button onclick="document.getElementById('refInput').click()">Reference</button>
@@ -512,6 +594,8 @@
                     <div class="ref-canvas-container">
                         <canvas id="refCanvas"></canvas>
                         <div id="refSelection"></div>
+                        <div id="refCrosshairH" class="ref-crosshair horizontal"></div>
+                        <div id="refCrosshairV" class="ref-crosshair vertical"></div>
                     </div>
                 </div>
                 <div class="ref-info" id="refInfo">Click to pick color</div>
@@ -589,6 +673,15 @@
                 </div>
 
                 <div class="action-buttons">
+                    <div class="shift-controls">
+                        <div class="shift-label">Shift Canvas</div>
+                        <div class="shift-grid">
+                            <button onclick="shiftCanvas(0, -1)">↑</button>
+                            <button onclick="shiftCanvas(-1, 0)">←</button>
+                            <button onclick="shiftCanvas(1, 0)">→</button>
+                            <button onclick="shiftCanvas(0, 1)">↓</button>
+                        </div>
+                    </div>
                     <button onclick="undo()">↩ Undo</button>
                     <button onclick="redo()">↪ Redo</button>
                     <button onclick="clearCanvas()">🗑 Clear</button>
@@ -947,6 +1040,37 @@
             saveState();
         }
 
+        function shiftCanvas(dx, dy) {
+            // Get current image data
+            const imageData = pixelCtx.getImageData(0, 0, textureSize, textureSize);
+            const data = imageData.data;
+            
+            // Create new image data
+            const newImageData = pixelCtx.createImageData(textureSize, textureSize);
+            const newData = newImageData.data;
+            
+            for (let y = 0; y < textureSize; y++) {
+                for (let x = 0; x < textureSize; x++) {
+                    // Source position with wrapping
+                    const sx = (x - dx + textureSize) % textureSize;
+                    const sy = (y - dy + textureSize) % textureSize;
+                    
+                    const srcIdx = (sy * textureSize + sx) * 4;
+                    const dstIdx = (y * textureSize + x) * 4;
+                    
+                    newData[dstIdx] = data[srcIdx];
+                    newData[dstIdx + 1] = data[srcIdx + 1];
+                    newData[dstIdx + 2] = data[srcIdx + 2];
+                    newData[dstIdx + 3] = data[srcIdx + 3];
+                }
+            }
+            
+            pixelCtx.putImageData(newImageData, 0, 0);
+            redraw();
+            updatePreviews();
+            saveState();
+        }
+
         function importTexture(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -980,8 +1104,10 @@
         }
 
         function exportTexture() {
+            const fileName = document.getElementById('fileName').value.trim() || 'texture';
+            const safeName = fileName.replace(/[^a-zA-Z0-9_-]/g, '_');
             const link = document.createElement('a');
-            link.download = `texture_${textureSize}x${textureSize}.png`;
+            link.download = `${safeName}.png`;
             link.href = pixelCanvas.toDataURL('image/png');
             link.click();
         }
@@ -1089,6 +1215,20 @@
         let selectionEnd = null;
         let currentSelection = null;
         const refSelection = document.getElementById('refSelection');
+        const refCrosshairH = document.getElementById('refCrosshairH');
+        const refCrosshairV = document.getElementById('refCrosshairV');
+
+        function showCrosshairs(x, y) {
+            refCrosshairH.style.display = 'block';
+            refCrosshairV.style.display = 'block';
+            refCrosshairH.style.top = (y * refZoom) + 'px';
+            refCrosshairV.style.left = (x * refZoom) + 'px';
+        }
+
+        function hideCrosshairs() {
+            refCrosshairH.style.display = 'none';
+            refCrosshairV.style.display = 'none';
+        }
 
         function importReference(e) {
             const file = e.target.files[0];
@@ -1204,7 +1344,13 @@
             
             const pos = getRefPixelPos(e);
             
+            // Show crosshairs when not selecting
+            if (!isSelecting) {
+                showCrosshairs(pos.x, pos.y);
+            }
+            
             if (isSelecting) {
+                hideCrosshairs();
                 selectionEnd = pos;
                 const dx = selectionEnd.x - selectionStart.x;
                 const dy = selectionEnd.y - selectionStart.y;
@@ -1243,6 +1389,7 @@
 
         refCanvas.addEventListener('mouseleave', () => {
             isSelecting = false;
+            hideCrosshairs();
         });
 
         function sampleSelection() {
